@@ -65,14 +65,17 @@ Labs' refusal.
 
 Press →.
 
-**Step 4 · What it left out, and why (30 s)**
+**Step 4 · What it left out, and why (40 s)**
 
 > A producer's first question is what it skipped. Here are the 93 candidates it weighed and dropped, each
 > with a reason you can argue with. If it missed a gem, it is one click away.
 
+> And because it can say why footage will never be used, that is a storage call too: about 23 minutes of
+> this match nothing pointed at, so its master can go to cold storage.
+
 Press →.
 
-**Step 5 · Edits for each audience (50 s)**
+**Step 5 · Edits for each audience (40 s)**
 
 > From the 76 moments it planned 18 clips. The biggest moments get several edits each: the goal, the
 > reaction, the player, the build-up, in 9:16 and 1:1, cut for match fans, season ticket holders, a sponsor

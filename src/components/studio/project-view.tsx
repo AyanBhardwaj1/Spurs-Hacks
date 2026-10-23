@@ -22,6 +22,7 @@ import { Published, pairKey } from "./published";
 import { RecapPlayer } from "./recap-player";
 import { reelKey, withReelEdit } from "./reel-studio";
 import { RunRail } from "./run-rail";
+import { StorageVerdict } from "./storage-verdict";
 import { useReducedMotion } from "./use-reduced-motion";
 
 /** "a, b and c" */
@@ -283,6 +284,7 @@ export function ProjectView({ analysis, recordedAt, extras }: Props) {
 
           <div id="dropped" data-section="dropped" className="band mt-12 scroll-mt-24 pt-10">
             <Dropped rejected={rejected} momentsById={momentsById} onOpenMoment={setSelectedId} onSeek={seek} />
+            <StorageVerdict analysis={analysis} onSeek={seek} />
           </div>
 
           <div id="clips" data-section="clips" className="band mt-12 scroll-mt-24 pt-10">
