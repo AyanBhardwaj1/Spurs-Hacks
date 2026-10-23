@@ -40,6 +40,21 @@ for (const failure of ["allowance", "network", "timeout"]) {
   });
 }
 
+test("answers an unrecorded query from the run's own moments when the allowance is used up", async () => {
+  process.env.TWELVELABS_API_KEY = "test-key";
+  process.env.TWELVELABS_INDEX_ID = "test-index";
+  spyOn(globalThis, "fetch").mockImplementation(Object.assign(async () =>
+    Response.json({ message: "The Workload allowance is exhausted and overage is disabled" }, { status: 422 }),
+  { preconnect: fetch.preconnect }));
+  const response = await GET(new Request("http://localhost/api/studio/search?q=goal"));
+  expect(response.status).toBe(200);
+  const body = await response.json();
+  expect(body.source).toBe("moments");
+  expect(body.reason).toBe("allowance");
+  // m-5822-goal, Solanke's equaliser, outranks Mbeumo's goal on scores.total.
+  expect(body.hits[0].start).toBeCloseTo(5797.3, 2);
+});
+
 test("labels successful Twelve Labs searches as live", async () => {
   process.env.TWELVELABS_API_KEY = "test-key";
   process.env.TWELVELABS_INDEX_ID = "test-index";

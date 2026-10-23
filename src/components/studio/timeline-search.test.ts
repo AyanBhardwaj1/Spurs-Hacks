@@ -17,6 +17,14 @@ test("recorded search banners identify the actual fallback reason", () => {
   }
 });
 
+test("results from the run's own moments are labelled as such, not as Twelve Labs finds", () => {
+  const found: Found = { query: "goal", source: "moments", reason: "allowance", hits: [{ start: 5797.3, end: 5830, rank: 1 }] };
+  const html = renderToStaticMarkup(createElement(TimelineSearch, { found, onFound: () => {}, onSeek: () => {}, frameSource: "https://cdn.scoreplay.io/match.mp4" }));
+  expect(html).toContain("Live Twelve Labs search allowance used up; these are moments from this run");
+  expect(html).toContain("among the run’s moments");
+  expect(html).not.toContain("Twelve Labs found");
+});
+
 test("recorded hits without thumbnails show the match's frame at each start, requesting one frame at a time", () => {
   const found: Found = {
     query: "header",

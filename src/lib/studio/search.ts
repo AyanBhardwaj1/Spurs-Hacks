@@ -14,6 +14,7 @@ export type SearchHit = { start: number; end: number; rank: number; thumbnailUrl
 export type SearchResult = { hits: SearchHit[] } & (
   | { source: "live" }
   | { source: "recorded"; matchedQuery: string; reason: "allowance" | "timeout" | "network" }
+  | { source: "moments"; reason: "allowance" | "timeout" | "network" }
 );
 
 export class SearchBusy extends Error {

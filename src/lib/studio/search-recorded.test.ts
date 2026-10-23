@@ -24,3 +24,8 @@ test("requires every request token and rejects opposing near misses", () => {
   expect(matchRecordedSearch("striker heads cross into far corner United")).toBeNull();
   expect(matchRecordedSearch("purple spaceship juggling bananas")).toBeNull();
 });
+
+test("keeps on target and off target apart, though on is a stop word", () => {
+  expect(matchRecordedSearch("shot on target")).toBeNull();
+  expect(matchRecordedSearch("shot off target")?.query).toContain("off target");
+});

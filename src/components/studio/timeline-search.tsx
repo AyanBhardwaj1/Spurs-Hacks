@@ -117,12 +117,17 @@ export function TimelineSearch({ found, onFound, onSeek, frameSource }: Props) {
               Recorded Twelve Labs results for &ldquo;{found.matchedQuery}&rdquo; ({found.reason === "allowance" ? "live search allowance used up" : found.reason === "timeout" ? "live search timed out" : "live search connection failed"})
             </p>
           )}
+          {found.source === "moments" && (
+            <p className="mb-1 text-caption text-secondary">
+              Live Twelve Labs search {found.reason === "allowance" ? "allowance used up" : found.reason === "timeout" ? "timed out" : "connection failed"}; these are moments from this run whose title, commentary or Pegasus description mention it.
+            </p>
+          )}
           <p className="text-caption text-secondary">
             {found.hits.length === 0 ? (
               <>Twelve Labs found nothing for &ldquo;{found.query}&rdquo;.</>
             ) : (
               <>
-                {found.hits.length} {found.hits.length === 1 ? "place" : "places"} {found.source === "recorded" ? "in the recorded search" : "Twelve Labs found"} for &ldquo;
+                {found.hits.length} {found.hits.length === 1 ? "place" : "places"} {found.source === "recorded" ? "in the recorded search" : found.source === "moments" ? "among the run’s moments" : "Twelve Labs found"} for &ldquo;
                 <span className="text-label">{found.query}</span>&rdquo;, best first. White pins mark them on the timeline.
               </>
             )}

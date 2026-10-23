@@ -11,11 +11,19 @@ const SYNONYMS: Record<string, string> = {
 };
 const OPPOSITES = [
   ["near", "far"], ["left", "right"], ["home", "away"], ["yellow", "red"],
-  ["miss", "score"], ["save", "score"], ["united", "spurs"],
+  ["miss", "score"], ["save", "score"], ["united", "spurs"], ["ontarget", "offtarget"],
 ] as const;
 
-function tokens(query: string): Set<string> {
-  const words = query.toLowerCase().replace(/\b(?:sent|send|sends|sending)\s+off\b/g, "red card").match(/[a-z0-9]+/g) ?? [];
+// Accents are dropped so "Martínez" stays one word, and "on target" and "off target" become single
+// opposing words, because "on" is a stop word and would otherwise vanish.
+export function tokens(query: string): Set<string> {
+  const words = query
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\b(?:sent|send|sends|sending)\s+off\b/g, "red card")
+    .replace(/\b(on|off)\s+target\b/g, "$1target")
+    .match(/[a-z0-9]+/g) ?? [];
   return new Set(words.filter((word) => !STOP_WORDS.has(word)).map((word) =>
     SYNONYMS[word] ?? (word.endsWith("s") && !word.endsWith("ss") ? word.slice(0, -1) : word),
   ));

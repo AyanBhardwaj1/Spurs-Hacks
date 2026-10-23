@@ -1,5 +1,7 @@
 import { TwelveLabsError, twelvelabsConfigured } from "@/lib/twelvelabs";
 import { SearchBusy, searchMatch, type SearchResult } from "@/lib/studio/search";
+import { loadStudioAnalysis } from "@/lib/studio/load";
+import { matchMoments } from "@/lib/studio/search-moments";
 import { matchRecordedSearch } from "@/lib/studio/search-recorded";
 import { ServiceTimeout } from "@/lib/studio/slow";
 
@@ -16,7 +18,8 @@ function recordedFallbackReason(err: unknown): RecordedReason | null {
   return null;
 }
 
-// Recorded pipeline hits keep known match searches available when Twelve Labs fails.
+// When Twelve Labs fails, recorded pipeline hits answer known match searches, and the run's own moments
+// answer the rest.
 export async function GET(request: Request) {
   if (!twelvelabsConfigured()) return Response.json({ error: "No Twelve Labs key on the server." }, { status: 503 });
   const q = new URL(request.url).searchParams.get("q")?.trim() ?? "";
@@ -28,6 +31,9 @@ export async function GET(request: Request) {
     if (reason && !request.signal.aborted) {
       const recorded = matchRecordedSearch(q);
       if (recorded) return Response.json({ source: "recorded", reason, matchedQuery: recorded.query, hits: recorded.hits.slice(0, 10) });
+      const analysis = loadStudioAnalysis();
+      const own = matchMoments(q, analysis.moments, analysis.source.players);
+      if (own.length > 0) return Response.json({ source: "moments", reason, hits: own });
     }
     if (err instanceof SearchBusy) return Response.json({ error: err.message }, { status: 503 });
     if (err instanceof ServiceTimeout) return Response.json({ slow: true });

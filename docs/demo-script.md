@@ -58,10 +58,10 @@ The monitor is playing the top moment, Solanke's equaliser in stoppage time. The
 Click the first result, at 1:36:59; it plays the equaliser.
 
 Our Twelve Labs allowance ran out on the morning of the demo, so search answers from results recorded
-before it ran out, and the page says so. Press a suggestion rather than typing. A typed query gets results
-only when a recorded query contains all of its words (it ignores small words like "the" and treats "header"
-and "heads" as the same word), and it needs at least two such words. Otherwise the page shows Twelve
-Labs' refusal.
+before it ran out, and the page says so. A typed query gets recorded Twelve Labs results when a recorded
+query covers all of its words. Otherwise it gets the run's own moments whose title, commentary or Pegasus
+description mention those words, and the page labels them as that. The suggestions are still the safe
+path, so press one of them on stage.
 
 Press →.
 
