@@ -126,3 +126,10 @@ the recorded run. Video and search need the network, so talk over the page as it
 > clips cut for four audiences, 16 of them rendered and uploaded back to ScorePlay for a producer to
 > approve. On this match, 9 of its top 10 moments overlap clips Tottenham's team made by hand; random picks
 > average 1.7.
+
+## If a judge asks how a producer overrules it
+
+Press **Make a clip anyway** on a row under "Ranked below the cut". The rescue lands as a timecoded log
+tagged `rundown-rescued` on the match in ScorePlay, for the edit team to cut. Press it at most once per
+candidate: ScorePlay returns no log IDs (`docs/engine.md`), so the studio cannot remove a log once it is
+written.

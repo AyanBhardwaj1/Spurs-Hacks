@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { PlayIcon } from "@/components/landing/icons";
+import { scoreplayMediaUrl } from "@/lib/studio/links";
 import { timecode } from "@/lib/studio/time";
 import type { Moment, Rejected } from "@/lib/studio/types";
 import { KIND_LABEL, SectionTitle } from "./bits";
@@ -89,6 +90,11 @@ function Group({
   );
 }
 
+type Rescue =
+  | { state: "idle" | "saving" }
+  | { state: "written" | "already"; mediaId: number; start: number; end: number }
+  | { state: "error"; message: string };
+
 function Row({
   item,
   moment,
@@ -100,8 +106,28 @@ function Row({
   onOpenMoment: (id: string) => void;
   onSeek: (t: number, play: boolean) => void;
 }) {
-  const [asked, setAsked] = useState(false);
+  const [rescue, setRescue] = useState<Rescue>({ state: "idle" });
   const start = moment ? moment.start : Math.max(0, item.at - 3);
+
+  // The rescue is a timecoded log on the match in ScorePlay; the server allows only this run's candidates.
+  async function logRescue() {
+    setRescue({ state: "saving" });
+    try {
+      const res = await fetch("/api/studio/rescue", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ at: item.at, title: item.title }),
+        signal: AbortSignal.timeout(20_000),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error ?? `The server answered ${res.status}.`);
+      setRescue({ state: body.status === "already" ? "already" : "written", mediaId: body.mediaId, start: body.start, end: body.end });
+    } catch (err) {
+      const timedOut = err instanceof Error && err.name === "TimeoutError";
+      setRescue({ state: "error", message: timedOut ? "ScorePlay did not answer in time. The rescue may still land; press again to check." : (err as Error).message });
+    }
+  }
+
   return (
     <li className="rounded-xl px-2 py-2 hover:bg-fill/60">
       <div className="flex items-baseline gap-2">
@@ -125,19 +151,34 @@ function Row({
       <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
         <button
           type="button"
+          disabled={rescue.state === "saving"}
           onClick={() => {
-            setAsked(true);
             if (moment) onOpenMoment(moment.id);
             onSeek(start, true);
+            void logRescue();
           }}
-          className="press rounded-md text-caption font-semibold text-tint hover:underline"
+          className="press rounded-md text-caption font-semibold text-tint hover:underline disabled:opacity-50"
         >
           Make a clip anyway
         </button>
-        {asked && (
+        {rescue.state === "saving" && (
           <span role="status" className="text-caption text-secondary">
-            {moment ? "Opened as a moment in the monitor." : "Playing in the monitor."} Planning a new clip from here isn&rsquo;t wired up
-            yet; the pipeline plans clips.
+            Logging it on the match in ScorePlay&hellip;
+          </span>
+        )}
+        {(rescue.state === "written" || rescue.state === "already") && (
+          <span role="status" className="text-caption text-secondary">
+            {rescue.state === "written"
+              ? `Logged on the match in ScorePlay at ${timecode(rescue.start)}–${timecode(rescue.end)}, tagged rundown-rescued, for the edit team to cut.`
+              : "Already logged in ScorePlay as a rescue."}{" "}
+            <a href={scoreplayMediaUrl(rescue.mediaId)} target="_blank" rel="noreferrer" className="press rounded-md font-semibold text-tint hover:underline">
+              Open the match in ScorePlay <span aria-hidden>↗</span>
+            </a>
+          </span>
+        )}
+        {rescue.state === "error" && (
+          <span role="alert" className="text-caption text-tally">
+            {rescue.message}
           </span>
         )}
       </div>
