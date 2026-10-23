@@ -14,7 +14,7 @@ import { audienceFor, planAudiences } from "./audiences";
 import { describeMoments } from "./descriptions";
 import { rankedRejections, visualRejections } from "./rejected";
 import { tagsFor } from "./taxonomy";
-import { applyWriteback, writeback } from "./writeback";
+import { applyWriteback, writeback, writebackDetail } from "./writeback";
 import { cached, cacheMisses, cachePath, readCache, writeCache } from "./cache";
 import { planClips } from "./clips";
 import { mapLimit, modelConfig } from "./claude";
@@ -279,10 +279,7 @@ assertAnalysis(analysis);
 if (REAL) {
   const receipt = await stage("writeback", "Write proposals onto the ScorePlay source", async () => {
     const result = await writeback(moments);
-    const detail = result.kind === "rehearsal"
-      ? `Rehearsal: ${result.tags.join(", ")} proposed; no writes confirmed`
-      : `Read back ${result.confirmed.videoLogs} video logs on media ${SOURCE_ID}; ${result.confirmed.tags.join(", ")} attached to the source`;
-    return { result, detail };
+    return { result, detail: writebackDetail(result, SOURCE_ID) };
   });
   applyWriteback(analysis, receipt);
 }

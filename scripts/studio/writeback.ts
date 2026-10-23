@@ -19,6 +19,14 @@ export function applyWriteback(analysis: Pick<MatchAnalysis, "source" | "writeba
 }
 
 // The marker survives a lost HTTP response, so a rerun can recover a successful write from ScorePlay.
+// The run card's text. A rehearsal rerun writes nothing, but it still carries the receipt from the write that did land,
+// so the card reports that instead of saying nothing was confirmed.
+export function writebackDetail(result: WritebackResult, mediaId: number): string {
+  if (result.kind === "confirmed") return `Read back ${result.confirmed.videoLogs} video logs on media ${mediaId}; ${result.confirmed.tags.join(", ")} attached to the source`;
+  if (result.confirmed) return `${result.confirmed.videoLogs} video logs on media ${mediaId}, confirmed by an earlier write; this rerun wrote nothing new`;
+  return `Rehearsal: ${result.tags.join(", ")} proposed; no writes confirmed`;
+}
+
 export function writebackKey(mediaId: number, moment: Pick<Moment, "id" | "start" | "end">): string {
   return `rundown:${mediaId}:${hashOf(moment.id, String(moment.start), String(moment.end))}`;
 }

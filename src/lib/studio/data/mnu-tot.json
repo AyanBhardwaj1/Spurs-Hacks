@@ -223,7 +223,7 @@
     {
       "id": "writeback",
       "label": "Write proposals onto the ScorePlay source",
-      "detail": "Rehearsal: Chance, Disallowed goal, Goal, Red card, Rundown, Save, Skill, Tackle proposed; no writes confirmed",
+      "detail": "30 video logs on media 130852725, confirmed by an earlier write; this rerun wrote nothing new",
       "durationMs": 1
     }
   ],

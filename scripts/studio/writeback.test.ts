@@ -3,7 +3,7 @@ import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSy
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import type { MatchAnalysis, Moment } from "../../src/lib/studio/types";
-import { applyWriteback, rehearsalWriteback, pendingLogs, writebackKey } from "./writeback";
+import { applyWriteback, rehearsalWriteback, pendingLogs, writebackDetail, writebackKey } from "./writeback";
 
 const moment: Moment = { id: "m-goal", kind: "goal", title: "Equaliser", summary: "Header", start: 10, peak: 15, end: 20, players: [], team: "spurs", evidence: [], focus: [], scores: { importance: 1, emotion: 1, crowd: 1, social: 0, total: 0.9 } };
 
@@ -70,4 +70,13 @@ test("fails if read-back moments are missing from the persisted receipt or a reh
     expect(readFileSync(join(cacheDir, "writeback.json"), "utf8")).toBe(receipt);
     expect(requests.every((request) => request.startsWith("GET "))).toBe(true);
   } finally { server.stop(true); rmSync(root, { recursive: true, force: true }); }
+});
+
+test("fails if a rehearsal rerun hides a writeback that ScorePlay already confirmed", () => {
+  const confirmed = { videoLogs: 30, tags: ["Goal", "Rundown"], at: "2026-10-23T09:01:41.646Z", momentIds: ["m-goal"] };
+  expect(writebackDetail({ kind: "confirmed", confirmed }, 7)).toBe("Read back 30 video logs on media 7; Goal, Rundown attached to the source");
+  expect(writebackDetail(rehearsalWriteback([{ ...moment, tags: ["Goal"] }], 30, confirmed), 7)).toBe(
+    "30 video logs on media 7, confirmed by an earlier write; this rerun wrote nothing new",
+  );
+  expect(writebackDetail(rehearsalWriteback([{ ...moment, tags: ["Goal"] }], 0), 7)).toBe("Rehearsal: Goal proposed; no writes confirmed");
 });
