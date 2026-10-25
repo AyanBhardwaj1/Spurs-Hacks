@@ -1,0 +1,6 @@
+# Never upload local keys, pipeline caches or rendered clips to Vercel.
+.env*
+.media/
+scripts/studio/out/
+.next/
+node_modules/

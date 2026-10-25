@@ -1,0 +1,46 @@
+name: PR title
+
+# Not a required check. A red result means the squash commit on main would break
+# the Conventional Commits format in AGENTS.md. Retitle the PR to clear it.
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: pr-title-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  title:
+    name: Conventional Commits title
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            const pattern = /^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9./-]+\))?!?: \S.*[^.]$/;
+            const maxLength = 72;
+            const pr = context.payload.pull_request;
+            const check = (label, text) => {
+              if (!pattern.test(text)) return `${label} "${text}" is not \`type(scope): subject\`.`;
+              if (text.length > maxLength) return `${label} is ${text.length} characters; keep it to ${maxLength}.`;
+              return "";
+            };
+
+            const problems = [check("PR title", pr.title)];
+            // With one commit, GitHub's squash merge uses the commit subject instead of the PR title.
+            if (pr.commits === 1) {
+              const { data: [commit] } = await github.rest.pulls.listCommits({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+              });
+              problems.push(check("Commit subject", commit.commit.message.split("\n")[0]));
+            }
+
+            const failures = problems.filter(Boolean);
+            if (failures.length) core.setFailed(failures.join("\n"));

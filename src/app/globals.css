@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+/* Colors are named by role, not hue, and each holds a light and a dark value. Red is the studio
+   tally light: it marks a piece still waiting on the producer and nothing else. Blue marks anything
+   you can press. Next compiles light-dark() into variables that resolve where they are declared,
+   so .theme-dark redeclares the tokens to flip a section to the dark values. */
+:root {
+  color-scheme: light dark;
+}
+
+.theme-dark {
+  color-scheme: dark;
+  background: var(--page);
+  color: var(--label);
+}
+
+:root,
+.theme-dark {
+  --page: light-dark(#ffffff, #000000);
+  --grouped: light-dark(#f5f5f7, #161617);
+  --card: light-dark(#ffffff, #1d1d1f);
+  --label: light-dark(#1d1d1f, #f5f5f7);
+  --secondary: light-dark(#6e6e73, #a1a1a6);
+  --separator: light-dark(#d2d2d7, #424245);
+  --fill: light-dark(#e8e8ed, #2c2c2e);
+  --tint: light-dark(#0066cc, #2997ff);
+  --tint-fill: light-dark(#e8f1fc, #10233d);
+  --button: #0071e3;
+  --button-hover: #0077ed;
+  --tally: light-dark(#d7261e, #ff6159);
+  --go: light-dark(#1d7a3c, #4fd17d);
+  --glass: light-dark(rgb(255 255 255 / 0.72), rgb(0 0 0 / 0.72));
+}
+
+@media (prefers-contrast: more) {
+  :root,
+  .theme-dark {
+    --secondary: light-dark(#48484d, #c7c7cc);
+    --separator: light-dark(#86868b, #6e6e73);
+    --tint: light-dark(#004f9e, #6cb6ff);
+  }
+}
+
+@theme inline {
+  --color-page: var(--page);
+  --color-grouped: var(--grouped);
+  --color-card: var(--card);
+  --color-label: var(--label);
+  --color-secondary: var(--secondary);
+  --color-separator: var(--separator);
+  --color-fill: var(--fill);
+  --color-tint: var(--tint);
+  --color-tint-fill: var(--tint-fill);
+  --color-button: var(--button);
+  --color-button-hover: var(--button-hover);
+  --color-tally: var(--tally);
+  --color-go: var(--go);
+}
+
+@theme {
+  /* San Francisco on Apple devices, the platform's own UI face everywhere else. */
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Marketing sizes follow apple.com product pages. The rest are iOS text styles at the default size. */
+  --text-hero: clamp(44px, 4.7vw, 64px);
+  --text-hero--line-height: 1.04;
+  --text-hero--letter-spacing: -0.015em;
+  --text-headline: clamp(40px, 6vw, 64px);
+  --text-headline--line-height: 1.06;
+  --text-headline--letter-spacing: -0.009em;
+  --text-tile: clamp(24px, 2.6vw, 32px);
+  --text-tile--line-height: 1.14;
+  --text-eyebrow: 21px;
+  --text-eyebrow--line-height: 1.19;
+  --text-intro: 21px;
+  --text-intro--line-height: 1.38;
+  --text-title2: 22px;
+  --text-title2--line-height: 28px;
+  --text-title3: 20px;
+  --text-title3--line-height: 25px;
+  --text-body: 17px;
+  --text-body--line-height: 22px;
+  --text-subhead: 15px;
+  --text-subhead--line-height: 20px;
+  --text-footnote: 13px;
+  --text-footnote--line-height: 18px;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+
+}
+
+html {
+  background: var(--page);
+  color: var(--label);
+  scroll-padding-top: 64px;
+}
+
+body {
+  font-size: 17px;
+  line-height: 1.47;
+}
+
+::selection {
+  background: var(--tint-fill);
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+:focus-visible {
+  outline: 2px solid var(--tint);
+  outline-offset: 2px;
+}
+
+.timecode {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}

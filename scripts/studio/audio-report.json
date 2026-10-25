@@ -1,0 +1,3988 @@
+{
+  "sourceId": 130852725,
+  "method": "8 kHz mono PCM pipe; 2048-sample Hann FFT, 16 log bands from 120 to 3800 Hz, temporal differences at 10 Hz; normalized cross-correlation of 4 s windows every 2 s; runner-up outside +/-2 s of the best peak; no speed warping or extrapolation",
+  "thresholds": {
+    "minScore": 0.65,
+    "minRatio": 1.5
+  },
+  "thresholdEvidence": {
+    "checks": 259,
+    "accepted": 199,
+    "maxAcceptedAbsErrorSec": 0.446667,
+    "nullControls": 259,
+    "nullAccepted": 0,
+    "maxNullScore": 0.500455,
+    "maxNullRatio": 1.463981,
+    "limitation": "Thresholds are checked on this match, not an independent corpus. Overlapping windows are dependent. Subtitle offsets have cue-timing error. Only windows entirely inside a subtitle span are validation checks."
+  },
+  "validation": [
+    {
+      "scoreplayId": 130852722,
+      "name": "9x16_MNU_1_1_TOT_HIGHLIGHTS.mp4",
+      "checked": 20,
+      "accepted": 20,
+      "meanAbsErrorSec": 0.085575,
+      "maxAbsErrorSec": 0.360818,
+      "recoveredWithinOneSec": 20,
+      "windows": [
+        {
+          "clipStart": 2,
+          "clipEnd": 6,
+          "offset": 368.6,
+          "subtitleOffset": 368.8633333333334,
+          "errorSec": -0.26333333333337805,
+          "score": 0.8919309093061392,
+          "ratio": 3.040439545830689,
+          "accepted": true
+        },
+        {
+          "clipStart": 16,
+          "clipEnd": 20,
+          "offset": 2217.7000000000003,
+          "subtitleOffset": 2217.46,
+          "errorSec": 0.24000000000023647,
+          "score": 0.9955117333827532,
+          "ratio": 3.352920696087652,
+          "accepted": true
+        },
+        {
+          "clipStart": 24,
+          "clipEnd": 28,
+          "offset": 2696.3,
+          "subtitleOffset": 2696.3825454545454,
+          "errorSec": -0.08254545454519757,
+          "score": 0.8731313919182738,
+          "ratio": 2.114612835120258,
+          "accepted": true
+        },
+        {
+          "clipStart": 26,
+          "clipEnd": 30,
+          "offset": 2696.3,
+          "subtitleOffset": 2696.3825454545454,
+          "errorSec": -0.08254545454519757,
+          "score": 0.8633400363228971,
+          "ratio": 3.246472770126596,
+          "accepted": true
+        },
+        {
+          "clipStart": 34,
+          "clipEnd": 38,
+          "offset": 3231.4,
+          "subtitleOffset": 3231.443038961039,
+          "errorSec": -0.04303896103874649,
+          "score": 0.8506346988065093,
+          "ratio": 2.965101216051321,
+          "accepted": true
+        },
+        {
+          "clipStart": 36,
+          "clipEnd": 40,
+          "offset": 3231.4,
+          "subtitleOffset": 3231.443038961039,
+          "errorSec": -0.04303896103874649,
+          "score": 0.8576319221890192,
+          "ratio": 2.5876713146454575,
+          "accepted": true
+        },
+        {
+          "clipStart": 38,
+          "clipEnd": 42,
+          "offset": 3231.4,
+          "subtitleOffset": 3231.443038961039,
+          "errorSec": -0.04303896103874649,
+          "score": 0.8621342461921144,
+          "ratio": 2.7142157525646775,
+          "accepted": true
+        },
+        {
+          "clipStart": 54,
+          "clipEnd": 58,
+          "offset": 4376.5,
+          "subtitleOffset": 4376.485865079365,
+          "errorSec": 0.014134920635115122,
+          "score": 0.9951589373865173,
+          "ratio": 3.490719682823193,
+          "accepted": true
+        },
+        {
+          "clipStart": 56,
+          "clipEnd": 60,
+          "offset": 4376.5,
+          "subtitleOffset": 4376.485865079365,
+          "errorSec": 0.014134920635115122,
+          "score": 0.9952495729891606,
+          "ratio": 3.1641996022459615,
+          "accepted": true
+        },
+        {
+          "clipStart": 68,
+          "clipEnd": 72,
+          "offset": 4601.900000000001,
+          "subtitleOffset": 4602.260818181818,
+          "errorSec": -0.3608181818171943,
+          "score": 0.8786444084039492,
+          "ratio": 2.196157067704791,
+          "accepted": true
+        },
+        {
+          "clipStart": 76,
+          "clipEnd": 80,
+          "offset": 4855.400000000001,
+          "subtitleOffset": 4855.422333333333,
+          "errorSec": -0.022333333332426264,
+          "score": 0.7141114012997984,
+          "ratio": 2.2434031840810174,
+          "accepted": true
+        },
+        {
+          "clipStart": 78,
+          "clipEnd": 82,
+          "offset": 4855.400000000001,
+          "subtitleOffset": 4855.422333333333,
+          "errorSec": -0.022333333332426264,
+          "score": 0.6995338669119253,
+          "ratio": 2.4564148431630435,
+          "accepted": true
+        },
+        {
+          "clipStart": 80,
+          "clipEnd": 84,
+          "offset": 4855.400000000001,
+          "subtitleOffset": 4855.422333333333,
+          "errorSec": -0.022333333332426264,
+          "score": 0.6676123155119331,
+          "ratio": 2.195145812164762,
+          "accepted": true
+        },
+        {
+          "clipStart": 88,
+          "clipEnd": 92,
+          "offset": 4912.900000000001,
+          "subtitleOffset": 4913.0207083333335,
+          "errorSec": -0.12070833333291375,
+          "score": 0.8157970938158962,
+          "ratio": 2.8262007817101624,
+          "accepted": true
+        },
+        {
+          "clipStart": 102,
+          "clipEnd": 106,
+          "offset": 5720.3,
+          "subtitleOffset": 5720.243804924243,
+          "errorSec": 0.0561950757573868,
+          "score": 0.9985258155054573,
+          "ratio": 2.6333804246972017,
+          "accepted": true
+        },
+        {
+          "clipStart": 104,
+          "clipEnd": 108,
+          "offset": 5720.3,
+          "subtitleOffset": 5720.243804924243,
+          "errorSec": 0.0561950757573868,
+          "score": 0.997671765777389,
+          "ratio": 3.2343230676358212,
+          "accepted": true
+        },
+        {
+          "clipStart": 106,
+          "clipEnd": 110,
+          "offset": 5720.3,
+          "subtitleOffset": 5720.243804924243,
+          "errorSec": 0.0561950757573868,
+          "score": 0.9975684885942034,
+          "ratio": 3.539894774538054,
+          "accepted": true
+        },
+        {
+          "clipStart": 108,
+          "clipEnd": 112,
+          "offset": 5720.3,
+          "subtitleOffset": 5720.243804924243,
+          "errorSec": 0.0561950757573868,
+          "score": 0.9979111267617321,
+          "ratio": 3.3670442943457575,
+          "accepted": true
+        },
+        {
+          "clipStart": 110,
+          "clipEnd": 114,
+          "offset": 5720.3,
+          "subtitleOffset": 5720.243804924243,
+          "errorSec": 0.0561950757573868,
+          "score": 0.9981828423509919,
+          "ratio": 3.2137172017975484,
+          "accepted": true
+        },
+        {
+          "clipStart": 112,
+          "clipEnd": 116,
+          "offset": 5720.3,
+          "subtitleOffset": 5720.243804924243,
+          "errorSec": 0.0561950757573868,
+          "score": 0.9980047039744372,
+          "ratio": 3.096689702140379,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "scoreplayId": 130852723,
+      "name": "16x9_MNU_1_1_TOT_KEY_HIGHLIGHTS.mp4",
+      "checked": 18,
+      "accepted": 17,
+      "meanAbsErrorSec": 0.099265,
+      "maxAbsErrorSec": 0.446667,
+      "recoveredWithinOneSec": 18,
+      "windows": [
+        {
+          "clipStart": 2,
+          "clipEnd": 6,
+          "offset": 368.6,
+          "subtitleOffset": 369.04666666666674,
+          "errorSec": -0.4466666666667152,
+          "score": 0.8914616745917897,
+          "ratio": 3.020952919748047,
+          "accepted": true
+        },
+        {
+          "clipStart": 16,
+          "clipEnd": 20,
+          "offset": 2217.7000000000003,
+          "subtitleOffset": 2217.40125,
+          "errorSec": 0.298750000000382,
+          "score": 0.9954900688854519,
+          "ratio": 3.355000159532884,
+          "accepted": true
+        },
+        {
+          "clipStart": 18,
+          "clipEnd": 22,
+          "offset": 2217.7000000000003,
+          "subtitleOffset": 2217.40125,
+          "errorSec": 0.298750000000382,
+          "score": 0.9959172103862604,
+          "ratio": 2.8129123576533877,
+          "accepted": true
+        },
+        {
+          "clipStart": 26,
+          "clipEnd": 30,
+          "offset": 2695.6000000000004,
+          "subtitleOffset": 2695.7089523809527,
+          "errorSec": -0.10895238095235982,
+          "score": 0.7586767181373084,
+          "ratio": 1.8961140896988515,
+          "accepted": true
+        },
+        {
+          "clipStart": 34,
+          "clipEnd": 38,
+          "offset": 3230.7000000000003,
+          "subtitleOffset": 3230.634564102564,
+          "errorSec": 0.06543589743614575,
+          "score": 0.7468397043904825,
+          "ratio": 2.4949640350466744,
+          "accepted": true
+        },
+        {
+          "clipStart": 36,
+          "clipEnd": 40,
+          "offset": 3230.7000000000003,
+          "subtitleOffset": 3230.634564102564,
+          "errorSec": 0.06543589743614575,
+          "score": 0.7296642442969214,
+          "ratio": 2.3881703545439104,
+          "accepted": true
+        },
+        {
+          "clipStart": 38,
+          "clipEnd": 42,
+          "offset": 3230.7000000000003,
+          "subtitleOffset": 3230.634564102564,
+          "errorSec": 0.06543589743614575,
+          "score": 0.7552701444074812,
+          "ratio": 2.2921632206701745,
+          "accepted": true
+        },
+        {
+          "clipStart": 56,
+          "clipEnd": 60,
+          "offset": 4375.8,
+          "subtitleOffset": 4375.773365079365,
+          "errorSec": 0.026634920634933223,
+          "score": 0.964319959445784,
+          "ratio": 3.6156737440648428,
+          "accepted": true
+        },
+        {
+          "clipStart": 70,
+          "clipEnd": 74,
+          "offset": 4601.2,
+          "subtitleOffset": 4601.1715,
+          "errorSec": 0.02849999999943975,
+          "score": 0.8158525662372882,
+          "ratio": 2.258763086857656,
+          "accepted": true
+        },
+        {
+          "clipStart": 78,
+          "clipEnd": 82,
+          "offset": 4853,
+          "subtitleOffset": 4852.981142857143,
+          "errorSec": 0.01885714285708673,
+          "score": 0.9036988954570698,
+          "ratio": 2.5578602776787163,
+          "accepted": true
+        },
+        {
+          "clipStart": 80,
+          "clipEnd": 84,
+          "offset": 4853,
+          "subtitleOffset": 4852.981142857143,
+          "errorSec": 0.01885714285708673,
+          "score": 0.9119433617490788,
+          "ratio": 3.2421152274948364,
+          "accepted": true
+        },
+        {
+          "clipStart": 82,
+          "clipEnd": 86,
+          "offset": 4853,
+          "subtitleOffset": 4852.981142857143,
+          "errorSec": 0.01885714285708673,
+          "score": 0.9091755214031756,
+          "ratio": 2.882795009746896,
+          "accepted": true
+        },
+        {
+          "clipStart": 90,
+          "clipEnd": 94,
+          "offset": 4910.5,
+          "subtitleOffset": 4910.6615833333335,
+          "errorSec": -0.16158333333351038,
+          "score": 0.7885502162322241,
+          "ratio": 2.960994452499114,
+          "accepted": true
+        },
+        {
+          "clipStart": 106,
+          "clipEnd": 110,
+          "offset": 5717.8,
+          "subtitleOffset": 5717.783804924242,
+          "errorSec": 0.016195075758332678,
+          "score": 0.6440976173193137,
+          "ratio": 1.9644588298058745,
+          "accepted": false
+        },
+        {
+          "clipStart": 108,
+          "clipEnd": 112,
+          "offset": 5717.8,
+          "subtitleOffset": 5717.783804924242,
+          "errorSec": 0.016195075758332678,
+          "score": 0.7186266004514207,
+          "ratio": 2.604451198608599,
+          "accepted": true
+        },
+        {
+          "clipStart": 110,
+          "clipEnd": 114,
+          "offset": 5717.8,
+          "subtitleOffset": 5717.783804924242,
+          "errorSec": 0.016195075758332678,
+          "score": 0.7024294775729583,
+          "ratio": 2.284932177914953,
+          "accepted": true
+        },
+        {
+          "clipStart": 112,
+          "clipEnd": 116,
+          "offset": 5717.8,
+          "subtitleOffset": 5717.783804924242,
+          "errorSec": 0.016195075758332678,
+          "score": 0.6830452786911309,
+          "ratio": 2.1605764586250276,
+          "accepted": true
+        },
+        {
+          "clipStart": 114,
+          "clipEnd": 118,
+          "offset": 5717.8,
+          "subtitleOffset": 5717.783804924242,
+          "errorSec": 0.016195075758332678,
+          "score": 0.7213855318951852,
+          "ratio": 2.5694417790785247,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "scoreplayId": 130852724,
+      "name": "Manchester United vs Spurs | Extended Highlights | 2026-27.mp4",
+      "checked": 166,
+      "accepted": 111,
+      "meanAbsErrorSec": 0.045232,
+      "maxAbsErrorSec": 0.163,
+      "recoveredWithinOneSec": 165,
+      "windows": [
+        {
+          "clipStart": 2,
+          "clipEnd": 6,
+          "offset": 5878.900000000001,
+          "subtitleOffset": -2.9400000000000013,
+          "errorSec": 5881.84,
+          "score": 0.4097564519222838,
+          "ratio": 1.1311296166668268,
+          "accepted": false
+        },
+        {
+          "clipStart": 4,
+          "clipEnd": 8,
+          "offset": -2.9,
+          "subtitleOffset": -2.9400000000000013,
+          "errorSec": 0.04000000000000137,
+          "score": 0.6109208601651224,
+          "ratio": 1.647104752967715,
+          "accepted": false
+        },
+        {
+          "clipStart": 6,
+          "clipEnd": 10,
+          "offset": -2.9,
+          "subtitleOffset": -2.9400000000000013,
+          "errorSec": 0.04000000000000137,
+          "score": 0.6559840872264009,
+          "ratio": 2.12108924738071,
+          "accepted": true
+        },
+        {
+          "clipStart": 8,
+          "clipEnd": 12,
+          "offset": -2.8999999999999995,
+          "subtitleOffset": -2.9400000000000013,
+          "errorSec": 0.04000000000000181,
+          "score": 0.64693135413419,
+          "ratio": 2.1322386268752624,
+          "accepted": false
+        },
+        {
+          "clipStart": 10,
+          "clipEnd": 14,
+          "offset": -2.8999999999999995,
+          "subtitleOffset": -2.9400000000000013,
+          "errorSec": 0.04000000000000181,
+          "score": 0.6462369570350228,
+          "ratio": 1.9613877426245343,
+          "accepted": false
+        },
+        {
+          "clipStart": 12,
+          "clipEnd": 16,
+          "offset": -2.9000000000000004,
+          "subtitleOffset": -2.9400000000000013,
+          "errorSec": 0.040000000000000924,
+          "score": 0.5980994687088631,
+          "ratio": 1.7857036642793718,
+          "accepted": false
+        },
+        {
+          "clipStart": 14,
+          "clipEnd": 18,
+          "offset": -2.8999999999999986,
+          "subtitleOffset": -2.9400000000000013,
+          "errorSec": 0.0400000000000027,
+          "score": 0.6388738047360877,
+          "ratio": 2.3731686042610707,
+          "accepted": false
+        },
+        {
+          "clipStart": 24,
+          "clipEnd": 28,
+          "offset": 348.20000000000005,
+          "subtitleOffset": 348.2292307692308,
+          "errorSec": -0.02923076923076451,
+          "score": 0.81536652370691,
+          "ratio": 2.595182704816855,
+          "accepted": true
+        },
+        {
+          "clipStart": 26,
+          "clipEnd": 30,
+          "offset": 348.20000000000005,
+          "subtitleOffset": 348.2292307692308,
+          "errorSec": -0.02923076923076451,
+          "score": 0.8123315064018876,
+          "ratio": 2.4464057555709595,
+          "accepted": true
+        },
+        {
+          "clipStart": 28,
+          "clipEnd": 32,
+          "offset": 348.20000000000005,
+          "subtitleOffset": 348.2292307692308,
+          "errorSec": -0.02923076923076451,
+          "score": 0.8120795075807729,
+          "ratio": 2.366490549741199,
+          "accepted": true
+        },
+        {
+          "clipStart": 30,
+          "clipEnd": 34,
+          "offset": 348.20000000000005,
+          "subtitleOffset": 348.2292307692308,
+          "errorSec": -0.02923076923076451,
+          "score": 0.808267876677227,
+          "ratio": 2.8281430135592895,
+          "accepted": true
+        },
+        {
+          "clipStart": 38,
+          "clipEnd": 42,
+          "offset": 909.4000000000001,
+          "subtitleOffset": 909.3115,
+          "errorSec": 0.0885000000000673,
+          "score": 0.6043647458314434,
+          "ratio": 2.0064494395117025,
+          "accepted": false
+        },
+        {
+          "clipStart": 40,
+          "clipEnd": 44,
+          "offset": 909.4000000000001,
+          "subtitleOffset": 909.3115,
+          "errorSec": 0.0885000000000673,
+          "score": 0.571785342609441,
+          "ratio": 1.8489112528831209,
+          "accepted": false
+        },
+        {
+          "clipStart": 42,
+          "clipEnd": 46,
+          "offset": 909.4000000000001,
+          "subtitleOffset": 909.3115,
+          "errorSec": 0.0885000000000673,
+          "score": 0.5562873400937692,
+          "ratio": 1.3677345578215525,
+          "accepted": false
+        },
+        {
+          "clipStart": 44,
+          "clipEnd": 48,
+          "offset": 909.4000000000001,
+          "subtitleOffset": 909.3115,
+          "errorSec": 0.0885000000000673,
+          "score": 0.6171475996623197,
+          "ratio": 1.830690788218435,
+          "accepted": false
+        },
+        {
+          "clipStart": 46,
+          "clipEnd": 50,
+          "offset": 909.4000000000001,
+          "subtitleOffset": 909.3115,
+          "errorSec": 0.0885000000000673,
+          "score": 0.671812093888455,
+          "ratio": 2.1049157045149567,
+          "accepted": true
+        },
+        {
+          "clipStart": 48,
+          "clipEnd": 52,
+          "offset": 909.4000000000001,
+          "subtitleOffset": 909.3115,
+          "errorSec": 0.0885000000000673,
+          "score": 0.6001929503414923,
+          "ratio": 2.0368055923996105,
+          "accepted": false
+        },
+        {
+          "clipStart": 68,
+          "clipEnd": 72,
+          "offset": 1375.3000000000002,
+          "subtitleOffset": 1375.30775,
+          "errorSec": -0.007749999999759893,
+          "score": 0.9123980350381358,
+          "ratio": 3.0392211798299664,
+          "accepted": true
+        },
+        {
+          "clipStart": 70,
+          "clipEnd": 74,
+          "offset": 1375.3000000000002,
+          "subtitleOffset": 1375.30775,
+          "errorSec": -0.007749999999759893,
+          "score": 0.8758959886345022,
+          "ratio": 2.81180479943225,
+          "accepted": true
+        },
+        {
+          "clipStart": 72,
+          "clipEnd": 76,
+          "offset": 1375.3000000000002,
+          "subtitleOffset": 1375.30775,
+          "errorSec": -0.007749999999759893,
+          "score": 0.8716437709997187,
+          "ratio": 3.4963357031469036,
+          "accepted": true
+        },
+        {
+          "clipStart": 74,
+          "clipEnd": 78,
+          "offset": 1375.3000000000002,
+          "subtitleOffset": 1375.30775,
+          "errorSec": -0.007749999999759893,
+          "score": 0.8921189138191524,
+          "ratio": 3.1009123739327413,
+          "accepted": true
+        },
+        {
+          "clipStart": 76,
+          "clipEnd": 80,
+          "offset": 1375.3000000000002,
+          "subtitleOffset": 1375.30775,
+          "errorSec": -0.007749999999759893,
+          "score": 0.8972705048106353,
+          "ratio": 2.7477885092681857,
+          "accepted": true
+        },
+        {
+          "clipStart": 78,
+          "clipEnd": 82,
+          "offset": 1375.3000000000002,
+          "subtitleOffset": 1375.30775,
+          "errorSec": -0.007749999999759893,
+          "score": 0.8799439808874321,
+          "ratio": 2.9156357860835334,
+          "accepted": true
+        },
+        {
+          "clipStart": 80,
+          "clipEnd": 84,
+          "offset": 1375.3000000000002,
+          "subtitleOffset": 1375.30775,
+          "errorSec": -0.007749999999759893,
+          "score": 0.9000990359756703,
+          "ratio": 2.841112889560275,
+          "accepted": true
+        },
+        {
+          "clipStart": 90,
+          "clipEnd": 94,
+          "offset": 2136.7000000000003,
+          "subtitleOffset": 2136.715,
+          "errorSec": -0.01499999999987267,
+          "score": 0.9734274198767355,
+          "ratio": 2.6946540787708493,
+          "accepted": true
+        },
+        {
+          "clipStart": 92,
+          "clipEnd": 96,
+          "offset": 2136.7000000000003,
+          "subtitleOffset": 2136.715,
+          "errorSec": -0.01499999999987267,
+          "score": 0.9752561106126442,
+          "ratio": 2.730161007155289,
+          "accepted": true
+        },
+        {
+          "clipStart": 94,
+          "clipEnd": 98,
+          "offset": 2136.7000000000003,
+          "subtitleOffset": 2136.715,
+          "errorSec": -0.01499999999987267,
+          "score": 0.9762391047765777,
+          "ratio": 2.9532867299195207,
+          "accepted": true
+        },
+        {
+          "clipStart": 96,
+          "clipEnd": 100,
+          "offset": 2136.7000000000003,
+          "subtitleOffset": 2136.715,
+          "errorSec": -0.01499999999987267,
+          "score": 0.9699379735813103,
+          "ratio": 3.142118354959131,
+          "accepted": true
+        },
+        {
+          "clipStart": 98,
+          "clipEnd": 102,
+          "offset": 2136.7000000000003,
+          "subtitleOffset": 2136.715,
+          "errorSec": -0.01499999999987267,
+          "score": 0.9733063597672074,
+          "ratio": 3.386855314910886,
+          "accepted": true
+        },
+        {
+          "clipStart": 110,
+          "clipEnd": 114,
+          "offset": 2610.9,
+          "subtitleOffset": 2610.8559062500003,
+          "errorSec": 0.044093749999774445,
+          "score": 0.9681888083297295,
+          "ratio": 3.518303096069747,
+          "accepted": true
+        },
+        {
+          "clipStart": 112,
+          "clipEnd": 116,
+          "offset": 2610.9,
+          "subtitleOffset": 2610.8559062500003,
+          "errorSec": 0.044093749999774445,
+          "score": 0.9642792786187729,
+          "ratio": 3.546728705431438,
+          "accepted": true
+        },
+        {
+          "clipStart": 114,
+          "clipEnd": 118,
+          "offset": 2610.9,
+          "subtitleOffset": 2610.8559062500003,
+          "errorSec": 0.044093749999774445,
+          "score": 0.9647537707858563,
+          "ratio": 3.5951517308392016,
+          "accepted": true
+        },
+        {
+          "clipStart": 116,
+          "clipEnd": 120,
+          "offset": 2610.9,
+          "subtitleOffset": 2610.8559062500003,
+          "errorSec": 0.044093749999774445,
+          "score": 0.9679878196450075,
+          "ratio": 3.291908021790026,
+          "accepted": true
+        },
+        {
+          "clipStart": 118,
+          "clipEnd": 122,
+          "offset": 2610.9,
+          "subtitleOffset": 2610.8559062500003,
+          "errorSec": 0.044093749999774445,
+          "score": 0.9658453678355486,
+          "ratio": 3.073475860090128,
+          "accepted": true
+        },
+        {
+          "clipStart": 120,
+          "clipEnd": 124,
+          "offset": 2610.9,
+          "subtitleOffset": 2610.8559062500003,
+          "errorSec": 0.044093749999774445,
+          "score": 0.969285841097422,
+          "ratio": 3.182063615041669,
+          "accepted": true
+        },
+        {
+          "clipStart": 122,
+          "clipEnd": 126,
+          "offset": 2610.9,
+          "subtitleOffset": 2610.8559062500003,
+          "errorSec": 0.044093749999774445,
+          "score": 0.9746822894154852,
+          "ratio": 3.2077239014082477,
+          "accepted": true
+        },
+        {
+          "clipStart": 124,
+          "clipEnd": 128,
+          "offset": 2610.9,
+          "subtitleOffset": 2610.8559062500003,
+          "errorSec": 0.044093749999774445,
+          "score": 0.9747299063763998,
+          "ratio": 3.3018883138480413,
+          "accepted": true
+        },
+        {
+          "clipStart": 132,
+          "clipEnd": 136,
+          "offset": 3051.5,
+          "subtitleOffset": 3051.480333333333,
+          "errorSec": 0.019666666667035315,
+          "score": 0.7784080109050276,
+          "ratio": 2.4859244572206,
+          "accepted": true
+        },
+        {
+          "clipStart": 134,
+          "clipEnd": 138,
+          "offset": 3051.5,
+          "subtitleOffset": 3051.480333333333,
+          "errorSec": 0.019666666667035315,
+          "score": 0.7435600088334938,
+          "ratio": 2.713084701398783,
+          "accepted": true
+        },
+        {
+          "clipStart": 136,
+          "clipEnd": 140,
+          "offset": 3051.5,
+          "subtitleOffset": 3051.480333333333,
+          "errorSec": 0.019666666667035315,
+          "score": 0.7525433013996768,
+          "ratio": 3.0898218093256484,
+          "accepted": true
+        },
+        {
+          "clipStart": 138,
+          "clipEnd": 142,
+          "offset": 3051.5,
+          "subtitleOffset": 3051.480333333333,
+          "errorSec": 0.019666666667035315,
+          "score": 0.7730902577033748,
+          "ratio": 2.827805992158868,
+          "accepted": true
+        },
+        {
+          "clipStart": 146,
+          "clipEnd": 150,
+          "offset": 3112.7000000000003,
+          "subtitleOffset": 3112.6485000000002,
+          "errorSec": 0.05150000000003274,
+          "score": 0.9295428408516939,
+          "ratio": 3.3642591105277875,
+          "accepted": true
+        },
+        {
+          "clipStart": 148,
+          "clipEnd": 152,
+          "offset": 3112.7000000000003,
+          "subtitleOffset": 3112.6485000000002,
+          "errorSec": 0.05150000000003274,
+          "score": 0.9194553516946846,
+          "ratio": 3.633265261163543,
+          "accepted": true
+        },
+        {
+          "clipStart": 150,
+          "clipEnd": 154,
+          "offset": 3112.7000000000003,
+          "subtitleOffset": 3112.6485000000002,
+          "errorSec": 0.05150000000003274,
+          "score": 0.9198993186190441,
+          "ratio": 3.517409663132328,
+          "accepted": true
+        },
+        {
+          "clipStart": 152,
+          "clipEnd": 156,
+          "offset": 3112.7000000000003,
+          "subtitleOffset": 3112.6485000000002,
+          "errorSec": 0.05150000000003274,
+          "score": 0.9305591161401396,
+          "ratio": 3.207233201802019,
+          "accepted": true
+        },
+        {
+          "clipStart": 154,
+          "clipEnd": 158,
+          "offset": 3112.7000000000003,
+          "subtitleOffset": 3112.6485000000002,
+          "errorSec": 0.05150000000003274,
+          "score": 0.9327948555305973,
+          "ratio": 3.1380952134535165,
+          "accepted": true
+        },
+        {
+          "clipStart": 156,
+          "clipEnd": 160,
+          "offset": 3112.7000000000003,
+          "subtitleOffset": 3112.6485000000002,
+          "errorSec": 0.05150000000003274,
+          "score": 0.9351857817467477,
+          "ratio": 2.8034945118374277,
+          "accepted": true
+        },
+        {
+          "clipStart": 158,
+          "clipEnd": 162,
+          "offset": 3112.7000000000003,
+          "subtitleOffset": 3112.6485000000002,
+          "errorSec": 0.05150000000003274,
+          "score": 0.9349934418357163,
+          "ratio": 2.5605785630783044,
+          "accepted": true
+        },
+        {
+          "clipStart": 160,
+          "clipEnd": 164,
+          "offset": 3112.7000000000003,
+          "subtitleOffset": 3112.6485000000002,
+          "errorSec": 0.05150000000003274,
+          "score": 0.924580866142273,
+          "ratio": 3.043243960543393,
+          "accepted": true
+        },
+        {
+          "clipStart": 168,
+          "clipEnd": 172,
+          "offset": 3194.1000000000004,
+          "subtitleOffset": 3194.0919999999996,
+          "errorSec": 0.00800000000072032,
+          "score": 0.9066968575471429,
+          "ratio": 2.655966033292139,
+          "accepted": true
+        },
+        {
+          "clipStart": 170,
+          "clipEnd": 174,
+          "offset": 3194.1000000000004,
+          "subtitleOffset": 3194.0919999999996,
+          "errorSec": 0.00800000000072032,
+          "score": 0.9149672210257327,
+          "ratio": 2.885654227677958,
+          "accepted": true
+        },
+        {
+          "clipStart": 172,
+          "clipEnd": 176,
+          "offset": 3194.1000000000004,
+          "subtitleOffset": 3194.0919999999996,
+          "errorSec": 0.00800000000072032,
+          "score": 0.9075317535125063,
+          "ratio": 3.061428972008578,
+          "accepted": true
+        },
+        {
+          "clipStart": 174,
+          "clipEnd": 178,
+          "offset": 3194.1000000000004,
+          "subtitleOffset": 3194.0919999999996,
+          "errorSec": 0.00800000000072032,
+          "score": 0.8987568118205077,
+          "ratio": 2.58453263796209,
+          "accepted": true
+        },
+        {
+          "clipStart": 176,
+          "clipEnd": 180,
+          "offset": 3194.1000000000004,
+          "subtitleOffset": 3194.0919999999996,
+          "errorSec": 0.00800000000072032,
+          "score": 0.8842812787583036,
+          "ratio": 2.546253982382539,
+          "accepted": true
+        },
+        {
+          "clipStart": 178,
+          "clipEnd": 182,
+          "offset": 3194.1000000000004,
+          "subtitleOffset": 3194.0919999999996,
+          "errorSec": 0.00800000000072032,
+          "score": 0.8795264098979548,
+          "ratio": 3.0258708900823006,
+          "accepted": true
+        },
+        {
+          "clipStart": 180,
+          "clipEnd": 184,
+          "offset": 3194.1000000000004,
+          "subtitleOffset": 3194.0919999999996,
+          "errorSec": 0.00800000000072032,
+          "score": 0.8852719152632827,
+          "ratio": 2.6642897131232957,
+          "accepted": true
+        },
+        {
+          "clipStart": 182,
+          "clipEnd": 186,
+          "offset": 3194.1000000000004,
+          "subtitleOffset": 3194.0919999999996,
+          "errorSec": 0.00800000000072032,
+          "score": 0.902725367896322,
+          "ratio": 2.676809324384826,
+          "accepted": true
+        },
+        {
+          "clipStart": 184,
+          "clipEnd": 188,
+          "offset": 3194.1000000000004,
+          "subtitleOffset": 3194.0919999999996,
+          "errorSec": 0.00800000000072032,
+          "score": 0.9082495190632499,
+          "ratio": 3.231635940401903,
+          "accepted": true
+        },
+        {
+          "clipStart": 186,
+          "clipEnd": 190,
+          "offset": 3194.1000000000004,
+          "subtitleOffset": 3194.0919999999996,
+          "errorSec": 0.00800000000072032,
+          "score": 0.9040647309154276,
+          "ratio": 2.800986099998601,
+          "accepted": true
+        },
+        {
+          "clipStart": 188,
+          "clipEnd": 192,
+          "offset": 3194.1000000000004,
+          "subtitleOffset": 3194.0919999999996,
+          "errorSec": 0.00800000000072032,
+          "score": 0.9156299611885041,
+          "ratio": 3.020753828719799,
+          "accepted": true
+        },
+        {
+          "clipStart": 198,
+          "clipEnd": 202,
+          "offset": 3423,
+          "subtitleOffset": 3422.972589285714,
+          "errorSec": 0.02741071428590658,
+          "score": 0.9055515525633532,
+          "ratio": 2.763279428689007,
+          "accepted": true
+        },
+        {
+          "clipStart": 200,
+          "clipEnd": 204,
+          "offset": 3423,
+          "subtitleOffset": 3422.972589285714,
+          "errorSec": 0.02741071428590658,
+          "score": 0.8890216487194549,
+          "ratio": 3.1385327140512986,
+          "accepted": true
+        },
+        {
+          "clipStart": 202,
+          "clipEnd": 206,
+          "offset": 3423,
+          "subtitleOffset": 3422.972589285714,
+          "errorSec": 0.02741071428590658,
+          "score": 0.8819983585073692,
+          "ratio": 3.112913964893619,
+          "accepted": true
+        },
+        {
+          "clipStart": 204,
+          "clipEnd": 208,
+          "offset": 3423,
+          "subtitleOffset": 3422.972589285714,
+          "errorSec": 0.02741071428590658,
+          "score": 0.8886266204601232,
+          "ratio": 3.093764626001246,
+          "accepted": true
+        },
+        {
+          "clipStart": 206,
+          "clipEnd": 210,
+          "offset": 3423,
+          "subtitleOffset": 3422.972589285714,
+          "errorSec": 0.02741071428590658,
+          "score": 0.878655389384808,
+          "ratio": 2.94488489182109,
+          "accepted": true
+        },
+        {
+          "clipStart": 208,
+          "clipEnd": 212,
+          "offset": 3423,
+          "subtitleOffset": 3422.972589285714,
+          "errorSec": 0.02741071428590658,
+          "score": 0.8651403686673189,
+          "ratio": 3.0518377572765174,
+          "accepted": true
+        },
+        {
+          "clipStart": 210,
+          "clipEnd": 214,
+          "offset": 3423,
+          "subtitleOffset": 3422.972589285714,
+          "errorSec": 0.02741071428590658,
+          "score": 0.8651769771521095,
+          "ratio": 2.9889424619971736,
+          "accepted": true
+        },
+        {
+          "clipStart": 212,
+          "clipEnd": 216,
+          "offset": 3423,
+          "subtitleOffset": 3422.972589285714,
+          "errorSec": 0.02741071428590658,
+          "score": 0.8916877510148723,
+          "ratio": 2.7522451297370703,
+          "accepted": true
+        },
+        {
+          "clipStart": 214,
+          "clipEnd": 218,
+          "offset": 3423,
+          "subtitleOffset": 3422.972589285714,
+          "errorSec": 0.02741071428590658,
+          "score": 0.8887054739021258,
+          "ratio": 2.5319754030523076,
+          "accepted": true
+        },
+        {
+          "clipStart": 222,
+          "clipEnd": 226,
+          "offset": 3527,
+          "subtitleOffset": 3527.0570000000002,
+          "errorSec": -0.057000000000243745,
+          "score": 0.7946800140490055,
+          "ratio": 2.419234195329865,
+          "accepted": true
+        },
+        {
+          "clipStart": 224,
+          "clipEnd": 228,
+          "offset": 3527,
+          "subtitleOffset": 3527.0570000000002,
+          "errorSec": -0.057000000000243745,
+          "score": 0.7615958016612464,
+          "ratio": 2.3982314451286206,
+          "accepted": true
+        },
+        {
+          "clipStart": 226,
+          "clipEnd": 230,
+          "offset": 3527,
+          "subtitleOffset": 3527.0570000000002,
+          "errorSec": -0.057000000000243745,
+          "score": 0.7538459935420878,
+          "ratio": 2.46662743164016,
+          "accepted": true
+        },
+        {
+          "clipStart": 228,
+          "clipEnd": 232,
+          "offset": 3527,
+          "subtitleOffset": 3527.0570000000002,
+          "errorSec": -0.057000000000243745,
+          "score": 0.7340161218201651,
+          "ratio": 2.4265931768831828,
+          "accepted": true
+        },
+        {
+          "clipStart": 230,
+          "clipEnd": 234,
+          "offset": 3527,
+          "subtitleOffset": 3527.0570000000002,
+          "errorSec": -0.057000000000243745,
+          "score": 0.7411671118614586,
+          "ratio": 2.069798520766465,
+          "accepted": true
+        },
+        {
+          "clipStart": 232,
+          "clipEnd": 236,
+          "offset": 3527,
+          "subtitleOffset": 3527.0570000000002,
+          "errorSec": -0.057000000000243745,
+          "score": 0.7907486908589151,
+          "ratio": 2.5110932069088077,
+          "accepted": true
+        },
+        {
+          "clipStart": 234,
+          "clipEnd": 238,
+          "offset": 3527,
+          "subtitleOffset": 3527.0570000000002,
+          "errorSec": -0.057000000000243745,
+          "score": 0.8149146560282097,
+          "ratio": 2.3353092027424056,
+          "accepted": true
+        },
+        {
+          "clipStart": 242,
+          "clipEnd": 246,
+          "offset": 3568.1000000000004,
+          "subtitleOffset": 3568.0467708333335,
+          "errorSec": 0.05322916666682431,
+          "score": 0.5444461448195532,
+          "ratio": 1.9764627508394166,
+          "accepted": false
+        },
+        {
+          "clipStart": 244,
+          "clipEnd": 248,
+          "offset": 3568.1000000000004,
+          "subtitleOffset": 3568.0467708333335,
+          "errorSec": 0.05322916666682431,
+          "score": 0.5041950412511981,
+          "ratio": 1.9110841735099813,
+          "accepted": false
+        },
+        {
+          "clipStart": 246,
+          "clipEnd": 250,
+          "offset": 3568.1000000000004,
+          "subtitleOffset": 3568.0467708333335,
+          "errorSec": 0.05322916666682431,
+          "score": 0.5024434371876968,
+          "ratio": 1.8189705852053952,
+          "accepted": false
+        },
+        {
+          "clipStart": 254,
+          "clipEnd": 258,
+          "offset": 3858.5,
+          "subtitleOffset": 3858.337,
+          "errorSec": 0.16300000000001091,
+          "score": 0.9831402601548713,
+          "ratio": 3.170055154380201,
+          "accepted": true
+        },
+        {
+          "clipStart": 256,
+          "clipEnd": 260,
+          "offset": 3858.5,
+          "subtitleOffset": 3858.337,
+          "errorSec": 0.16300000000001091,
+          "score": 0.9825677891644266,
+          "ratio": 3.4575145457745253,
+          "accepted": true
+        },
+        {
+          "clipStart": 266,
+          "clipEnd": 270,
+          "offset": 4165.7,
+          "subtitleOffset": 4165.696142857143,
+          "errorSec": 0.0038571428567593102,
+          "score": 0.8571558027941482,
+          "ratio": 2.9174330253305625,
+          "accepted": true
+        },
+        {
+          "clipStart": 268,
+          "clipEnd": 272,
+          "offset": 4165.7,
+          "subtitleOffset": 4165.696142857143,
+          "errorSec": 0.0038571428567593102,
+          "score": 0.862385966669239,
+          "ratio": 2.664781542995987,
+          "accepted": true
+        },
+        {
+          "clipStart": 270,
+          "clipEnd": 274,
+          "offset": 4165.7,
+          "subtitleOffset": 4165.696142857143,
+          "errorSec": 0.0038571428567593102,
+          "score": 0.8732650043065244,
+          "ratio": 2.9313979534919743,
+          "accepted": true
+        },
+        {
+          "clipStart": 286,
+          "clipEnd": 290,
+          "offset": 4385.1,
+          "subtitleOffset": 4385.124,
+          "errorSec": -0.023999999999432475,
+          "score": 0.9513597467950459,
+          "ratio": 2.8582431759797577,
+          "accepted": true
+        },
+        {
+          "clipStart": 288,
+          "clipEnd": 292,
+          "offset": 4385.1,
+          "subtitleOffset": 4385.124,
+          "errorSec": -0.023999999999432475,
+          "score": 0.9045426179271645,
+          "ratio": 3.281291440800662,
+          "accepted": true
+        },
+        {
+          "clipStart": 290,
+          "clipEnd": 294,
+          "offset": 4385.1,
+          "subtitleOffset": 4385.124,
+          "errorSec": -0.023999999999432475,
+          "score": 0.9162853063343356,
+          "ratio": 2.7570835906391107,
+          "accepted": true
+        },
+        {
+          "clipStart": 292,
+          "clipEnd": 296,
+          "offset": 4385.1,
+          "subtitleOffset": 4385.124,
+          "errorSec": -0.023999999999432475,
+          "score": 0.9322129215822698,
+          "ratio": 3.141301311269548,
+          "accepted": true
+        },
+        {
+          "clipStart": 294,
+          "clipEnd": 298,
+          "offset": 4385.1,
+          "subtitleOffset": 4385.124,
+          "errorSec": -0.023999999999432475,
+          "score": 0.9321825762198555,
+          "ratio": 2.683605633487326,
+          "accepted": true
+        },
+        {
+          "clipStart": 296,
+          "clipEnd": 300,
+          "offset": 4385.1,
+          "subtitleOffset": 4385.124,
+          "errorSec": -0.023999999999432475,
+          "score": 0.9269192371213001,
+          "ratio": 2.7177094720437496,
+          "accepted": true
+        },
+        {
+          "clipStart": 298,
+          "clipEnd": 302,
+          "offset": 4385.1,
+          "subtitleOffset": 4385.124,
+          "errorSec": -0.023999999999432475,
+          "score": 0.9288082131229465,
+          "ratio": 2.7994267873705265,
+          "accepted": true
+        },
+        {
+          "clipStart": 304,
+          "clipEnd": 308,
+          "offset": 4620,
+          "subtitleOffset": 4619.880666666667,
+          "errorSec": 0.11933333333308838,
+          "score": 0.7718582936114305,
+          "ratio": 2.427418508965906,
+          "accepted": true
+        },
+        {
+          "clipStart": 306,
+          "clipEnd": 310,
+          "offset": 4620,
+          "subtitleOffset": 4619.880666666667,
+          "errorSec": 0.11933333333308838,
+          "score": 0.8101648188330922,
+          "ratio": 2.592742841333195,
+          "accepted": true
+        },
+        {
+          "clipStart": 308,
+          "clipEnd": 312,
+          "offset": 4620,
+          "subtitleOffset": 4619.880666666667,
+          "errorSec": 0.11933333333308838,
+          "score": 0.7848881077340235,
+          "ratio": 2.8040597270296166,
+          "accepted": true
+        },
+        {
+          "clipStart": 310,
+          "clipEnd": 314,
+          "offset": 4620,
+          "subtitleOffset": 4619.880666666667,
+          "errorSec": 0.11933333333308838,
+          "score": 0.7374774174372147,
+          "ratio": 2.2737021557457107,
+          "accepted": true
+        },
+        {
+          "clipStart": 312,
+          "clipEnd": 316,
+          "offset": 4620,
+          "subtitleOffset": 4619.880666666667,
+          "errorSec": 0.11933333333308838,
+          "score": 0.744449373797957,
+          "ratio": 2.3127052735180844,
+          "accepted": true
+        },
+        {
+          "clipStart": 314,
+          "clipEnd": 318,
+          "offset": 4620,
+          "subtitleOffset": 4619.880666666667,
+          "errorSec": 0.11933333333308838,
+          "score": 0.7560786839655409,
+          "ratio": 2.401663431554196,
+          "accepted": true
+        },
+        {
+          "clipStart": 316,
+          "clipEnd": 320,
+          "offset": 4620,
+          "subtitleOffset": 4619.880666666667,
+          "errorSec": 0.11933333333308838,
+          "score": 0.7776210342065419,
+          "ratio": 3.138898445054109,
+          "accepted": true
+        },
+        {
+          "clipStart": 318,
+          "clipEnd": 322,
+          "offset": 4620,
+          "subtitleOffset": 4619.880666666667,
+          "errorSec": 0.11933333333308838,
+          "score": 0.7893992300391144,
+          "ratio": 3.0996086078676894,
+          "accepted": true
+        },
+        {
+          "clipStart": 320,
+          "clipEnd": 324,
+          "offset": 4620,
+          "subtitleOffset": 4619.880666666667,
+          "errorSec": 0.11933333333308838,
+          "score": 0.7828327875007475,
+          "ratio": 2.666505331984018,
+          "accepted": true
+        },
+        {
+          "clipStart": 330,
+          "clipEnd": 334,
+          "offset": 4666.200000000001,
+          "subtitleOffset": 4666.173555555556,
+          "errorSec": 0.026444444444678084,
+          "score": 0.8925127727490765,
+          "ratio": 2.342132235999578,
+          "accepted": true
+        },
+        {
+          "clipStart": 332,
+          "clipEnd": 336,
+          "offset": 4666.200000000001,
+          "subtitleOffset": 4666.173555555556,
+          "errorSec": 0.026444444444678084,
+          "score": 0.9111011492849215,
+          "ratio": 2.932966056250606,
+          "accepted": true
+        },
+        {
+          "clipStart": 334,
+          "clipEnd": 338,
+          "offset": 4666.200000000001,
+          "subtitleOffset": 4666.173555555556,
+          "errorSec": 0.026444444444678084,
+          "score": 0.8981848882116781,
+          "ratio": 3.0361506606690676,
+          "accepted": true
+        },
+        {
+          "clipStart": 350,
+          "clipEnd": 354,
+          "offset": 5093,
+          "subtitleOffset": 5092.838333333333,
+          "errorSec": 0.1616666666668607,
+          "score": 0.7751371527242097,
+          "ratio": 2.3877628490308793,
+          "accepted": true
+        },
+        {
+          "clipStart": 352,
+          "clipEnd": 356,
+          "offset": 5093,
+          "subtitleOffset": 5092.838333333333,
+          "errorSec": 0.1616666666668607,
+          "score": 0.7462967839976622,
+          "ratio": 2.8522366170499214,
+          "accepted": true
+        },
+        {
+          "clipStart": 366,
+          "clipEnd": 370,
+          "offset": 5350.200000000001,
+          "subtitleOffset": 5350.172,
+          "errorSec": 0.028000000001156877,
+          "score": 0.7881691339269137,
+          "ratio": 2.319000867219372,
+          "accepted": true
+        },
+        {
+          "clipStart": 374,
+          "clipEnd": 378,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.5722090618713462,
+          "ratio": 1.675341314430051,
+          "accepted": false
+        },
+        {
+          "clipStart": 376,
+          "clipEnd": 380,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.5296307911304408,
+          "ratio": 1.55752504162737,
+          "accepted": false
+        },
+        {
+          "clipStart": 378,
+          "clipEnd": 382,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.5916316030214459,
+          "ratio": 1.92235471326242,
+          "accepted": false
+        },
+        {
+          "clipStart": 380,
+          "clipEnd": 384,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.5532399625019444,
+          "ratio": 1.9375263714634063,
+          "accepted": false
+        },
+        {
+          "clipStart": 382,
+          "clipEnd": 386,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.5511109526218769,
+          "ratio": 1.8511274394430304,
+          "accepted": false
+        },
+        {
+          "clipStart": 384,
+          "clipEnd": 388,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.5189549883527909,
+          "ratio": 1.7124968303930626,
+          "accepted": false
+        },
+        {
+          "clipStart": 386,
+          "clipEnd": 390,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.5224184597271047,
+          "ratio": 1.3436709903648811,
+          "accepted": false
+        },
+        {
+          "clipStart": 388,
+          "clipEnd": 392,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.5585563144372422,
+          "ratio": 1.7654275064087541,
+          "accepted": false
+        },
+        {
+          "clipStart": 390,
+          "clipEnd": 394,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.5844325318982042,
+          "ratio": 1.3184659778937455,
+          "accepted": false
+        },
+        {
+          "clipStart": 392,
+          "clipEnd": 396,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.55078513565149,
+          "ratio": 1.1815131600414175,
+          "accepted": false
+        },
+        {
+          "clipStart": 394,
+          "clipEnd": 398,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.60698540150151,
+          "ratio": 1.757858275328195,
+          "accepted": false
+        },
+        {
+          "clipStart": 396,
+          "clipEnd": 400,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.5876294102860267,
+          "ratio": 2.319884011562088,
+          "accepted": false
+        },
+        {
+          "clipStart": 398,
+          "clipEnd": 402,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.5822481222770636,
+          "ratio": 2.1695457661012485,
+          "accepted": false
+        },
+        {
+          "clipStart": 400,
+          "clipEnd": 404,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.5805262484961715,
+          "ratio": 1.9927273142600443,
+          "accepted": false
+        },
+        {
+          "clipStart": 402,
+          "clipEnd": 406,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.574629776173645,
+          "ratio": 2.052659644968575,
+          "accepted": false
+        },
+        {
+          "clipStart": 404,
+          "clipEnd": 408,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.6029651361941853,
+          "ratio": 2.094672195493482,
+          "accepted": false
+        },
+        {
+          "clipStart": 406,
+          "clipEnd": 410,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.5950096220383737,
+          "ratio": 1.8196383945138073,
+          "accepted": false
+        },
+        {
+          "clipStart": 408,
+          "clipEnd": 412,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.593928739707233,
+          "ratio": 1.8212053731048183,
+          "accepted": false
+        },
+        {
+          "clipStart": 410,
+          "clipEnd": 414,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.5446702039260374,
+          "ratio": 2.109339426341077,
+          "accepted": false
+        },
+        {
+          "clipStart": 412,
+          "clipEnd": 416,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.5700031807300429,
+          "ratio": 2.1352611255893152,
+          "accepted": false
+        },
+        {
+          "clipStart": 414,
+          "clipEnd": 418,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.6119073587059988,
+          "ratio": 1.9477710098827183,
+          "accepted": false
+        },
+        {
+          "clipStart": 416,
+          "clipEnd": 420,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.5989558271467159,
+          "ratio": 1.9718547441048615,
+          "accepted": false
+        },
+        {
+          "clipStart": 418,
+          "clipEnd": 422,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.6110588131524457,
+          "ratio": 2.2013664408536435,
+          "accepted": false
+        },
+        {
+          "clipStart": 420,
+          "clipEnd": 424,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.6057662761627511,
+          "ratio": 2.1327145237260723,
+          "accepted": false
+        },
+        {
+          "clipStart": 422,
+          "clipEnd": 426,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.5905654524513649,
+          "ratio": 2.177619997795462,
+          "accepted": false
+        },
+        {
+          "clipStart": 424,
+          "clipEnd": 428,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.6088694779772207,
+          "ratio": 2.1810364083608134,
+          "accepted": false
+        },
+        {
+          "clipStart": 426,
+          "clipEnd": 430,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.5705893613349128,
+          "ratio": 1.97411138796812,
+          "accepted": false
+        },
+        {
+          "clipStart": 428,
+          "clipEnd": 432,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.5117902051476082,
+          "ratio": 1.6426668964025657,
+          "accepted": false
+        },
+        {
+          "clipStart": 430,
+          "clipEnd": 434,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.5494981829378086,
+          "ratio": 1.9634685718423817,
+          "accepted": false
+        },
+        {
+          "clipStart": 432,
+          "clipEnd": 436,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.5923450201196735,
+          "ratio": 1.7933070679658787,
+          "accepted": false
+        },
+        {
+          "clipStart": 434,
+          "clipEnd": 438,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.5845628231164998,
+          "ratio": 1.9944984957665337,
+          "accepted": false
+        },
+        {
+          "clipStart": 436,
+          "clipEnd": 440,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.6026551432870124,
+          "ratio": 2.1256420318425033,
+          "accepted": false
+        },
+        {
+          "clipStart": 438,
+          "clipEnd": 442,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.6029548004792106,
+          "ratio": 1.997478268150012,
+          "accepted": false
+        },
+        {
+          "clipStart": 440,
+          "clipEnd": 444,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.5789122730427037,
+          "ratio": 1.7681159067327827,
+          "accepted": false
+        },
+        {
+          "clipStart": 442,
+          "clipEnd": 446,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.5767919540833258,
+          "ratio": 2.1610646351873632,
+          "accepted": false
+        },
+        {
+          "clipStart": 444,
+          "clipEnd": 448,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.5755583488488507,
+          "ratio": 1.8318892690558124,
+          "accepted": false
+        },
+        {
+          "clipStart": 446,
+          "clipEnd": 450,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.564188796811268,
+          "ratio": 1.5918196138392022,
+          "accepted": false
+        },
+        {
+          "clipStart": 448,
+          "clipEnd": 452,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.599055207084744,
+          "ratio": 1.931936562812759,
+          "accepted": false
+        },
+        {
+          "clipStart": 450,
+          "clipEnd": 454,
+          "offset": 5429.3,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": -0.015919642856715654,
+          "score": 0.6390640491696551,
+          "ratio": 1.7856406129054674,
+          "accepted": false
+        },
+        {
+          "clipStart": 452,
+          "clipEnd": 456,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.5595320686654621,
+          "ratio": 1.680870056910474,
+          "accepted": false
+        },
+        {
+          "clipStart": 454,
+          "clipEnd": 458,
+          "offset": 5429.400000000001,
+          "subtitleOffset": 5429.315919642857,
+          "errorSec": 0.08408035714364814,
+          "score": 0.5703029607881758,
+          "ratio": 1.6182999731903522,
+          "accepted": false
+        },
+        {
+          "clipStart": 462,
+          "clipEnd": 466,
+          "offset": 5466.6,
+          "subtitleOffset": 5466.508333333333,
+          "errorSec": 0.09166666666715173,
+          "score": 0.8095649566214667,
+          "ratio": 2.78492572627771,
+          "accepted": true
+        },
+        {
+          "clipStart": 464,
+          "clipEnd": 468,
+          "offset": 5466.6,
+          "subtitleOffset": 5466.508333333333,
+          "errorSec": 0.09166666666715173,
+          "score": 0.816957827131163,
+          "ratio": 2.3945904489025853,
+          "accepted": true
+        },
+        {
+          "clipStart": 466,
+          "clipEnd": 470,
+          "offset": 5466.6,
+          "subtitleOffset": 5466.508333333333,
+          "errorSec": 0.09166666666715173,
+          "score": 0.7949791563296265,
+          "ratio": 2.622964786704477,
+          "accepted": true
+        },
+        {
+          "clipStart": 468,
+          "clipEnd": 472,
+          "offset": 5466.6,
+          "subtitleOffset": 5466.508333333333,
+          "errorSec": 0.09166666666715173,
+          "score": 0.7743847349581092,
+          "ratio": 2.607551126593594,
+          "accepted": true
+        },
+        {
+          "clipStart": 476,
+          "clipEnd": 480,
+          "offset": 5821.5,
+          "subtitleOffset": 5821.453863636363,
+          "errorSec": 0.046136363636833266,
+          "score": 0.9963056870518704,
+          "ratio": 3.130303683068417,
+          "accepted": true
+        },
+        {
+          "clipStart": 478,
+          "clipEnd": 482,
+          "offset": 5821.5,
+          "subtitleOffset": 5821.453863636363,
+          "errorSec": 0.046136363636833266,
+          "score": 0.9969128356232955,
+          "ratio": 3.0713814672558994,
+          "accepted": true
+        },
+        {
+          "clipStart": 480,
+          "clipEnd": 484,
+          "offset": 5821.5,
+          "subtitleOffset": 5821.453863636363,
+          "errorSec": 0.046136363636833266,
+          "score": 0.9966598510305336,
+          "ratio": 3.350356180770728,
+          "accepted": true
+        },
+        {
+          "clipStart": 482,
+          "clipEnd": 486,
+          "offset": 5821.5,
+          "subtitleOffset": 5821.453863636363,
+          "errorSec": 0.046136363636833266,
+          "score": 0.9964361073908716,
+          "ratio": 2.9318352665439775,
+          "accepted": true
+        },
+        {
+          "clipStart": 484,
+          "clipEnd": 488,
+          "offset": 5821.5,
+          "subtitleOffset": 5821.453863636363,
+          "errorSec": 0.046136363636833266,
+          "score": 0.9951424261724098,
+          "ratio": 3.386281114200248,
+          "accepted": true
+        },
+        {
+          "clipStart": 486,
+          "clipEnd": 490,
+          "offset": 5821.5,
+          "subtitleOffset": 5821.453863636363,
+          "errorSec": 0.046136363636833266,
+          "score": 0.9946274480584841,
+          "ratio": 3.008451274635837,
+          "accepted": true
+        },
+        {
+          "clipStart": 488,
+          "clipEnd": 492,
+          "offset": 5821.5,
+          "subtitleOffset": 5821.453863636363,
+          "errorSec": 0.046136363636833266,
+          "score": 0.9959763099039445,
+          "ratio": 3.4332901264233557,
+          "accepted": true
+        },
+        {
+          "clipStart": 490,
+          "clipEnd": 494,
+          "offset": 5821.5,
+          "subtitleOffset": 5821.453863636363,
+          "errorSec": 0.046136363636833266,
+          "score": 0.9966130195965489,
+          "ratio": 3.072607179428629,
+          "accepted": true
+        },
+        {
+          "clipStart": 492,
+          "clipEnd": 496,
+          "offset": 5821.5,
+          "subtitleOffset": 5821.453863636363,
+          "errorSec": 0.046136363636833266,
+          "score": 0.9962998056524093,
+          "ratio": 3.768444711552708,
+          "accepted": true
+        },
+        {
+          "clipStart": 494,
+          "clipEnd": 498,
+          "offset": 5821.5,
+          "subtitleOffset": 5821.453863636363,
+          "errorSec": 0.046136363636833266,
+          "score": 0.9954745710140882,
+          "ratio": 4.195154640465705,
+          "accepted": true
+        },
+        {
+          "clipStart": 496,
+          "clipEnd": 500,
+          "offset": 5821.5,
+          "subtitleOffset": 5821.453863636363,
+          "errorSec": 0.046136363636833266,
+          "score": 0.9959272339591475,
+          "ratio": 3.6991681687730624,
+          "accepted": true
+        },
+        {
+          "clipStart": 498,
+          "clipEnd": 502,
+          "offset": 5821.5,
+          "subtitleOffset": 5821.453863636363,
+          "errorSec": 0.046136363636833266,
+          "score": 0.9965473727038933,
+          "ratio": 3.482303030049745,
+          "accepted": true
+        },
+        {
+          "clipStart": 500,
+          "clipEnd": 504,
+          "offset": 5821.5,
+          "subtitleOffset": 5821.453863636363,
+          "errorSec": 0.046136363636833266,
+          "score": 0.9962866745311947,
+          "ratio": 2.9907315802537546,
+          "accepted": true
+        },
+        {
+          "clipStart": 502,
+          "clipEnd": 506,
+          "offset": 5821.5,
+          "subtitleOffset": 5821.453863636363,
+          "errorSec": 0.046136363636833266,
+          "score": 0.9965151221957754,
+          "ratio": 3.262302930516891,
+          "accepted": true
+        },
+        {
+          "clipStart": 504,
+          "clipEnd": 508,
+          "offset": 5821.5,
+          "subtitleOffset": 5821.453863636363,
+          "errorSec": 0.046136363636833266,
+          "score": 0.9961578229395222,
+          "ratio": 3.0133222538611393,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "scoreplayId": 130852788,
+      "name": "Archie tackle.mp4",
+      "checked": 1,
+      "accepted": 1,
+      "meanAbsErrorSec": 0.026,
+      "maxAbsErrorSec": 0.026,
+      "recoveredWithinOneSec": 1,
+      "windows": [
+        {
+          "clipStart": 4,
+          "clipEnd": 8,
+          "offset": 2542.8,
+          "subtitleOffset": 2542.774,
+          "errorSec": 0.026000000000294676,
+          "score": 0.8138244770081878,
+          "ratio": 2.515796816588629,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "scoreplayId": 130852789,
+      "name": "kudus chance_1.mp4",
+      "checked": 9,
+      "accepted": 9,
+      "meanAbsErrorSec": 0.016,
+      "maxAbsErrorSec": 0.016,
+      "recoveredWithinOneSec": 9,
+      "windows": [
+        {
+          "clipStart": 4,
+          "clipEnd": 8,
+          "offset": 1441.3000000000002,
+          "subtitleOffset": 1441.284,
+          "errorSec": 0.016000000000076398,
+          "score": 0.9460066673619154,
+          "ratio": 3.016706491368225,
+          "accepted": true
+        },
+        {
+          "clipStart": 6,
+          "clipEnd": 10,
+          "offset": 1441.3000000000002,
+          "subtitleOffset": 1441.284,
+          "errorSec": 0.016000000000076398,
+          "score": 0.9451928564103005,
+          "ratio": 3.959412699298873,
+          "accepted": true
+        },
+        {
+          "clipStart": 8,
+          "clipEnd": 12,
+          "offset": 1441.3000000000002,
+          "subtitleOffset": 1441.284,
+          "errorSec": 0.016000000000076398,
+          "score": 0.9532168513126793,
+          "ratio": 3.476478004332564,
+          "accepted": true
+        },
+        {
+          "clipStart": 10,
+          "clipEnd": 14,
+          "offset": 1441.3000000000002,
+          "subtitleOffset": 1441.284,
+          "errorSec": 0.016000000000076398,
+          "score": 0.9565859129436298,
+          "ratio": 2.990615733423956,
+          "accepted": true
+        },
+        {
+          "clipStart": 12,
+          "clipEnd": 16,
+          "offset": 1441.3000000000002,
+          "subtitleOffset": 1441.284,
+          "errorSec": 0.016000000000076398,
+          "score": 0.9800999915896023,
+          "ratio": 3.145762053711065,
+          "accepted": true
+        },
+        {
+          "clipStart": 14,
+          "clipEnd": 18,
+          "offset": 1441.3000000000002,
+          "subtitleOffset": 1441.284,
+          "errorSec": 0.016000000000076398,
+          "score": 0.9867472636368148,
+          "ratio": 3.209456417701049,
+          "accepted": true
+        },
+        {
+          "clipStart": 16,
+          "clipEnd": 20,
+          "offset": 1441.3000000000002,
+          "subtitleOffset": 1441.284,
+          "errorSec": 0.016000000000076398,
+          "score": 0.9871629489126552,
+          "ratio": 3.6988740659543,
+          "accepted": true
+        },
+        {
+          "clipStart": 18,
+          "clipEnd": 22,
+          "offset": 1441.3000000000002,
+          "subtitleOffset": 1441.284,
+          "errorSec": 0.016000000000076398,
+          "score": 0.9874804290969921,
+          "ratio": 3.2470144966525036,
+          "accepted": true
+        },
+        {
+          "clipStart": 20,
+          "clipEnd": 24,
+          "offset": 1441.3000000000002,
+          "subtitleOffset": 1441.284,
+          "errorSec": 0.016000000000076398,
+          "score": 0.9879835768107031,
+          "ratio": 3.380275826337137,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "scoreplayId": 130852790,
+      "name": "Gallagher.mp4",
+      "checked": 10,
+      "accepted": 10,
+      "meanAbsErrorSec": 0.023978,
+      "maxAbsErrorSec": 0.023978,
+      "recoveredWithinOneSec": 10,
+      "windows": [
+        {
+          "clipStart": 2,
+          "clipEnd": 6,
+          "offset": 2716.6000000000004,
+          "subtitleOffset": 2716.576022321429,
+          "errorSec": 0.02397767857155486,
+          "score": 0.8081773913894988,
+          "ratio": 2.3891572628991553,
+          "accepted": true
+        },
+        {
+          "clipStart": 4,
+          "clipEnd": 8,
+          "offset": 2716.6000000000004,
+          "subtitleOffset": 2716.576022321429,
+          "errorSec": 0.02397767857155486,
+          "score": 0.8409563482338756,
+          "ratio": 1.9569868126662553,
+          "accepted": true
+        },
+        {
+          "clipStart": 6,
+          "clipEnd": 10,
+          "offset": 2716.6000000000004,
+          "subtitleOffset": 2716.576022321429,
+          "errorSec": 0.02397767857155486,
+          "score": 0.839045253070297,
+          "ratio": 2.5424634279332903,
+          "accepted": true
+        },
+        {
+          "clipStart": 8,
+          "clipEnd": 12,
+          "offset": 2716.6000000000004,
+          "subtitleOffset": 2716.576022321429,
+          "errorSec": 0.02397767857155486,
+          "score": 0.8512160581780561,
+          "ratio": 3.278480628605963,
+          "accepted": true
+        },
+        {
+          "clipStart": 10,
+          "clipEnd": 14,
+          "offset": 2716.6000000000004,
+          "subtitleOffset": 2716.576022321429,
+          "errorSec": 0.02397767857155486,
+          "score": 0.8504529452102096,
+          "ratio": 2.8170369274098137,
+          "accepted": true
+        },
+        {
+          "clipStart": 12,
+          "clipEnd": 16,
+          "offset": 2716.6000000000004,
+          "subtitleOffset": 2716.576022321429,
+          "errorSec": 0.02397767857155486,
+          "score": 0.8399597223853906,
+          "ratio": 2.277144111278173,
+          "accepted": true
+        },
+        {
+          "clipStart": 14,
+          "clipEnd": 18,
+          "offset": 2716.6000000000004,
+          "subtitleOffset": 2716.576022321429,
+          "errorSec": 0.02397767857155486,
+          "score": 0.8506055939256572,
+          "ratio": 3.0552868178441766,
+          "accepted": true
+        },
+        {
+          "clipStart": 16,
+          "clipEnd": 20,
+          "offset": 2716.6000000000004,
+          "subtitleOffset": 2716.576022321429,
+          "errorSec": 0.02397767857155486,
+          "score": 0.8549347469035641,
+          "ratio": 2.900905547016185,
+          "accepted": true
+        },
+        {
+          "clipStart": 18,
+          "clipEnd": 22,
+          "offset": 2716.6000000000004,
+          "subtitleOffset": 2716.576022321429,
+          "errorSec": 0.02397767857155486,
+          "score": 0.8610948750466266,
+          "ratio": 2.8269282657119357,
+          "accepted": true
+        },
+        {
+          "clipStart": 20,
+          "clipEnd": 24,
+          "offset": 2716.6000000000004,
+          "subtitleOffset": 2716.576022321429,
+          "errorSec": 0.02397767857155486,
+          "score": 0.8754184715463744,
+          "ratio": 2.4619882887755513,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "scoreplayId": 130852806,
+      "name": "savio chance.mp4",
+      "checked": 7,
+      "accepted": 7,
+      "meanAbsErrorSec": 0.076,
+      "maxAbsErrorSec": 0.076,
+      "recoveredWithinOneSec": 7,
+      "windows": [
+        {
+          "clipStart": 2,
+          "clipEnd": 6,
+          "offset": 3258.7000000000003,
+          "subtitleOffset": 3258.776,
+          "errorSec": -0.07599999999956708,
+          "score": 0.9695794422578875,
+          "ratio": 3.509235299183442,
+          "accepted": true
+        },
+        {
+          "clipStart": 4,
+          "clipEnd": 8,
+          "offset": 3258.7000000000003,
+          "subtitleOffset": 3258.776,
+          "errorSec": -0.07599999999956708,
+          "score": 0.9656747762425947,
+          "ratio": 3.5189037876746947,
+          "accepted": true
+        },
+        {
+          "clipStart": 6,
+          "clipEnd": 10,
+          "offset": 3258.7000000000003,
+          "subtitleOffset": 3258.776,
+          "errorSec": -0.07599999999956708,
+          "score": 0.9727697896191736,
+          "ratio": 3.684937695203192,
+          "accepted": true
+        },
+        {
+          "clipStart": 8,
+          "clipEnd": 12,
+          "offset": 3258.7000000000003,
+          "subtitleOffset": 3258.776,
+          "errorSec": -0.07599999999956708,
+          "score": 0.9803082179515687,
+          "ratio": 3.1963528283568454,
+          "accepted": true
+        },
+        {
+          "clipStart": 10,
+          "clipEnd": 14,
+          "offset": 3258.7000000000003,
+          "subtitleOffset": 3258.776,
+          "errorSec": -0.07599999999956708,
+          "score": 0.9794537263777885,
+          "ratio": 2.7740748763484144,
+          "accepted": true
+        },
+        {
+          "clipStart": 12,
+          "clipEnd": 16,
+          "offset": 3258.7000000000003,
+          "subtitleOffset": 3258.776,
+          "errorSec": -0.07599999999956708,
+          "score": 0.9790412455706922,
+          "ratio": 2.6624125792121807,
+          "accepted": true
+        },
+        {
+          "clipStart": 14,
+          "clipEnd": 18,
+          "offset": 3258.7000000000003,
+          "subtitleOffset": 3258.776,
+          "errorSec": -0.07599999999956708,
+          "score": 0.9765515743070812,
+          "ratio": 3.2325988930757203,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "scoreplayId": 130852807,
+      "name": "Solanke early chance.mp4",
+      "checked": 6,
+      "accepted": 2,
+      "meanAbsErrorSec": 0.05,
+      "maxAbsErrorSec": 0.05,
+      "recoveredWithinOneSec": 6,
+      "windows": [
+        {
+          "clipStart": 4,
+          "clipEnd": 8,
+          "offset": 368.6,
+          "subtitleOffset": 368.55,
+          "errorSec": 0.05000000000001137,
+          "score": 0.6019854007120514,
+          "ratio": 1.8660180314397645,
+          "accepted": false
+        },
+        {
+          "clipStart": 6,
+          "clipEnd": 10,
+          "offset": 368.6,
+          "subtitleOffset": 368.55,
+          "errorSec": 0.05000000000001137,
+          "score": 0.6442810727476902,
+          "ratio": 1.8284706104968316,
+          "accepted": false
+        },
+        {
+          "clipStart": 8,
+          "clipEnd": 12,
+          "offset": 368.6,
+          "subtitleOffset": 368.55,
+          "errorSec": 0.05000000000001137,
+          "score": 0.6479724557188717,
+          "ratio": 1.7418662466727914,
+          "accepted": false
+        },
+        {
+          "clipStart": 10,
+          "clipEnd": 14,
+          "offset": 368.6,
+          "subtitleOffset": 368.55,
+          "errorSec": 0.05000000000001137,
+          "score": 0.6656009304491468,
+          "ratio": 2.0320508581945482,
+          "accepted": true
+        },
+        {
+          "clipStart": 12,
+          "clipEnd": 16,
+          "offset": 368.6,
+          "subtitleOffset": 368.55,
+          "errorSec": 0.05000000000001137,
+          "score": 0.6574800998442053,
+          "ratio": 2.2223569125521996,
+          "accepted": true
+        },
+        {
+          "clipStart": 14,
+          "clipEnd": 18,
+          "offset": 368.6,
+          "subtitleOffset": 368.55,
+          "errorSec": 0.05000000000001137,
+          "score": 0.6162352029980792,
+          "ratio": 2.327788809330646,
+          "accepted": false
+        }
+      ]
+    },
+    {
+      "scoreplayId": 130852808,
+      "name": "solanke late goal.mp4",
+      "checked": 11,
+      "accepted": 11,
+      "meanAbsErrorSec": 0.197617,
+      "maxAbsErrorSec": 0.197617,
+      "recoveredWithinOneSec": 11,
+      "windows": [
+        {
+          "clipStart": 4,
+          "clipEnd": 8,
+          "offset": 5818.5,
+          "subtitleOffset": 5818.697616883117,
+          "errorSec": -0.1976168831170071,
+          "score": 0.922611175785414,
+          "ratio": 2.808693981769645,
+          "accepted": true
+        },
+        {
+          "clipStart": 6,
+          "clipEnd": 10,
+          "offset": 5818.5,
+          "subtitleOffset": 5818.697616883117,
+          "errorSec": -0.1976168831170071,
+          "score": 0.925870418196812,
+          "ratio": 3.149901869733598,
+          "accepted": true
+        },
+        {
+          "clipStart": 8,
+          "clipEnd": 12,
+          "offset": 5818.5,
+          "subtitleOffset": 5818.697616883117,
+          "errorSec": -0.1976168831170071,
+          "score": 0.9427613862487593,
+          "ratio": 3.4155122297932725,
+          "accepted": true
+        },
+        {
+          "clipStart": 10,
+          "clipEnd": 14,
+          "offset": 5818.5,
+          "subtitleOffset": 5818.697616883117,
+          "errorSec": -0.1976168831170071,
+          "score": 0.9441942017160592,
+          "ratio": 2.88922532207408,
+          "accepted": true
+        },
+        {
+          "clipStart": 12,
+          "clipEnd": 16,
+          "offset": 5818.5,
+          "subtitleOffset": 5818.697616883117,
+          "errorSec": -0.1976168831170071,
+          "score": 0.9376857849687805,
+          "ratio": 2.813121818551491,
+          "accepted": true
+        },
+        {
+          "clipStart": 14,
+          "clipEnd": 18,
+          "offset": 5818.5,
+          "subtitleOffset": 5818.697616883117,
+          "errorSec": -0.1976168831170071,
+          "score": 0.9128722371526234,
+          "ratio": 3.038515000913767,
+          "accepted": true
+        },
+        {
+          "clipStart": 16,
+          "clipEnd": 20,
+          "offset": 5818.5,
+          "subtitleOffset": 5818.697616883117,
+          "errorSec": -0.1976168831170071,
+          "score": 0.8462764223944467,
+          "ratio": 2.846890592363896,
+          "accepted": true
+        },
+        {
+          "clipStart": 18,
+          "clipEnd": 22,
+          "offset": 5818.5,
+          "subtitleOffset": 5818.697616883117,
+          "errorSec": -0.1976168831170071,
+          "score": 0.8271024627126613,
+          "ratio": 2.3488761903536757,
+          "accepted": true
+        },
+        {
+          "clipStart": 20,
+          "clipEnd": 24,
+          "offset": 5818.5,
+          "subtitleOffset": 5818.697616883117,
+          "errorSec": -0.1976168831170071,
+          "score": 0.9229832746746405,
+          "ratio": 3.0094007358728883,
+          "accepted": true
+        },
+        {
+          "clipStart": 22,
+          "clipEnd": 26,
+          "offset": 5818.5,
+          "subtitleOffset": 5818.697616883117,
+          "errorSec": -0.1976168831170071,
+          "score": 0.9377798896389988,
+          "ratio": 3.533499495988959,
+          "accepted": true
+        },
+        {
+          "clipStart": 24,
+          "clipEnd": 28,
+          "offset": 5818.5,
+          "subtitleOffset": 5818.697616883117,
+          "errorSec": -0.1976168831170071,
+          "score": 0.9467773804687918,
+          "ratio": 3.1880248818186874,
+          "accepted": true
+        }
+      ]
+    },
+    {
+      "scoreplayId": 130852809,
+      "name": "solanke over the bar.mp4",
+      "checked": 11,
+      "accepted": 11,
+      "meanAbsErrorSec": 0.049982,
+      "maxAbsErrorSec": 0.049982,
+      "recoveredWithinOneSec": 11,
+      "windows": [
+        {
+          "clipStart": 2,
+          "clipEnd": 6,
+          "offset": 3358.7000000000003,
+          "subtitleOffset": 3358.6500181623933,
+          "errorSec": 0.049981837606992485,
+          "score": 0.9997342994942665,
+          "ratio": 3.375482569145631,
+          "accepted": true
+        },
+        {
+          "clipStart": 4,
+          "clipEnd": 8,
+          "offset": 3358.7000000000003,
+          "subtitleOffset": 3358.6500181623933,
+          "errorSec": 0.049981837606992485,
+          "score": 0.9995204772242323,
+          "ratio": 3.153868043409991,
+          "accepted": true
+        },
+        {
+          "clipStart": 6,
+          "clipEnd": 10,
+          "offset": 3358.7000000000003,
+          "subtitleOffset": 3358.6500181623933,
+          "errorSec": 0.049981837606992485,
+          "score": 0.999404204407521,
+          "ratio": 2.6431714784087768,
+          "accepted": true
+        },
+        {
+          "clipStart": 8,
+          "clipEnd": 12,
+          "offset": 3358.7000000000003,
+          "subtitleOffset": 3358.6500181623933,
+          "errorSec": 0.049981837606992485,
+          "score": 0.9994815430353331,
+          "ratio": 3.427470075104369,
+          "accepted": true
+        },
+        {
+          "clipStart": 10,
+          "clipEnd": 14,
+          "offset": 3358.7000000000003,
+          "subtitleOffset": 3358.6500181623933,
+          "errorSec": 0.049981837606992485,
+          "score": 0.9995198469492108,
+          "ratio": 3.1432622190763597,
+          "accepted": true
+        },
+        {
+          "clipStart": 12,
+          "clipEnd": 16,
+          "offset": 3358.7000000000003,
+          "subtitleOffset": 3358.6500181623933,
+          "errorSec": 0.049981837606992485,
+          "score": 0.999664812324558,
+          "ratio": 3.0617872027638415,
+          "accepted": true
+        },
+        {
+          "clipStart": 14,
+          "clipEnd": 18,
+          "offset": 3358.7000000000003,
+          "subtitleOffset": 3358.6500181623933,
+          "errorSec": 0.049981837606992485,
+          "score": 0.9995646160675155,
+          "ratio": 3.3762585289657965,
+          "accepted": true
+        },
+        {
+          "clipStart": 16,
+          "clipEnd": 20,
+          "offset": 3358.7000000000003,
+          "subtitleOffset": 3358.6500181623933,
+          "errorSec": 0.049981837606992485,
+          "score": 0.9996645300852922,
+          "ratio": 3.319046653948395,
+          "accepted": true
+        },
+        {
+          "clipStart": 18,
+          "clipEnd": 22,
+          "offset": 3358.7000000000003,
+          "subtitleOffset": 3358.6500181623933,
+          "errorSec": 0.049981837606992485,
+          "score": 0.9997981408311108,
+          "ratio": 3.223482821958549,
+          "accepted": true
+        },
+        {
+          "clipStart": 20,
+          "clipEnd": 24,
+          "offset": 3358.7000000000003,
+          "subtitleOffset": 3358.6500181623933,
+          "errorSec": 0.049981837606992485,
+          "score": 0.9997519981954371,
+          "ratio": 3.000882068069732,
+          "accepted": true
+        },
+        {
+          "clipStart": 22,
+          "clipEnd": 26,
+          "offset": 3358.7000000000003,
+          "subtitleOffset": 3358.6500181623933,
+          "errorSec": 0.049981837606992485,
+          "score": 0.9996623131653003,
+          "ratio": 3.1668982069040585,
+          "accepted": true
+        }
+      ]
+    }
+  ],
+  "targets": [
+    {
+      "scoreplayId": 130852685,
+      "name": "Solanke Goal.mp4",
+      "durationSec": 58,
+      "windows": [
+        {
+          "clipStart": 0,
+          "clipEnd": 4,
+          "offset": 2745.8,
+          "score": 0.20395764667045818,
+          "secondScore": 0.19391454604668174,
+          "ratio": 1.0517913732029094,
+          "accepted": false
+        },
+        {
+          "clipStart": 2,
+          "clipEnd": 6,
+          "offset": 5143.5,
+          "score": 0.2162102975185114,
+          "secondScore": 0.1981243205659356,
+          "ratio": 1.0912860011376382,
+          "accepted": false
+        },
+        {
+          "clipStart": 4,
+          "clipEnd": 8,
+          "offset": 4121.5,
+          "score": 0.22470970077180247,
+          "secondScore": 0.21822422145542186,
+          "ratio": 1.0297193376295557,
+          "accepted": false
+        },
+        {
+          "clipStart": 6,
+          "clipEnd": 10,
+          "offset": 2213.6,
+          "score": 0.2044580488839118,
+          "secondScore": 0.19968012033849142,
+          "ratio": 1.0239279129906422,
+          "accepted": false
+        },
+        {
+          "clipStart": 8,
+          "clipEnd": 12,
+          "offset": 5983.3,
+          "score": 0.2155320398316058,
+          "secondScore": 0.20858369591278636,
+          "ratio": 1.0333120184126217,
+          "accepted": false
+        },
+        {
+          "clipStart": 10,
+          "clipEnd": 14,
+          "offset": 4367,
+          "score": 0.22006815550075565,
+          "secondScore": 0.2099936284366834,
+          "ratio": 1.0479753940111087,
+          "accepted": false
+        },
+        {
+          "clipStart": 12,
+          "clipEnd": 16,
+          "offset": 4740.2,
+          "score": 0.23067741953320223,
+          "secondScore": 0.2257832363422176,
+          "ratio": 1.021676468414008,
+          "accepted": false
+        },
+        {
+          "clipStart": 14,
+          "clipEnd": 18,
+          "offset": 1910.1,
+          "score": 0.21420398115438488,
+          "secondScore": 0.20529370010299355,
+          "ratio": 1.0434026034258292,
+          "accepted": false
+        },
+        {
+          "clipStart": 16,
+          "clipEnd": 20,
+          "offset": 4771.8,
+          "score": 0.21001194030116926,
+          "secondScore": 0.19691755091549917,
+          "ratio": 1.0664968121165042,
+          "accepted": false
+        },
+        {
+          "clipStart": 18,
+          "clipEnd": 22,
+          "offset": 2451.7,
+          "score": 0.20347602834500442,
+          "secondScore": 0.19525378392197587,
+          "ratio": 1.0421105509858604,
+          "accepted": false
+        },
+        {
+          "clipStart": 20,
+          "clipEnd": 24,
+          "offset": 5064.3,
+          "score": 0.20352123834222996,
+          "secondScore": 0.19038582696138664,
+          "ratio": 1.0689936409158618,
+          "accepted": false
+        },
+        {
+          "clipStart": 22,
+          "clipEnd": 26,
+          "offset": 3000.6,
+          "score": 0.2513105768199677,
+          "secondScore": 0.2163974771997081,
+          "ratio": 1.1613378310692557,
+          "accepted": false
+        },
+        {
+          "clipStart": 24,
+          "clipEnd": 28,
+          "offset": 3000.6,
+          "score": 0.28276133893647054,
+          "secondScore": 0.2472729373468871,
+          "ratio": 1.1435191492055539,
+          "accepted": false
+        },
+        {
+          "clipStart": 26,
+          "clipEnd": 30,
+          "offset": 1714.4,
+          "score": 0.24538780002005872,
+          "secondScore": 0.2149887822497999,
+          "ratio": 1.1413981578580112,
+          "accepted": false
+        },
+        {
+          "clipStart": 28,
+          "clipEnd": 32,
+          "offset": 4769.9,
+          "score": 0.22732838414827894,
+          "secondScore": 0.21542419544182928,
+          "ratio": 1.0552592928664977,
+          "accepted": false
+        },
+        {
+          "clipStart": 30,
+          "clipEnd": 34,
+          "offset": 2169.7,
+          "score": 0.20400378005832406,
+          "secondScore": 0.2014622042431458,
+          "ratio": 1.0126156458216393,
+          "accepted": false
+        },
+        {
+          "clipStart": 32,
+          "clipEnd": 36,
+          "offset": 4493,
+          "score": 0.22837754311353017,
+          "secondScore": 0.21010655985052284,
+          "ratio": 1.0869605559959954,
+          "accepted": false
+        },
+        {
+          "clipStart": 34,
+          "clipEnd": 38,
+          "offset": 2205,
+          "score": 0.22503299847556082,
+          "secondScore": 0.22227070949494998,
+          "ratio": 1.0124275888032543,
+          "accepted": false
+        },
+        {
+          "clipStart": 36,
+          "clipEnd": 40,
+          "offset": 144.2,
+          "score": 0.23590910933474887,
+          "secondScore": 0.2201486952210027,
+          "ratio": 1.0715898592899886,
+          "accepted": false
+        },
+        {
+          "clipStart": 38,
+          "clipEnd": 42,
+          "offset": 553.5,
+          "score": 0.2283482185431037,
+          "secondScore": 0.21243154048424817,
+          "ratio": 1.0749261527858465,
+          "accepted": false
+        },
+        {
+          "clipStart": 40,
+          "clipEnd": 44,
+          "offset": 1412.6,
+          "score": 0.24448496823923938,
+          "secondScore": 0.2316843177580876,
+          "ratio": 1.055250396768406,
+          "accepted": false
+        },
+        {
+          "clipStart": 42,
+          "clipEnd": 46,
+          "offset": 2103.6,
+          "score": 0.2268196179974598,
+          "secondScore": 0.21626820399038219,
+          "ratio": 1.0487885588930441,
+          "accepted": false
+        },
+        {
+          "clipStart": 44,
+          "clipEnd": 48,
+          "offset": 5844.7,
+          "score": 0.21541363711915434,
+          "secondScore": 0.2144777875759191,
+          "ratio": 1.0043633867815052,
+          "accepted": false
+        },
+        {
+          "clipStart": 46,
+          "clipEnd": 50,
+          "offset": 4595.8,
+          "score": 0.2221990278942205,
+          "secondScore": 0.2020632591539915,
+          "ratio": 1.0996508164053893,
+          "accepted": false
+        },
+        {
+          "clipStart": 48,
+          "clipEnd": 52,
+          "offset": 4447.3,
+          "score": 0.23502465817185275,
+          "secondScore": 0.2188948848876077,
+          "ratio": 1.0736873010647414,
+          "accepted": false
+        },
+        {
+          "clipStart": 50,
+          "clipEnd": 54,
+          "offset": 3631.5,
+          "score": 0.23006779984785375,
+          "secondScore": 0.22574397080399491,
+          "ratio": 1.0191536856043568,
+          "accepted": false
+        },
+        {
+          "clipStart": 52,
+          "clipEnd": 56,
+          "offset": 4969.1,
+          "score": 0.25188870874674735,
+          "secondScore": 0.24642128522464693,
+          "ratio": 1.022187302193137,
+          "accepted": false
+        },
+        {
+          "clipStart": 54,
+          "clipEnd": 58,
+          "offset": 48.8,
+          "score": 0.2602553543836764,
+          "secondScore": 0.20836829799608717,
+          "ratio": 1.2490160781970951,
+          "accepted": false
+        }
+      ],
+      "segments": [],
+      "reason": "no window passes the broadcast-audio gate; music, retiming or different audio cannot be located by this method",
+      "unexaminedTailSec": 0
+    },
+    {
+      "scoreplayId": 130852721,
+      "name": "9x16_DEF_ACTIONS_VS_MNU.mp4",
+      "durationSec": 120,
+      "windows": [
+        {
+          "clipStart": 0,
+          "clipEnd": 4,
+          "offset": 3028.8,
+          "score": 0.31617928500999043,
+          "secondScore": 0.2977882595552371,
+          "ratio": 1.0617587324705862,
+          "accepted": false
+        },
+        {
+          "clipStart": 2,
+          "clipEnd": 6,
+          "offset": 3028.8,
+          "score": 0.32095735912655415,
+          "secondScore": 0.2822568185297279,
+          "ratio": 1.1371110919424972,
+          "accepted": false
+        },
+        {
+          "clipStart": 4,
+          "clipEnd": 8,
+          "offset": 3026.1,
+          "score": 0.32282848191316277,
+          "secondScore": 0.2451156892181509,
+          "ratio": 1.3170453631217711,
+          "accepted": false
+        },
+        {
+          "clipStart": 6,
+          "clipEnd": 10,
+          "offset": 6095.1,
+          "score": 0.2807844066370787,
+          "secondScore": 0.2671381269638189,
+          "ratio": 1.0510832348356927,
+          "accepted": false
+        },
+        {
+          "clipStart": 8,
+          "clipEnd": 12,
+          "offset": 3023.4,
+          "score": 0.24403590578337062,
+          "secondScore": 0.23065871840939045,
+          "ratio": 1.0579955852795355,
+          "accepted": false
+        },
+        {
+          "clipStart": 10,
+          "clipEnd": 14,
+          "offset": 3021.4,
+          "score": 0.2631858418257849,
+          "secondScore": 0.25950076414406453,
+          "ratio": 1.0142006428916508,
+          "accepted": false
+        },
+        {
+          "clipStart": 12,
+          "clipEnd": 16,
+          "offset": 3126.6,
+          "score": 0.249826423930011,
+          "secondScore": 0.2439673666003029,
+          "ratio": 1.024015741987768,
+          "accepted": false
+        },
+        {
+          "clipStart": 14,
+          "clipEnd": 18,
+          "offset": 3824.8,
+          "score": 0.30533953040354533,
+          "secondScore": 0.28779917930483956,
+          "ratio": 1.0609464945003435,
+          "accepted": false
+        },
+        {
+          "clipStart": 16,
+          "clipEnd": 20,
+          "offset": 1307.1,
+          "score": 0.30367454115298004,
+          "secondScore": 0.29854086165853555,
+          "ratio": 1.0171959023161,
+          "accepted": false
+        },
+        {
+          "clipStart": 18,
+          "clipEnd": 22,
+          "offset": 2270.3,
+          "score": 0.31556416179082963,
+          "secondScore": 0.29167176083039775,
+          "ratio": 1.0819153725832407,
+          "accepted": false
+        },
+        {
+          "clipStart": 20,
+          "clipEnd": 24,
+          "offset": 5523.7,
+          "score": 0.3070052638461737,
+          "secondScore": 0.3060789912952986,
+          "ratio": 1.00302625327846,
+          "accepted": false
+        },
+        {
+          "clipStart": 22,
+          "clipEnd": 26,
+          "offset": 3623.8,
+          "score": 0.2964511370205697,
+          "secondScore": 0.29376276162919157,
+          "ratio": 1.009151518648819,
+          "accepted": false
+        },
+        {
+          "clipStart": 24,
+          "clipEnd": 28,
+          "offset": 5801.8,
+          "score": 0.2844418073176539,
+          "secondScore": 0.2835442976146295,
+          "ratio": 1.003165324468081,
+          "accepted": false
+        },
+        {
+          "clipStart": 26,
+          "clipEnd": 30,
+          "offset": 3999.6,
+          "score": 0.28452838451950097,
+          "secondScore": 0.278532916515807,
+          "ratio": 1.0215251686540026,
+          "accepted": false
+        },
+        {
+          "clipStart": 28,
+          "clipEnd": 32,
+          "offset": 5515.7,
+          "score": 0.31904074164418034,
+          "secondScore": 0.2950332933620059,
+          "ratio": 1.081371997067183,
+          "accepted": false
+        },
+        {
+          "clipStart": 30,
+          "clipEnd": 34,
+          "offset": 6279.9,
+          "score": 0.30059306910862316,
+          "secondScore": 0.2911551500060139,
+          "ratio": 1.0324154290329892,
+          "accepted": false
+        },
+        {
+          "clipStart": 32,
+          "clipEnd": 36,
+          "offset": 2163.3,
+          "score": 0.312678338979166,
+          "secondScore": 0.28193051565513033,
+          "ratio": 1.1090617071110094,
+          "accepted": false
+        },
+        {
+          "clipStart": 34,
+          "clipEnd": 38,
+          "offset": 5791.1,
+          "score": 0.3359095506679292,
+          "secondScore": 0.27952710088590915,
+          "ratio": 1.2017065594116862,
+          "accepted": false
+        },
+        {
+          "clipStart": 36,
+          "clipEnd": 40,
+          "offset": 2155.8,
+          "score": 0.3118342284719648,
+          "secondScore": 0.3088881471524374,
+          "ratio": 1.0095376962395177,
+          "accepted": false
+        },
+        {
+          "clipStart": 38,
+          "clipEnd": 42,
+          "offset": 1477.7,
+          "score": 0.3434455679102708,
+          "secondScore": 0.287709963251081,
+          "ratio": 1.1937214965703151,
+          "accepted": false
+        },
+        {
+          "clipStart": 40,
+          "clipEnd": 44,
+          "offset": 5793.1,
+          "score": 0.295585688219559,
+          "secondScore": 0.2955489437446397,
+          "ratio": 1.000124326192656,
+          "accepted": false
+        },
+        {
+          "clipStart": 42,
+          "clipEnd": 46,
+          "offset": 2246.3,
+          "score": 0.2988714585245982,
+          "secondScore": 0.2945012329067021,
+          "ratio": 1.0148394136580086,
+          "accepted": false
+        },
+        {
+          "clipStart": 44,
+          "clipEnd": 48,
+          "offset": 886.9,
+          "score": 0.3072272700037961,
+          "secondScore": 0.30208611959335,
+          "ratio": 1.0170188236962585,
+          "accepted": false
+        },
+        {
+          "clipStart": 46,
+          "clipEnd": 50,
+          "offset": 5840.2,
+          "score": 0.30137478010109164,
+          "secondScore": 0.2762553768903209,
+          "ratio": 1.0909281965604734,
+          "accepted": false
+        },
+        {
+          "clipStart": 48,
+          "clipEnd": 52,
+          "offset": 2763.1,
+          "score": 0.28274824235771207,
+          "secondScore": 0.2757062657925073,
+          "ratio": 1.025541590594479,
+          "accepted": false
+        },
+        {
+          "clipStart": 50,
+          "clipEnd": 54,
+          "offset": 2980.7,
+          "score": 0.2341202382145457,
+          "secondScore": 0.2141397653378237,
+          "ratio": 1.0933057568509104,
+          "accepted": false
+        },
+        {
+          "clipStart": 52,
+          "clipEnd": 56,
+          "offset": 6049.8,
+          "score": 0.2650537944678098,
+          "secondScore": 0.24372770995874316,
+          "ratio": 1.087499630274607,
+          "accepted": false
+        },
+        {
+          "clipStart": 54,
+          "clipEnd": 58,
+          "offset": 5826.1,
+          "score": 0.2477595234826283,
+          "secondScore": 0.2212962310962333,
+          "ratio": 1.119583113798658,
+          "accepted": false
+        },
+        {
+          "clipStart": 56,
+          "clipEnd": 60,
+          "offset": 438.2,
+          "score": 0.3215896435313431,
+          "secondScore": 0.3095603851327529,
+          "ratio": 1.0388591660183895,
+          "accepted": false
+        },
+        {
+          "clipStart": 58,
+          "clipEnd": 62,
+          "offset": 3496.6,
+          "score": 0.33328208282445354,
+          "secondScore": 0.3295113900729592,
+          "ratio": 1.011443285012574,
+          "accepted": false
+        },
+        {
+          "clipStart": 60,
+          "clipEnd": 64,
+          "offset": 5483.7,
+          "score": 0.3067716288177175,
+          "secondScore": 0.2863577377789977,
+          "ratio": 1.0712880720355273,
+          "accepted": false
+        },
+        {
+          "clipStart": 62,
+          "clipEnd": 66,
+          "offset": 4404.3,
+          "score": 0.30941024859886684,
+          "secondScore": 0.2948757657617747,
+          "ratio": 1.0492901910726509,
+          "accepted": false
+        },
+        {
+          "clipStart": 64,
+          "clipEnd": 68,
+          "offset": 2131.3,
+          "score": 0.32763755152444496,
+          "secondScore": 0.3117630738233389,
+          "ratio": 1.0509184025754807,
+          "accepted": false
+        },
+        {
+          "clipStart": 66,
+          "clipEnd": 70,
+          "offset": 4456.6,
+          "score": 0.29629721686139604,
+          "secondScore": 0.27360758285691394,
+          "ratio": 1.0829276504969816,
+          "accepted": false
+        },
+        {
+          "clipStart": 68,
+          "clipEnd": 72,
+          "offset": 2957.1,
+          "score": 0.32831000694923196,
+          "secondScore": 0.3282697916782654,
+          "ratio": 1.0001225067672568,
+          "accepted": false
+        },
+        {
+          "clipStart": 70,
+          "clipEnd": 74,
+          "offset": 3068.6,
+          "score": 0.25127906086981083,
+          "secondScore": 0.25101123529070385,
+          "ratio": 1.001066986419141,
+          "accepted": false
+        },
+        {
+          "clipStart": 72,
+          "clipEnd": 76,
+          "offset": 2957.4,
+          "score": 0.23654336372270415,
+          "secondScore": 0.22603944367130746,
+          "ratio": 1.0464694120671738,
+          "accepted": false
+        },
+        {
+          "clipStart": 74,
+          "clipEnd": 78,
+          "offset": 2957.4,
+          "score": 0.2596174181438536,
+          "secondScore": 0.21794921526711478,
+          "ratio": 1.1911830828373067,
+          "accepted": false
+        },
+        {
+          "clipStart": 76,
+          "clipEnd": 80,
+          "offset": 820.4,
+          "score": 0.280371227496698,
+          "secondScore": 0.264267100573585,
+          "ratio": 1.0609388262411759,
+          "accepted": false
+        },
+        {
+          "clipStart": 78,
+          "clipEnd": 82,
+          "offset": 2953.4,
+          "score": 0.23761470077093352,
+          "secondScore": 0.23216280725314928,
+          "ratio": 1.0234830616595687,
+          "accepted": false
+        },
+        {
+          "clipStart": 80,
+          "clipEnd": 84,
+          "offset": 2948.7,
+          "score": 0.2698947656708426,
+          "secondScore": 0.24229990901274495,
+          "ratio": 1.1138871936458141,
+          "accepted": false
+        },
+        {
+          "clipStart": 82,
+          "clipEnd": 86,
+          "offset": 2948.7,
+          "score": 0.25425411947390936,
+          "secondScore": 0.22757478725213426,
+          "ratio": 1.117233251292537,
+          "accepted": false
+        },
+        {
+          "clipStart": 84,
+          "clipEnd": 88,
+          "offset": 6017.8,
+          "score": 0.24749354545146895,
+          "secondScore": 0.24572060621576808,
+          "ratio": 1.0072152647798047,
+          "accepted": false
+        },
+        {
+          "clipStart": 86,
+          "clipEnd": 90,
+          "offset": 288.5,
+          "score": 0.2113974353299787,
+          "secondScore": 0.20691297976217957,
+          "ratio": 1.0216731476824386,
+          "accepted": false
+        },
+        {
+          "clipStart": 88,
+          "clipEnd": 92,
+          "offset": 2538.4,
+          "score": 0.3054922055286637,
+          "secondScore": 0.30427646459508745,
+          "ratio": 1.00399551419527,
+          "accepted": false
+        },
+        {
+          "clipStart": 90,
+          "clipEnd": 94,
+          "offset": 4939.4,
+          "score": 0.32610908962056084,
+          "secondScore": 0.32418645952219693,
+          "ratio": 1.0059306304809819,
+          "accepted": false
+        },
+        {
+          "clipStart": 92,
+          "clipEnd": 96,
+          "offset": 4679.2,
+          "score": 0.30228129260231934,
+          "secondScore": 0.3011861694386476,
+          "ratio": 1.0036360340373955,
+          "accepted": false
+        },
+        {
+          "clipStart": 94,
+          "clipEnd": 98,
+          "offset": 4372.3,
+          "score": 0.3083445916643926,
+          "secondScore": 0.3056005933522579,
+          "ratio": 1.0089790346348304,
+          "accepted": false
+        },
+        {
+          "clipStart": 96,
+          "clipEnd": 100,
+          "offset": 2099.3,
+          "score": 0.3351560464158203,
+          "secondScore": 0.31280781904311494,
+          "ratio": 1.0714439538022706,
+          "accepted": false
+        },
+        {
+          "clipStart": 98,
+          "clipEnd": 102,
+          "offset": 5727.1,
+          "score": 0.35016585906992875,
+          "secondScore": 0.2814982600649861,
+          "ratio": 1.2439361400993745,
+          "accepted": false
+        },
+        {
+          "clipStart": 100,
+          "clipEnd": 104,
+          "offset": 2122.9,
+          "score": 0.3105502944669352,
+          "secondScore": 0.2941383208120918,
+          "ratio": 1.0557967884277415,
+          "accepted": false
+        },
+        {
+          "clipStart": 102,
+          "clipEnd": 106,
+          "offset": 1413.7,
+          "score": 0.3389374127458355,
+          "secondScore": 0.2876769960967141,
+          "ratio": 1.1781874023458176,
+          "accepted": false
+        },
+        {
+          "clipStart": 104,
+          "clipEnd": 108,
+          "offset": 5729.1,
+          "score": 0.29504495187703866,
+          "secondScore": 0.2871436613855521,
+          "ratio": 1.0275168549894522,
+          "accepted": false
+        },
+        {
+          "clipStart": 106,
+          "clipEnd": 110,
+          "offset": 2182.3,
+          "score": 0.2799137964478048,
+          "secondScore": 0.2685595646793891,
+          "ratio": 1.0422782624851608,
+          "accepted": false
+        },
+        {
+          "clipStart": 108,
+          "clipEnd": 112,
+          "offset": 5435.7,
+          "score": 0.3071073049719976,
+          "secondScore": 0.2781563949076283,
+          "ratio": 1.1040814110133383,
+          "accepted": false
+        },
+        {
+          "clipStart": 110,
+          "clipEnd": 114,
+          "offset": 6199.9,
+          "score": 0.3072644677185492,
+          "secondScore": 0.3019207773343295,
+          "ratio": 1.017698981936253,
+          "accepted": false
+        },
+        {
+          "clipStart": 112,
+          "clipEnd": 116,
+          "offset": 2083.3,
+          "score": 0.3381405935625988,
+          "secondScore": 0.31633779317323296,
+          "ratio": 1.0689225279428631,
+          "accepted": false
+        },
+        {
+          "clipStart": 114,
+          "clipEnd": 118,
+          "offset": 5711.1,
+          "score": 0.36529102822621484,
+          "secondScore": 0.27849608042576185,
+          "ratio": 1.3116559043407785,
+          "accepted": false
+        },
+        {
+          "clipStart": 116,
+          "clipEnd": 120,
+          "offset": 5716.1,
+          "score": 0.3085816266480147,
+          "secondScore": 0.2642777355394877,
+          "ratio": 1.1676414058039606,
+          "accepted": false
+        }
+      ],
+      "segments": [],
+      "reason": "no window passes the broadcast-audio gate; music, retiming or different audio cannot be located by this method",
+      "unexaminedTailSec": 0
+    },
+    {
+      "scoreplayId": 130852785,
+      "name": "Goal Slo Mo Man United 9x16 (A) v1.mp4",
+      "durationSec": 45,
+      "windows": [
+        {
+          "clipStart": 0,
+          "clipEnd": 4,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 2,
+          "clipEnd": 6,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 4,
+          "clipEnd": 8,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 6,
+          "clipEnd": 10,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 8,
+          "clipEnd": 12,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 10,
+          "clipEnd": 14,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 12,
+          "clipEnd": 16,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 14,
+          "clipEnd": 18,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 16,
+          "clipEnd": 20,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 18,
+          "clipEnd": 22,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 20,
+          "clipEnd": 24,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 22,
+          "clipEnd": 26,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 24,
+          "clipEnd": 28,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 26,
+          "clipEnd": 30,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 28,
+          "clipEnd": 32,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 30,
+          "clipEnd": 34,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 32,
+          "clipEnd": 36,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 34,
+          "clipEnd": 38,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 36,
+          "clipEnd": 40,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 38,
+          "clipEnd": 42,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        },
+        {
+          "clipStart": 40,
+          "clipEnd": 44,
+          "offset": null,
+          "score": 0,
+          "secondScore": 0,
+          "ratio": 0,
+          "accepted": false
+        }
+      ],
+      "segments": [],
+      "reason": "silent audio; no offset",
+      "unexaminedTailSec": 1
+    },
+    {
+      "scoreplayId": 130852787,
+      "name": "Goal Man United 9x16 (A) v1.mp4",
+      "durationSec": 30,
+      "windows": [
+        {
+          "clipStart": 0,
+          "clipEnd": 4,
+          "offset": 3031.8,
+          "score": 0.4735669237059967,
+          "secondScore": 0.20154078727213637,
+          "ratio": 2.349732429429032,
+          "accepted": false
+        },
+        {
+          "clipStart": 2,
+          "clipEnd": 6,
+          "offset": 3027.3,
+          "score": 0.26011272177172856,
+          "secondScore": 0.1990340204890251,
+          "ratio": 1.3068756845318883,
+          "accepted": false
+        },
+        {
+          "clipStart": 4,
+          "clipEnd": 8,
+          "offset": 3027.3,
+          "score": 0.27238232053491307,
+          "secondScore": 0.2116113506547296,
+          "ratio": 1.2871819951630992,
+          "accepted": false
+        },
+        {
+          "clipStart": 6,
+          "clipEnd": 10,
+          "offset": 143.9,
+          "score": 0.21386098675116255,
+          "secondScore": 0.20962064911565345,
+          "ratio": 1.0202286256311017,
+          "accepted": false
+        },
+        {
+          "clipStart": 8,
+          "clipEnd": 12,
+          "offset": 2462.8,
+          "score": 0.22647512074066167,
+          "secondScore": 0.20717974949879903,
+          "ratio": 1.093133480895412,
+          "accepted": false
+        },
+        {
+          "clipStart": 10,
+          "clipEnd": 14,
+          "offset": 4847.6,
+          "score": 0.2528027582909643,
+          "secondScore": 0.2209889756851076,
+          "ratio": 1.1439609487632945,
+          "accepted": false
+        },
+        {
+          "clipStart": 12,
+          "clipEnd": 16,
+          "offset": 4847.6,
+          "score": 0.24731208865150728,
+          "secondScore": 0.23866904630100685,
+          "ratio": 1.0362135035290665,
+          "accepted": false
+        },
+        {
+          "clipStart": 14,
+          "clipEnd": 18,
+          "offset": 5173,
+          "score": 0.26467773378925263,
+          "secondScore": 0.22807369027388713,
+          "ratio": 1.1604921789593914,
+          "accepted": false
+        },
+        {
+          "clipStart": 16,
+          "clipEnd": 20,
+          "offset": 5028.6,
+          "score": 0.24779157103742108,
+          "secondScore": 0.23892997052682663,
+          "ratio": 1.037088693775231,
+          "accepted": false
+        },
+        {
+          "clipStart": 18,
+          "clipEnd": 22,
+          "offset": 3952,
+          "score": 0.22192213017537982,
+          "secondScore": 0.21752008535308434,
+          "ratio": 1.0202374176855897,
+          "accepted": false
+        },
+        {
+          "clipStart": 20,
+          "clipEnd": 24,
+          "offset": 3847.6,
+          "score": 0.2119031863567375,
+          "secondScore": 0.20939172332232156,
+          "ratio": 1.0119940893296435,
+          "accepted": false
+        },
+        {
+          "clipStart": 22,
+          "clipEnd": 26,
+          "offset": 5837.4,
+          "score": 0.21101392260768456,
+          "secondScore": 0.20997459456993123,
+          "ratio": 1.0049497799478173,
+          "accepted": false
+        },
+        {
+          "clipStart": 24,
+          "clipEnd": 28,
+          "offset": 2086.1,
+          "score": 0.22645994072681572,
+          "secondScore": 0.21990129258407756,
+          "ratio": 1.0298254187852511,
+          "accepted": false
+        },
+        {
+          "clipStart": 26,
+          "clipEnd": 30,
+          "offset": 3752.4,
+          "score": 0.23196850013324438,
+          "secondScore": 0.2004632034360808,
+          "ratio": 1.1571624924531814,
+          "accepted": false
+        }
+      ],
+      "segments": [],
+      "reason": "no window passes the broadcast-audio gate; music, retiming or different audio cannot be located by this method",
+      "unexaminedTailSec": 0
+    },
+    {
+      "scoreplayId": 130852791,
+      "name": "Limbs Man United 9x16 (A) v2.mp4",
+      "durationSec": 17,
+      "windows": [
+        {
+          "clipStart": 0,
+          "clipEnd": 4,
+          "offset": 3031.8,
+          "score": 0.48812689707407764,
+          "secondScore": 0.22025270964017973,
+          "ratio": 2.2162129032215585,
+          "accepted": false
+        },
+        {
+          "clipStart": 2,
+          "clipEnd": 6,
+          "offset": 3981.6,
+          "score": 0.23714537608380812,
+          "secondScore": 0.2275986848626706,
+          "ratio": 1.0419452828864009,
+          "accepted": false
+        },
+        {
+          "clipStart": 4,
+          "clipEnd": 8,
+          "offset": 1651.5,
+          "score": 0.28028857907772176,
+          "secondScore": 0.2351920305331188,
+          "ratio": 1.1917435231218545,
+          "accepted": false
+        },
+        {
+          "clipStart": 6,
+          "clipEnd": 10,
+          "offset": 2277.9,
+          "score": 0.22964903225946257,
+          "secondScore": 0.22618555340607746,
+          "ratio": 1.0153125555599345,
+          "accepted": false
+        },
+        {
+          "clipStart": 8,
+          "clipEnd": 12,
+          "offset": 4714.1,
+          "score": 0.2235793677466967,
+          "secondScore": 0.2188606785727916,
+          "ratio": 1.0215602419067513,
+          "accepted": false
+        },
+        {
+          "clipStart": 10,
+          "clipEnd": 14,
+          "offset": 4948.2,
+          "score": 0.2203674394619869,
+          "secondScore": 0.21398415522077638,
+          "ratio": 1.029830639724818,
+          "accepted": false
+        },
+        {
+          "clipStart": 12,
+          "clipEnd": 16,
+          "offset": 358,
+          "score": 0.23101864950541579,
+          "secondScore": 0.21662384884570948,
+          "ratio": 1.066450673535761,
+          "accepted": false
+        }
+      ],
+      "segments": [],
+      "reason": "no window passes the broadcast-audio gate; music, retiming or different audio cannot be located by this method",
+      "unexaminedTailSec": 1
+    },
+    {
+      "scoreplayId": 130852805,
+      "name": "Savio cele Man United 9x16 (A) v2.mp4",
+      "durationSec": 13,
+      "windows": [
+        {
+          "clipStart": 0,
+          "clipEnd": 4,
+          "offset": 3031.8,
+          "score": 0.48502634241645715,
+          "secondScore": 0.259338951912017,
+          "ratio": 1.8702410063761135,
+          "accepted": false
+        },
+        {
+          "clipStart": 2,
+          "clipEnd": 6,
+          "offset": 5070.4,
+          "score": 0.2394518563958824,
+          "secondScore": 0.21735849427551446,
+          "ratio": 1.1016448066315887,
+          "accepted": false
+        },
+        {
+          "clipStart": 4,
+          "clipEnd": 8,
+          "offset": 2472.9,
+          "score": 0.23117062466879293,
+          "secondScore": 0.2239304776835072,
+          "ratio": 1.0323321195943618,
+          "accepted": false
+        },
+        {
+          "clipStart": 6,
+          "clipEnd": 10,
+          "offset": 4792,
+          "score": 0.2420137372158603,
+          "secondScore": 0.23266219662183832,
+          "ratio": 1.0401936400919556,
+          "accepted": false
+        },
+        {
+          "clipStart": 8,
+          "clipEnd": 12,
+          "offset": 4533.1,
+          "score": 0.23550144588580585,
+          "secondScore": 0.2214373354128359,
+          "ratio": 1.0635128238277867,
+          "accepted": false
+        }
+      ],
+      "segments": [],
+      "reason": "no window passes the broadcast-audio gate; music, retiming or different audio cannot be located by this method",
+      "unexaminedTailSec": 1
+    }
+  ]
+}

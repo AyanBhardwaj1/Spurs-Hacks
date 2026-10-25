@@ -1,0 +1,510 @@
+/* The studio: Rundown's dark theme laid out as an edit suite. Colors are globals.css roles; --motion-out
+   comes from landing.css, which the studio layout also loads. Everything here is scoped to .studio. */
+
+/* In the components layer, so a Tailwind utility on the same element wins. */
+@layer components {
+html:has(.studio) {
+  background: #000;
+  color-scheme: dark;
+}
+
+.studio {
+  --monitor: #0b0b0c;
+  --hairline: color-mix(in srgb, var(--separator) 70%, transparent);
+  min-height: 100dvh;
+}
+
+.studio .num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Section headings: a small label over a plain title, the same rhythm in every band. */
+.studio .band {
+  border-top: 1px solid var(--hairline);
+}
+
+/* ---------- Clip frames: a 16:9 reel slides inside a 9:16, 1:1 or 16:9 window. ---------- */
+
+.clip-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 5;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--monitor);
+}
+
+.clip-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #151517;
+  isolation: isolate;
+}
+
+.clip-stage .clip-frame[data-format="9:16"] {
+  height: 100%;
+  aspect-ratio: 9 / 16;
+}
+
+.clip-stage .clip-frame[data-format="1:1"] {
+  width: 100%;
+  aspect-ratio: 1;
+}
+
+.clip-stage .clip-frame[data-format="16:9"] {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.clip-reel {
+  position: absolute;
+  inset: 0 auto 0 0;
+  height: 100%;
+  aspect-ratio: 16 / 9;
+  will-change: transform;
+}
+
+.clip-poster {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+}
+
+.clip-reel video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.clip-frame[data-live] .clip-reel video {
+  opacity: 1;
+}
+
+/* A spinner shows only when footage is slow to arrive, so a quick seek never flashes it. */
+.clip-wait {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.clip-frame[data-waiting] .clip-wait {
+  opacity: 1;
+  transition-delay: 300ms;
+}
+
+.clip-wait::after {
+  content: "";
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgb(255 255 255 / 0.25);
+  border-top-color: #fff;
+  animation: studio-spin 700ms linear infinite;
+}
+
+@keyframes studio-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* The segment ticks under a playing clip: one bar per source range, filled as it plays. */
+.seg-track {
+  display: flex;
+  gap: 2px;
+}
+
+.seg-track > span {
+  position: relative;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.28);
+}
+
+.seg-track > span > i {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+/* ---------- Clip cards ---------- */
+
+.clip-card {
+  transition: background-color 160ms ease;
+}
+
+.clip-card .clip-play {
+  transition: opacity 160ms ease;
+}
+
+.clip-card[data-active] .clip-play {
+  opacity: 0;
+}
+
+.clip-card[data-flash] {
+  animation: card-flash 1200ms var(--motion-out);
+}
+
+@keyframes card-flash {
+  0%,
+  40% {
+    background-color: var(--tint-fill);
+  }
+}
+
+.score-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--fill);
+  overflow: hidden;
+}
+
+.score-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--label);
+  transform-origin: left center;
+}
+
+/* ---------- Match timeline ---------- */
+
+.timeline {
+  position: relative;
+  user-select: none;
+  touch-action: none;
+}
+
+.timeline-scrub {
+  cursor: col-resize;
+}
+
+.timeline-head {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--label);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.timeline-ghost {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  background: color-mix(in srgb, var(--label) 45%, transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.timeline-scrub:hover .timeline-ghost {
+  opacity: 1;
+}
+
+.timeline-peek {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  width: 192px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 140ms ease,
+    transform 180ms var(--motion-out);
+}
+
+.timeline-scrub:hover .timeline-peek {
+  opacity: 1;
+  transform: none;
+}
+
+.pin {
+  position: absolute;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 28px;
+  margin-left: -9px;
+  border-radius: 4px;
+}
+
+.pin > i {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--tint);
+  box-shadow: 0 0 0 1.5px var(--page);
+  transition: transform 160ms var(--motion-out);
+}
+
+.pin[data-size="m"] > i {
+  width: 9px;
+  height: 9px;
+}
+
+.pin[data-size="l"] > i {
+  width: 13px;
+  height: 13px;
+}
+
+.pin[data-team="opponent"] > i {
+  background: var(--page);
+  box-shadow:
+    inset 0 0 0 2px var(--tint),
+    0 0 0 1.5px var(--page);
+}
+
+.pin[aria-pressed="true"] {
+  z-index: 1;
+}
+
+.pin[aria-pressed="true"] > i {
+  width: 13px;
+  height: 13px;
+  background: var(--label);
+  box-shadow:
+    0 0 0 2px var(--page),
+    0 0 0 3.5px var(--label);
+}
+
+/* A drop line from the pin into the crowd strip, for the selected moment and the one under the pointer. */
+.pin::after {
+  content: "";
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  width: 1px;
+  height: 84px;
+  background: var(--label);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pin[aria-pressed="true"]::after,
+.pin:focus-visible::after {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pin:hover > i {
+    transform: scale(1.3);
+  }
+
+  .pin:hover::after {
+    opacity: 0.6;
+  }
+}
+
+.club-span {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  min-width: 8px;
+  border-radius: 2px;
+}
+
+.club-span[data-found] {
+  background: color-mix(in srgb, var(--go) 55%, transparent);
+  cursor: pointer;
+}
+
+.club-span:not([data-found]) {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--secondary);
+  cursor: pointer;
+}
+
+/* A Twelve Labs search hit: a small numbered flag, white so it reads apart from our blue pins. */
+.search-pin {
+  position: absolute;
+  top: 0;
+  display: grid;
+  place-items: center;
+  min-width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  padding: 0 3px;
+  border-radius: 4px;
+  background: var(--label);
+  color: var(--page);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.dropped-tick {
+  position: absolute;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  margin-left: -1.5px;
+  border-radius: 1px;
+  background: var(--secondary);
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+/* ---------- Pipeline replay ---------- */
+
+.stage-cell {
+  position: relative;
+  transition:
+    opacity 220ms ease,
+    background-color 220ms ease;
+}
+
+.stage-cell[data-state="waiting"] {
+  opacity: 0.38;
+}
+
+.stage-cell[data-state="running"] {
+  background: var(--card);
+}
+
+.stage-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: var(--label);
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+.stage-cell[data-state="running"] .stage-fill {
+  animation: stage-fill var(--replay, 800ms) linear forwards;
+}
+
+.stage-cell[data-state="done"] .stage-fill {
+  transform: scaleX(1);
+  background: var(--go);
+}
+
+@keyframes stage-fill {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.stage-check {
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 160ms ease,
+    transform 220ms var(--motion-pin);
+}
+
+.stage-cell[data-state="done"] .stage-check {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Shared ---------- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Thin overlay chips that sit on footage. */
+.chip-film {
+  background: rgb(0 0 0 / 0.62);
+  color: #fff;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.hover-preview video {
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.hover-preview[data-live] video {
+  opacity: 1;
+}
+
+/* ---------- Presenter ---------- */
+
+/* The section being presented stays lit; the rest step back so the room looks at one thing. */
+html[data-presenting] .studio [data-section] {
+  transition: opacity 240ms ease;
+}
+
+html[data-presenting] .studio [data-section]:not([data-spotlight]) {
+  opacity: 0.22;
+}
+
+.presenter {
+  transition:
+    opacity 200ms ease,
+    transform 240ms var(--motion-out);
+}
+
+@starting-style {
+  .presenter {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clip-card[data-flash] {
+    animation-duration: 600ms;
+  }
+
+  .stage-cell[data-state="running"] .stage-fill {
+    animation: none;
+    transform: scaleX(1);
+  }
+
+  .stage-check,
+  .timeline-peek,
+  .pin > i {
+    transition: opacity 160ms ease;
+    transform: none;
+  }
+
+  .clip-wait::after {
+    animation-duration: 1400ms;
+  }
+
+  .presenter {
+    transition: opacity 200ms ease;
+    transform: none;
+  }
+}
+}

@@ -1,0 +1,19 @@
+# Build output and installs are recreated inside the image.
+.next
+node_modules
+
+# Secrets stay out of the image. The host injects them at runtime.
+.env*
+!.env.example
+
+# Local run data and media working copies never leave the machine they were made on.
+.rundown
+.media
+
+# Not needed to build or run the app.
+.git
+.github
+.claude
+.agents
+docs
+*.md

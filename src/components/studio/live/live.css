@@ -1,0 +1,371 @@
+/* The live view. Colors are globals.css roles; --motion-out comes from landing.css, which the studio layout
+   loads. Red (--tally) marks only what is live: the feed and the crowd meter. Blue (--tint) marks the
+   analysis. */
+
+@layer components {
+.live-screen {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--monitor);
+}
+
+.live-screen video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.live-cover {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgb(0 0 0 / 0.55);
+}
+
+/* Grows a control's hit area to 44 px without changing how it looks. Needs a positioned element. */
+.hit {
+  position: relative;
+}
+
+.hit::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+}
+
+/* ---------- Tally lights ---------- */
+
+.live-dot,
+.live-tally > i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tally);
+  animation: live-pulse 2s linear infinite;
+}
+
+.live-tally > i {
+  background: rgb(255 255 255 / 0.5);
+  animation: none;
+}
+
+.live-tally[data-on] > i {
+  background: var(--tally);
+  animation: live-pulse 2s linear infinite;
+}
+
+@keyframes live-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* ---------- Scoreboard ---------- */
+
+.live-bug {
+  font-size: 56px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.live-strip {
+  position: relative;
+  height: 28px;
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.03);
+}
+
+.live-strip-half {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.05);
+}
+
+.live-strip-pin {
+  position: absolute;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: var(--separator);
+}
+
+.live-strip-pin[data-passed] {
+  background: color-mix(in srgb, var(--tint) 80%, transparent);
+}
+
+.live-strip-head {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: var(--tally);
+}
+
+/* ---------- Crowd meter ---------- */
+
+.live-plot {
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgb(0 0 0 / 0.3);
+}
+
+.live-plot {
+  transition: opacity 200ms ease;
+}
+
+.live-plot[data-paused] {
+  opacity: 0.4;
+}
+
+.live-plot path,
+.live-plot line {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.live-plot-base {
+  stroke: var(--hairline);
+}
+
+.live-plot-live {
+  stroke: var(--label);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.live-plot-analysis {
+  stroke: var(--tint);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+}
+
+.live-plot-moment {
+  stroke: color-mix(in srgb, var(--tint) 60%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+
+.live-plot-spike {
+  stroke: var(--tally);
+  stroke-width: 1.5;
+}
+
+.live-plot-spike-dot {
+  stroke: var(--tally);
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
+.live-key {
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+}
+
+.live-key-live {
+  background: var(--label);
+}
+
+.live-key-analysis {
+  background: repeating-linear-gradient(90deg, var(--tint) 0 4px, transparent 4px 7px);
+}
+
+.live-key-spike {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--tally);
+}
+
+.live-key-moment {
+  width: 2px;
+  height: 10px;
+  background: color-mix(in srgb, var(--tint) 60%, transparent);
+}
+
+.live-spike {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tally) 18%, transparent);
+  color: var(--tally);
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(3px);
+  transition:
+    opacity 160ms ease,
+    transform 220ms var(--motion-out);
+}
+
+.live-spike[data-on] {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Moment feed ---------- */
+
+.live-card {
+  position: relative;
+  isolation: isolate;
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: var(--card);
+  transition:
+    opacity 200ms ease,
+    transform 280ms var(--motion-out);
+}
+
+@starting-style {
+  .live-card {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+/* A card that just arrived holds a tint, then fades it out. Only the overlay's opacity animates. */
+.live-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--tint-fill);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.live-card[data-fresh]::after {
+  animation: live-fresh 1400ms linear;
+}
+
+/* Held for 1,180 ms, then a 220 ms fade. */
+@keyframes live-fresh {
+  0%,
+  84% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.live-ready {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--go);
+}
+
+.live-clip {
+  overflow: hidden;
+  margin-inline: auto;
+  border-radius: 10px;
+  background: #000;
+}
+
+.live-clip[data-format="9:16"] {
+  aspect-ratio: 9 / 16;
+  max-height: 440px;
+}
+
+.live-clip[data-format="1:1"] {
+  aspect-ratio: 1;
+  max-height: 340px;
+}
+
+.live-clip[data-format="16:9"] {
+  aspect-ratio: 16 / 9;
+}
+
+.live-clip video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- Replay ---------- */
+
+.live-bit {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 14px;
+  min-height: 60px;
+  padding: 10px 16px;
+  border-radius: 14px;
+  background: var(--grouped);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .live-bit:hover {
+    background: var(--card);
+  }
+}
+
+.live-dialog {
+  width: min(1120px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 20px;
+  border: 1px solid var(--hairline);
+  border-radius: 20px;
+  background: var(--grouped);
+  color: var(--label);
+  overflow: auto;
+  overscroll-behavior: contain;
+  transition:
+    opacity 200ms ease,
+    transform 240ms var(--motion-out);
+}
+
+@starting-style {
+  .live-dialog[open] {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+.live-dialog::backdrop {
+  background: rgb(0 0 0 / 0.72);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot,
+  .live-tally[data-on] > i {
+    animation: none;
+  }
+
+  .live-card,
+  .live-spike,
+  .live-dialog {
+    transform: none;
+    transition: opacity 200ms ease;
+  }
+
+  @starting-style {
+    .live-card,
+    .live-dialog[open] {
+      transform: none;
+    }
+  }
+
+}
+}

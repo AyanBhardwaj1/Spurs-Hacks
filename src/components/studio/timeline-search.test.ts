@@ -1,0 +1,36 @@
+import { expect, test } from "bun:test";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { TimelineSearch, type Found } from "./timeline-search";
+
+test("recorded search banners identify the actual fallback reason", () => {
+  for (const [reason, explanation] of [
+    ["allowance", "live search allowance used up"],
+    ["timeout", "live search timed out"],
+    ["network", "live search connection failed"],
+  ] as const) {
+    const found: Found = { query: "red card", source: "recorded", reason, matchedQuery: "referee showing a red card", hits: [] };
+    const html = renderToStaticMarkup(createElement(TimelineSearch, { found, onFound: () => {}, onSeek: () => {}, frameSource: "https://cdn.scoreplay.io/match.mp4" }));
+    expect(html).toContain("Recorded Twelve Labs results for");
+    expect(html).toContain(explanation);
+    if (reason !== "allowance") expect(html).not.toContain("live search allowance used up");
+  }
+});
+
+test("recorded hits without thumbnails show the match's frame at each start, requesting one frame at a time", () => {
+  const found: Found = {
+    query: "header",
+    source: "recorded",
+    reason: "allowance",
+    matchedQuery: "striker heads cross into far corner",
+    hits: [
+      { start: 5819.5, end: 5826, rank: 1 },
+      { start: 3628, end: 3634, rank: 2 },
+    ],
+  };
+  const html = renderToStaticMarkup(
+    createElement(TimelineSearch, { found, onFound: () => {}, onSeek: () => {}, frameSource: "https://cdn.scoreplay.io/match.mp4" }),
+  );
+  expect(html).toContain('src="https://cdn.scoreplay.io/match.mp4#t=5819.5"');
+  expect(html).not.toContain("#t=3628");
+});

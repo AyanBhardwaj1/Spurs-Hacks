@@ -1,0 +1,63 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - Dockerfile
+      - docker-entrypoint.sh
+      - .dockerignore
+      - fly.toml
+      - next.config.ts
+      - package.json
+      - bun.lock
+      - .github/workflows/deploy.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  image:
+    # Proves the Dockerfile still builds before a change to it reaches main. Nothing is pushed.
+    name: Docker image
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  fly:
+    name: Deploy to Fly
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    # A deploy that starts while another is rolling out waits for it instead of cancelling it.
+    concurrency:
+      group: deploy-fly
+      cancel-in-progress: false
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+    steps:
+      - name: Check for a Fly token
+        id: token
+        run: |
+          if [ -z "$FLY_API_TOKEN" ]; then
+            echo "::notice::FLY_API_TOKEN is not set, so nothing was deployed. docs/deploy.md has the setup."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.token.outputs.ready == 'true'
+        uses: actions/checkout@v4
+      - if: steps.token.outputs.ready == 'true'
+        uses: superfly/flyctl-actions/setup-flyctl@master
+      # Fly builds the image on its own builders, so the runner needs no Docker setup.
+      - if: steps.token.outputs.ready == 'true'
+        run: flyctl deploy --remote-only
