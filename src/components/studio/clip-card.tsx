@@ -3,7 +3,7 @@
 import { memo, useEffect, useMemo, useRef } from "react";
 import { PlayIcon, CheckIcon } from "@/components/landing/icons";
 import { linkedMoments, playersFor, reelStudioId, scoreBreakdown, seenOnCamera } from "@/lib/studio/clips";
-import { scoreplayMediaUrl } from "@/lib/studio/links";
+import { edlHref, scoreplayMediaUrl } from "@/lib/studio/links";
 import { clipLength } from "@/lib/studio/time";
 import type { Clip, Moment, Player } from "@/lib/studio/types";
 import { AUDIENCE_LABEL, LANE_LABEL, PlayerStack, ScoreParts, SeenOnCamera, pct } from "./bits";
@@ -220,6 +220,9 @@ export const ClipCard = memo(function ClipCard({
               </button>
             )}
           </div>
+          <a href={edlHref(clip.id)} download className="self-start rounded-md text-caption font-semibold text-tint hover:underline">
+            Download the edit (.edl)
+          </a>
           <ReviewControl clip={clip} className="mt-1 border-t border-separator/60 pt-3" />
         </div>
       </div>

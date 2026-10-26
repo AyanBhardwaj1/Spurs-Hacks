@@ -5,3 +5,6 @@ const APP = "https://app.scoreplay.io";
 
 export const scoreplayMediaUrl = (id: number) => `${APP}/media/media-details/${id}`;
 export const scoreplayEventUrl = (id: number) => `${APP}/events/${id}`;
+
+/** The studio's own download of a planned clip as an edit decision list. */
+export const edlHref = (clipId: string) => `/api/studio/edl?clip=${encodeURIComponent(clipId)}`;

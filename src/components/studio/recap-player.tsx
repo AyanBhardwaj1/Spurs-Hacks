@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { PauseIcon, PlayIcon, ReplayIcon } from "@/components/landing/icons";
+import { edlHref } from "@/lib/studio/links";
 import { clipLength, timecode } from "@/lib/studio/time";
 import type { Clip, Moment } from "@/lib/studio/types";
 import { LANE_LABEL, SectionTitle, pct } from "./bits";
@@ -123,6 +124,9 @@ export function RecapPlayer({ clip, momentsById, src, playing, onPlayingChange }
         <div className="min-w-0">
           <p className="text-footnote text-label/85 text-pretty">{clip.caption}</p>
           <p className="mt-1 text-caption text-secondary">{clip.rationale}</p>
+          <a href={edlHref(clip.id)} download className="mt-2 inline-block rounded-md text-caption font-semibold text-tint hover:underline">
+            Download the edit (.edl)
+          </a>
           <ReviewControl clip={clip} className="mt-3" />
           <ol className="mt-4 space-y-0.5" aria-label="Cuts in the recap">
             {clip.segments.map((seg, i) => {
