@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element -- Thumbnails come from Twelve Labs' CDN; next/image would need remotePatterns in next.config.ts, which the studio does not own. */
 
 import { useId, useState } from "react";
-import type { SearchHit, SearchResult } from "@/lib/studio/search";
+import type { FallbackReason, SearchHit, SearchResult } from "@/lib/studio/search";
 import { timecode } from "@/lib/studio/time";
 import { CameraIcon } from "./bits";
 
@@ -17,6 +17,20 @@ type Props = {
 };
 
 const EXAMPLES = ["red card, players surround referee", "striker heads cross into far corner", "players celebrating equaliser"];
+
+// Why an answer came from the recorded run instead of live Twelve Labs, in the two places it is said.
+const RECORDED_REASON: Record<FallbackReason, string> = {
+  allowance: "live search allowance used up",
+  timeout: "live search timed out",
+  network: "live search connection failed",
+  "no-key": "no Twelve Labs key on this server",
+};
+const MOMENTS_REASON: Record<FallbackReason, string> = {
+  allowance: "Live Twelve Labs search allowance used up",
+  timeout: "Live Twelve Labs search timed out",
+  network: "Live Twelve Labs search connection failed",
+  "no-key": "No Twelve Labs key on this server",
+};
 
 // Plain-language search over the full match with Twelve Labs. Results land on the timeline as pins and
 // here as thumbnails; either plays that moment in the monitor.
@@ -114,17 +128,23 @@ export function TimelineSearch({ found, onFound, onSeek, frameSource }: Props) {
         <div className="mt-3" aria-live="polite">
           {found.source === "recorded" && (
             <p className="mb-1 text-caption text-secondary">
-              Recorded Twelve Labs results for &ldquo;{found.matchedQuery}&rdquo; ({found.reason === "allowance" ? "live search allowance used up" : found.reason === "timeout" ? "live search timed out" : "live search connection failed"})
+              Recorded Twelve Labs results for &ldquo;{found.matchedQuery}&rdquo; ({RECORDED_REASON[found.reason]})
             </p>
           )}
-          {found.source === "moments" && (
+          {found.source === "moments" && found.hits.length > 0 && (
             <p className="mb-1 text-caption text-secondary">
-              Live Twelve Labs search {found.reason === "allowance" ? "allowance used up" : found.reason === "timeout" ? "timed out" : "connection failed"}; these are moments from this run whose title, commentary or Pegasus description mention it.
+              {MOMENTS_REASON[found.reason]}; these are moments from this run whose title, commentary or Pegasus description mention it.
             </p>
           )}
           <p className="text-caption text-secondary">
             {found.hits.length === 0 ? (
-              <>Twelve Labs found nothing for &ldquo;{found.query}&rdquo;.</>
+              found.source === "live" ? (
+                <>Twelve Labs found nothing for &ldquo;{found.query}&rdquo;.</>
+              ) : (
+                <>
+                  {MOMENTS_REASON[found.reason]}, and nothing recorded or in this run&rsquo;s moments matches &ldquo;{found.query}&rdquo;.
+                </>
+              )
             ) : (
               <>
                 {found.hits.length} {found.hits.length === 1 ? "place" : "places"} {found.source === "recorded" ? "in the recorded search" : found.source === "moments" ? "among the run’s moments" : "Twelve Labs found"} for &ldquo;

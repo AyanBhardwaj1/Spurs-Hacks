@@ -11,10 +11,13 @@ let activeSearches = 0;
 
 export type SearchHit = { start: number; end: number; rank: number; thumbnailUrl?: string };
 
+/** Why search answered without live Twelve Labs: it failed for one of the first three, or there is no key. */
+export type FallbackReason = "allowance" | "timeout" | "network" | "no-key";
+
 export type SearchResult = { hits: SearchHit[] } & (
   | { source: "live" }
-  | { source: "recorded"; matchedQuery: string; reason: "allowance" | "timeout" | "network" }
-  | { source: "moments"; reason: "allowance" | "timeout" | "network" }
+  | { source: "recorded"; matchedQuery: string; reason: FallbackReason }
+  | { source: "moments"; reason: FallbackReason }
 );
 
 export class SearchBusy extends Error {

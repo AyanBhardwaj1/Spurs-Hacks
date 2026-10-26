@@ -93,3 +93,34 @@ test("keeps the busy response when two searches are already in flight", async ()
     await Promise.allSettled([first, second]);
   }
 });
+
+test("answers from the recorded run with no Twelve Labs key, without calling out", async () => {
+  delete process.env.TWELVELABS_API_KEY;
+  delete process.env.TWELVELABS_INDEX_ID;
+  const fetchMock = spyOn(globalThis, "fetch");
+  const recorded = await GET(new Request("http://localhost/api/studio/search?q=striker%20heads%20cross%20into%20far%20corner"));
+  expect(recorded.status).toBe(200);
+  const recordedBody = await recorded.json();
+  expect(recordedBody.source).toBe("recorded");
+  expect(recordedBody.reason).toBe("no-key");
+  expect(recordedBody.hits[0].start).toBeCloseTo(5819.92, 2);
+
+  const own = await GET(new Request("http://localhost/api/studio/search?q=goal"));
+  expect(own.status).toBe(200);
+  const ownBody = await own.json();
+  expect(ownBody.source).toBe("moments");
+  expect(ownBody.reason).toBe("no-key");
+  expect(ownBody.hits[0].start).toBeCloseTo(5797.3, 2);
+  expect(fetchMock).not.toHaveBeenCalled();
+});
+
+test("with no Twelve Labs key, a search nothing matches is an empty answer, not an error", async () => {
+  delete process.env.TWELVELABS_API_KEY;
+  delete process.env.TWELVELABS_INDEX_ID;
+  const fetchMock = spyOn(globalThis, "fetch");
+  const response = await GET(new Request("http://localhost/api/studio/search?q=purple%20spaceship"));
+  expect(response.status).toBe(200);
+  expect(await response.json()).toEqual({ source: "moments", reason: "no-key", hits: [] });
+  expect((await GET(new Request("http://localhost/api/studio/search?q=x"))).status).toBe(400);
+  expect(fetchMock).not.toHaveBeenCalled();
+});
