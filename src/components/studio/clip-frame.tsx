@@ -78,7 +78,9 @@ export function ClipFrame({
   const [nearView, setNearView] = useState(false);
   const wantVideo = playing || warm === true || nearView;
   const [mounted, setMounted] = useState(wantVideo);
-  // The video mounts after hydration, so its own error event is enough to know the footage is gone.
+  // The card, recap and published frames mount their video after hydration, so its own error event is
+  // enough to know the footage is gone. A caller that renders the video on the server (playing or warm)
+  // would also need to read videoRef.current.error once mounted.
   const [failed, setFailed] = useState(false);
   if (wantVideo && !mounted) setMounted(true);
 

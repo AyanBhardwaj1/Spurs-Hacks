@@ -181,7 +181,7 @@ export function MatchTimeline({ durationSec, crowd, moments, groundTruth, droppe
             <span
               key={`${h.start}-${h.rank}`}
               className="search-pin num"
-              title={`${searchSource === "recorded" ? "Recorded Twelve Labs result" : "Twelve Labs result"} ${h.rank} · ${timecode(h.start)}`}
+              title={`${searchSource === "recorded" ? "Recorded Twelve Labs result" : searchSource === "moments" ? "Run moment" : "Twelve Labs result"} ${h.rank} · ${timecode(h.start)}`}
               style={{ left: at(h.start) }}
               onClick={() => onSeek(h.start, true)}
             >

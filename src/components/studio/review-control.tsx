@@ -25,6 +25,8 @@ export function ReviewControl({ clip, className = "" }: Props) {
 
 function ReviewForm({ mediaId, title, className }: { mediaId: number; title: string; className: string }) {
   const { rendered, missing } = useExtras();
+  // No ScorePlay key: say up front that a decision stays on this page, rather than promising a write.
+  const offline = missing.uploads === "off";
   const loaded = rendered[mediaId]?.review;
   const shared = useSharedReview(mediaId);
   const written = shared.written;
@@ -115,7 +117,7 @@ function ReviewForm({ mediaId, title, className }: { mediaId: number; title: str
           }}
         >
           <label htmlFor={reasonId} className="text-caption text-secondary">
-            Why reject it? Optional, saved with the clip in ScorePlay.
+            Why reject it? Optional, {offline ? "kept on this page only" : "saved with the clip in ScorePlay"}.
           </label>
           <input
             id={reasonId}
@@ -161,7 +163,7 @@ function ReviewForm({ mediaId, title, className }: { mediaId: number; title: str
       )}
       {saving && (
         <p role="status" className="mt-1.5 text-caption text-secondary">
-          Writing to ScorePlay…
+          {offline ? "Saving…" : "Writing to ScorePlay…"}
         </p>
       )}
       {(error || readError) && (
