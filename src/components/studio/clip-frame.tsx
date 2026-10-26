@@ -78,6 +78,8 @@ export function ClipFrame({
   const [nearView, setNearView] = useState(false);
   const wantVideo = playing || warm === true || nearView;
   const [mounted, setMounted] = useState(wantVideo);
+  // The video mounts after hydration, so its own error event is enough to know the footage is gone.
+  const [failed, setFailed] = useState(false);
   if (wantVideo && !mounted) setMounted(true);
 
   useEffect(() => {
@@ -249,6 +251,7 @@ export function ClipFrame({
             playsInline
             preload={playing ? "auto" : "metadata"}
             aria-label={label}
+            onError={() => setFailed(true)}
             onLoadedMetadata={() => {
               if (playingRef.current) start();
               else cue();
@@ -268,6 +271,11 @@ export function ClipFrame({
         )}
       </div>
       <div className="clip-wait" aria-hidden />
+      {failed && (
+        <p className="absolute inset-0 grid place-items-center p-3 text-center text-caption text-secondary text-pretty">
+          No footage: the club&rsquo;s video is no longer on ScorePlay.
+        </p>
+      )}
     </div>
   );
 }

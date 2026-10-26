@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { HoverPreview } from "@/components/studio/hover-preview";
-import { DOWN_COPY, SLOW_COPY } from "@/components/studio/extras";
+import { DOWN_COPY, OFF_COPY, SLOW_COPY } from "@/components/studio/extras";
 import { LibraryPresenter } from "@/components/studio/library-presenter";
 import { RunBadge, StudioBar, recordedLabel, studioContainer } from "@/components/studio/studio-bar";
 import { clubClipName, clubVideos, type ClubRange } from "@/lib/studio/clips";
@@ -80,7 +80,7 @@ async function LibraryContent({ summary }: { summary: Summary }) {
           note={`The full ${timecode(summary.source.durationSec)} match in the club's ScorePlay. The run starts from the full match alone.`}
         />
         <p role="status" className="mt-14 text-caption text-secondary" title={library.error}>
-          {library.slow ? SLOW_COPY : DOWN_COPY} The club&rsquo;s videos will show when it answers.
+          {library.off ? OFF_COPY : `${library.slow ? SLOW_COPY : DOWN_COPY} The club’s videos will show when it answers.`}
         </p>
       </>
     );

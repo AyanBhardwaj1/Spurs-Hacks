@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useRef } from "react";
 import { PauseIcon, PlayIcon } from "@/components/landing/icons";
 import { reelStudioId } from "@/lib/studio/clips";
-import type { RenderedClip } from "@/lib/studio/library";
+import type { MissingReason, RenderedClip } from "@/lib/studio/library";
 import { scoreplayMediaUrl } from "@/lib/studio/links";
 import { clipLength } from "@/lib/studio/time";
 import type { Clip } from "@/lib/studio/types";
@@ -105,7 +105,7 @@ function FileFrame({
   label: string;
   aspect: string;
   playing: boolean;
-  missing?: "slow" | "failed";
+  missing?: MissingReason;
 }) {
   const video = useRef<HTMLVideoElement>(null);
   useEffect(() => {
@@ -128,7 +128,7 @@ function FileFrame({
           <video ref={video} src={file.url} poster={file.thumbnailUrl} muted loop playsInline preload="metadata" aria-label={`${label}: ${file.name}`} className="absolute inset-0 size-full object-cover" />
         ) : (
           <p className="absolute inset-0 grid place-items-center p-3 text-center text-caption text-secondary">
-            {missing === "slow" ? "ScorePlay is slow" : missing ? "ScorePlay did not answer" : id ? `ScorePlay media ${id} did not load` : "No plain render"}
+            {missing === "off" ? "ScorePlay is not connected" : missing === "slow" ? "ScorePlay is slow" : missing ? "ScorePlay did not answer" : id ? `ScorePlay media ${id} did not load` : "No plain render"}
           </p>
         )}
       </div>

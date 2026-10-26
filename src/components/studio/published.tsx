@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { CheckIcon, PauseIcon, PlayIcon } from "@/components/landing/icons";
-import type { RenderedClip } from "@/lib/studio/library";
+import type { MissingReason, RenderedClip } from "@/lib/studio/library";
 import { scoreplayEventUrl, scoreplayMediaUrl } from "@/lib/studio/links";
 import { clipLength } from "@/lib/studio/time";
 import type { PublishedClip } from "@/lib/studio/clips";
@@ -107,7 +107,7 @@ export function Published({ clips, momentsById, src, activeId, onActive, onRelea
 type PairProps = {
   clip: PublishedClip;
   /** Why ScorePlay did not return the uploads, if it did not. */
-  missing?: "slow" | "failed";
+  missing?: MissingReason;
   file?: RenderedClip;
   momentsById: Map<string, Moment>;
   src: string;
@@ -185,7 +185,7 @@ function Pair({ clip, file, missing, momentsById, src, playing, onActive, onRele
               />
             ) : (
               <p className="absolute inset-0 grid place-items-center p-3 text-center text-caption text-secondary">
-                {missing === "slow" ? "ScorePlay is slow" : missing ? "ScorePlay did not answer" : `ScorePlay media ${clip.scoreplayMediaId} did not load`}
+                {missing === "off" ? "ScorePlay is not connected" : missing === "slow" ? "ScorePlay is slow" : missing ? "ScorePlay did not answer" : `ScorePlay media ${clip.scoreplayMediaId} did not load`}
               </p>
             )}
             <span className="chip chip-film pointer-events-none absolute bottom-2 left-2 gap-1">

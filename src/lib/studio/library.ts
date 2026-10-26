@@ -1,6 +1,6 @@
 import "server-only";
 import { io } from "next/cache";
-import { getMedia, searchMedia, type SpMedia } from "@/lib/scoreplay";
+import { getMedia, scoreplayConfigured, searchMedia, type SpMedia } from "@/lib/scoreplay";
 import { reviewOf, type Review } from "./review";
 import { READ_TIMEOUT_MS, ServiceTimeout, within } from "./slow";
 import { spriteSheets, type SpriteSheets } from "./sprites";
@@ -51,7 +51,7 @@ export type MatchLibrary =
       matchFolder: LibraryItem[];
       folders: { id: number; name: string; items: LibraryItem[] }[];
     }
-  | { ok: false; error: string; slow?: true };
+  | { ok: false; error: string; slow?: true; off?: true };
 
 function toItem(m: SearchHit): LibraryItem {
   return {
@@ -75,6 +75,7 @@ let cached: { at: number; promise: Promise<MatchLibrary> } | undefined;
 export async function matchLibrary(): Promise<MatchLibrary> {
   // Keeps the ScorePlay call out of the prerendered shell; the library always reflects the live account.
   await io();
+  if (!scoreplayConfigured()) return { ok: false, off: true, error: "No ScorePlay key on the server." };
   if (!cached || Date.now() - cached.at >= TTL_MS) {
     const promise = fetchLibrary();
     const entry = { at: Date.now(), promise };
@@ -160,9 +161,12 @@ export type SourceExtras = {
   clubPreviews: Record<number, string>;
   /** Rendered clips back in ScorePlay, by ScorePlay ID. A clip missing here failed to resolve; see `error`. */
   rendered: Record<number, RenderedClip>;
-  /** Parts ScorePlay did not return, and whether it was slow or failed; those sections say so quietly. */
-  missing: Partial<Record<ExtrasPart, "slow" | "failed">>;
+  /** Parts ScorePlay did not return, and why; those sections say so quietly. */
+  missing: Partial<Record<ExtrasPart, MissingReason>>;
 };
+
+/** Why a part of the page has no ScorePlay data: it was slow, it failed, or there is no key at all. */
+export type MissingReason = "slow" | "failed" | "off";
 
 export type ExtrasPart = "posters" | "club" | "uploads";
 
@@ -180,6 +184,11 @@ function sourceRecord(mediaId: number) {
 
 export async function sourceExtras(mediaId: number, durationSec: number, renderedIds: number[] = []): Promise<SourceExtras> {
   await io();
+  // No key, no calls: every part ScorePlay would fill says it is not connected.
+  if (!scoreplayConfigured()) {
+    const off = "off" as const;
+    return { rendered: {}, clubThumbs: {}, clubPreviews: {}, missing: { posters: off, club: off, ...(renderedIds.length > 0 && { uploads: off }) } };
+  }
   // Every call is bounded, so this settles within READ_TIMEOUT_MS whatever ScorePlay does. Decisions are
   // read fresh on each visit, so they are not cached like the source record and the listing.
   const [[media, library], renders] = await Promise.all([

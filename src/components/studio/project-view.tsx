@@ -13,7 +13,7 @@ import { Dropped } from "./dropped";
 import { TimelineSearch, type Found } from "./timeline-search";
 import { WrittenBack } from "./written-back";
 import { AUDIENCE_LABEL } from "./bits";
-import { ExtrasProvider, ScorePlayNote } from "./extras";
+import { ExtrasProvider, NO_FOOTAGE_COPY, ScorePlayNote } from "./extras";
 import { ReviewStoreProvider } from "./review-store";
 import { MatchTimeline } from "./match-timeline";
 import { MomentInspector } from "./moment-inspector";
@@ -23,6 +23,7 @@ import { RecapPlayer } from "./recap-player";
 import { reelKey, withReelEdit } from "./reel-studio";
 import { RunRail } from "./run-rail";
 import { StorageVerdict } from "./storage-verdict";
+import { useMediaFailed } from "./use-media-failed";
 import { useReducedMotion } from "./use-reduced-motion";
 
 /** "a, b and c" */
@@ -54,6 +55,7 @@ export function ProjectView({ analysis, recordedAt, extras }: Props) {
   const [recapPlaying, setRecapPlaying] = useState(false);
   const [clipView, setClipView] = useState<ClipView>("moment");
   const sourceRef = useRef<HTMLVideoElement>(null);
+  const monitorFailed = useMediaFailed(sourceRef);
   const inspectorRef = useRef<HTMLDivElement>(null);
 
   const selected = selectedId ? momentsById.get(selectedId) : undefined;
@@ -239,6 +241,11 @@ export function ProjectView({ analysis, recordedAt, extras }: Props) {
                     setRecapPlaying(false);
                   }}
                 />
+                {monitorFailed && (
+                  <p role="status" className="absolute inset-0 grid place-items-center bg-[var(--monitor)] p-6 text-center text-footnote text-secondary text-pretty">
+                    {NO_FOOTAGE_COPY}
+                  </p>
+                )}
               </div>
               <div ref={inspectorRef} className="min-h-[420px] scroll-mt-24 xl:relative">
                 <div className="xl:absolute xl:inset-0">

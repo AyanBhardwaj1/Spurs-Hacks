@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, Suspense, use, type ReactNode } from "react";
-import type { ExtrasPart, SourceExtras } from "@/lib/studio/library";
+import type { ExtrasPart, MissingReason, SourceExtras } from "@/lib/studio/library";
 import { spriteFrame } from "@/lib/studio/sprites";
 
 // What the studio reads from ScorePlay on top of the analysis: the source's sprite sheets and the club's
@@ -35,6 +35,12 @@ export function SpritePoster({ at, className = "clip-poster" }: { at: number; cl
 
 export const SLOW_COPY = "ScorePlay is slow; showing the recorded run.";
 export const DOWN_COPY = "ScorePlay did not answer; showing the recorded run.";
+export const OFF_COPY = "ScorePlay is not connected; showing the recorded run.";
+export const NO_FOOTAGE_COPY =
+  "No footage. The match video lived on the club’s ScorePlay, which was cleared after the event, and club footage can’t be re-hosted. The moments, timecodes and reasons on this page are the recorded run.";
+
+/** The line for a part of the page ScorePlay did not fill. */
+export const missingCopy = (reason: MissingReason) => (reason === "off" ? OFF_COPY : reason === "slow" ? SLOW_COPY : DOWN_COPY);
 
 /** A quiet line in a section whose ScorePlay data is missing. Renders nothing while waiting or when it arrived. */
 export function ScorePlayNote({ part, className = "" }: { part: ExtrasPart; className?: string }) {
@@ -50,7 +56,7 @@ function ScorePlayNoteInner({ part, className }: { part: ExtrasPart; className: 
   if (!missing[part]) return null;
   return (
     <p role="status" className={`text-caption text-secondary ${className}`}>
-      {missing[part] === "slow" ? SLOW_COPY : DOWN_COPY}
+      {missingCopy(missing[part])}
     </p>
   );
 }
