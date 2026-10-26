@@ -11,8 +11,6 @@ import { ServiceTimeout, WRITE_TIMEOUT_MS, within } from "@/lib/studio/slow";
 // POST { at: number, title: string }
 
 export async function POST(request: Request) {
-  if (!scoreplayConfigured()) return Response.json({ error: "No ScorePlay key on the server, so nothing was written." }, { status: 503 });
-
   let body: { at?: unknown; title?: unknown };
   try {
     body = await request.json();
@@ -28,6 +26,10 @@ export async function POST(request: Request) {
   if (!item) return Response.json({ error: "That candidate is not in this analysis's dropped list." }, { status: 404 });
   const moment = item.momentId ? analysis.moments.find((m) => m.id === item.momentId) : undefined;
   const range = rescueRange(item, moment, analysis.source.durationSec);
+  // Without a key the candidate is still checked, and the page gets the range so a person can cut it.
+  if (!scoreplayConfigured()) {
+    return Response.json({ error: "No ScorePlay key on the server, so nothing was logged.", offline: true, ...range }, { status: 503 });
+  }
 
   try {
     const { status } = await within(writeRescue(item, range, analysis.source.id), WRITE_TIMEOUT_MS, "the rescue");

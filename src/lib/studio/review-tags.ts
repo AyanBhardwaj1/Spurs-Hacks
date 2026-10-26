@@ -7,7 +7,13 @@ export type Decision = "approved" | "rejected";
  * `conflict` is both tags at once, which two writes racing can leave behind. It reads as no decision, and
  * clearing the decision removes both.
  */
-export type Review = { decision: Decision | null; reason?: string; conflict?: true };
+export type Review = {
+  decision: Decision | null;
+  reason?: string;
+  conflict?: true;
+  /** Held in this page only, because the server has no ScorePlay key; nothing was written. */
+  local?: true;
+};
 
 export const DECISION_TAGS: Record<Decision, { name: string; label: string }> = {
   approved: { name: "rundown-approved", label: "Rundown: approved" },

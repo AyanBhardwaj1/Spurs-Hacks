@@ -37,9 +37,21 @@ function scoreplay(logs: { comment?: string }[]) {
   return { fetchMock, posts };
 }
 
-test("returns 503 without a ScorePlay key", async () => {
+test("without a ScorePlay key, a real candidate comes back offline with the range to cut, and nothing is called", async () => {
   delete process.env.SCOREPLAY_API_KEY;
-  expect((await rescue({ at: 1, title: "nope" })).status).toBe(503);
+  const fetchMock = spyOn(globalThis, "fetch");
+  const analysis = loadStudioAnalysis();
+  const item = analysis.rejected.find((r) => r.source === "ranking" && r.momentId)!;
+  const moment = analysis.moments.find((m) => m.id === item.momentId)!;
+  const response = await rescue({ at: item.at, title: item.title });
+  expect(response.status).toBe(503);
+  expect(await response.json()).toMatchObject({ offline: true, start: moment.start, end: moment.end });
+  expect(fetchMock).not.toHaveBeenCalled();
+});
+
+test("without a ScorePlay key, a candidate outside the run is still a 404", async () => {
+  delete process.env.SCOREPLAY_API_KEY;
+  expect((await rescue({ at: 1, title: "nope" })).status).toBe(404);
 });
 
 test("returns 404 for a candidate outside the committed run, without calling ScorePlay", async () => {

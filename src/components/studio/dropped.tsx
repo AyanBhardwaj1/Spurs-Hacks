@@ -93,6 +93,7 @@ function Group({
 type Rescue =
   | { state: "idle" | "saving" }
   | { state: "written" | "already"; mediaId: number; start: number; end: number }
+  | { state: "local"; start: number; end: number }
   | { state: "error"; message: string };
 
 function Row({
@@ -120,6 +121,8 @@ function Row({
         signal: AbortSignal.timeout(20_000),
       });
       const body = await res.json().catch(() => ({}));
+      // No ScorePlay key: nothing was logged, but the server checked the candidate and sent its range.
+      if (res.status === 503 && body.offline) return setRescue({ state: "local", start: body.start, end: body.end });
       if (!res.ok) throw new Error(body.error ?? `The server answered ${res.status}.`);
       setRescue({ state: body.status === "already" ? "already" : "written", mediaId: body.mediaId, start: body.start, end: body.end });
     } catch (err) {
@@ -174,6 +177,11 @@ function Row({
             <a href={scoreplayMediaUrl(rescue.mediaId)} target="_blank" rel="noreferrer" className="press rounded-md font-semibold text-tint hover:underline">
               Open the match in ScorePlay <span aria-hidden>↗</span>
             </a>
+          </span>
+        )}
+        {rescue.state === "local" && (
+          <span role="status" className="text-caption text-secondary">
+            ScorePlay is not connected, so nothing was logged. To cut it, take {timecode(rescue.start)}–{timecode(rescue.end)} of the match.
           </span>
         )}
         {rescue.state === "error" && (

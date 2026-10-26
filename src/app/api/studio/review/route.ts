@@ -29,7 +29,8 @@ function oneAtATime<T>(mediaId: number, write: () => Promise<T>): Promise<T> {
 }
 
 export async function POST(request: Request) {
-  if (!scoreplayConfigured()) return Response.json({ error: "No ScorePlay key on the server, so nothing was written." }, { status: 503 });
+  // offline tells the page it may hold the decision itself, labelled as not written.
+  if (!scoreplayConfigured()) return Response.json({ error: "No ScorePlay key on the server, so nothing was written.", offline: true }, { status: 503 });
 
   let body: { mediaId?: unknown; decision?: unknown; reason?: unknown };
   try {

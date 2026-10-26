@@ -10,7 +10,8 @@ import { useSharedReview } from "./review-store";
 type Props = { clip: Clip; className?: string };
 
 // "The system proposes, a person approves." The decision is written onto the clip's uploaded media in
-// ScorePlay through /api/studio/review, and what the control shows is what ScorePlay returned.
+// ScorePlay through /api/studio/review, and what the control shows is what ScorePlay returned. With no
+// ScorePlay key the page holds the decision until reload and says so.
 export function ReviewControl({ clip, className = "" }: Props) {
   if (!clip.scoreplayMediaId) {
     return <p className={`text-caption text-secondary ${className}`}>Planned, not rendered: there is no file in ScorePlay to approve yet.</p>;
@@ -52,7 +53,14 @@ function ReviewForm({ mediaId, title, className }: { mediaId: number; title: str
         // The server gives ScorePlay 15 s; this covers a server or network that never answers at all.
         signal: AbortSignal.timeout(20_000),
       });
-      const body = (await res.json()) as Review | { error: string };
+      const body = (await res.json()) as Review | { error: string; offline?: true };
+      // No ScorePlay key: the page holds the decision itself and labels it as not written.
+      if (res.status === 503 && "offline" in body && body.offline) {
+        shared.record(decision === null ? { decision: null, local: true } : { decision, reason: why?.trim() || undefined, local: true });
+        setReason("");
+        setMode("idle");
+        return;
+      }
       if (!res.ok || "error" in body) throw new Error("error" in body ? body.error : `The server answered ${res.status}.`);
       shared.record(body);
       setReason("");
@@ -81,7 +89,7 @@ function ReviewForm({ mediaId, title, className }: { mediaId: number; title: str
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <p className="flex items-center gap-1.5 text-footnote font-semibold text-go">
             <CheckIcon className="size-4" />
-            Approved, tagged in ScorePlay
+            {review.local ? "Approved here only; ScorePlay is not connected" : "Approved, tagged in ScorePlay"}
           </p>
           <button type="button" disabled={saving} onClick={() => save(null)} className="press rounded-md text-caption font-semibold text-tint hover:underline disabled:opacity-40">
             Undo
@@ -92,6 +100,7 @@ function ReviewForm({ mediaId, title, className }: { mediaId: number; title: str
           <p className="min-w-0 text-footnote">
             <span className="font-semibold text-label">Rejected</span>
             <span className="text-secondary">{review.reason ? `: ${review.reason}` : ", no reason given"}</span>
+            {review.local && <span className="text-secondary"> · here only, not in ScorePlay</span>}
           </p>
           <button type="button" disabled={saving} onClick={() => save(null)} className="press rounded-md text-caption font-semibold text-tint hover:underline disabled:opacity-40">
             Undo
