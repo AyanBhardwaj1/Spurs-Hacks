@@ -1,5 +1,7 @@
 # Demo script
 
+This is the script the team used for judging on 23 October 2026. The event's platforms are gone now, so video does not play and approvals stay on the page. See "What works now" in the README.
+
 For whoever presents Rundown to the judges. It is five minutes, spoken, keyed to the seven steps of the
 studio's presenter. The figures come from the committed run (`src/lib/studio/data/mnu-tot.json`, recorded
 23 October); if a new run replaces it, check them against the page before you go on.

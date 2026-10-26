@@ -1,10 +1,41 @@
-# Rundown (Name WIP)
+# Rundown
 
 Rundown takes every asset from one game and drafts the content a club should make from it. A producer gets a short list of proposed pieces, each aimed at an audience, and approves or spikes them. Rundown also lists what it considered and dropped, with a reason, so a person can rescue the clip the model got wrong.
 
-Built in two days at the Spurs² Hackathon (UT Austin, October 22 to 23, 2026) for Problem 1 of the [builder brief](https://scoreplay.notion.site/Spurs-Hackathon-Builder-Brief-3fb9d8f0d4ce815096d4dc8294142346), Assisted Auto-Production. It runs on the [ScorePlay](https://developer.scoreplay.io/) and [Twelve Labs](https://docs.twelvelabs.io/) APIs with match content from Tottenham Hotspur and the San Antonio Spurs.
+It was built in two days at the Spurs² Hackathon (UT Austin, October 22 to 23, 2026) for Problem 1 of the [builder brief](https://scoreplay.notion.site/Spurs-Hackathon-Builder-Brief-3fb9d8f0d4ce815096d4dc8294142346), Assisted Auto-Production, on the [ScorePlay](https://developer.scoreplay.io/) and [Twelve Labs](https://docs.twelvelabs.io/) APIs, with Tottenham Hotspur's full match against Manchester United.
 
-Status: the studio works end to end on Tottenham's full match against Manchester United. Open `/studio` to see it, or press **Present the demo** there for the seven-step walkthrough in [docs/demo-script.md](docs/demo-script.md). The live view is at `/studio/130852725/live`. It runs on Fly.io behind a site password ([docs/deploy.md](docs/deploy.md)).
+## Team and this repo
+
+Team 7 built Rundown: Feria, Hamid, Sam, Ayan and Bryan. Feria and Hamid built the MatchWatch prompts the studio uses. The team's repository, with each person's commits, is `SamGu-NRX/spurs-hackathon`.
+
+This repo imports that code as one commit and carries it on. Every commit after the import is Ayan's:
+
+| Commit | What it does |
+| --- | --- |
+| `docs(readme)` describe the studio as built | The first honest README for the shipped studio |
+| `fix(studio)` show the confirmed writeback | The run's last stage reports the 30 logs ScorePlay confirmed, not "Rehearsal" |
+| `feat(studio)` storage call | Step 4 shows the stretches of the match nothing pointed at, as a cold-storage proposal |
+| `feat(studio)` log a rescued candidate | "Make a clip anyway" writes a timecoded `rundown-rescued` log onto the match |
+| `fix(studio)` answer typed searches from the run's moments | Search falls back to the run's 76 moments, and "shot on target" stops matching "off target" |
+| `chore(agents)` one person's project | Retires the five-agent coordination, the PR bots and their workflows |
+| `fix(studio)` search without a Twelve Labs key | Search works on a fresh clone, from recorded results and then the run's moments |
+| `feat(studio)` edit decision lists | Every planned clip downloads as a CMX 3600 EDL for Premiere, Resolve or Avid |
+| `fix(studio)` decisions without ScorePlay | Approve, Reject and rescues work offline, held on the page and labelled as not written |
+| `fix(studio)` say why the footage is dark | The page says ScorePlay is not connected and explains the missing video |
+
+## What works now
+
+The event's ScorePlay platform was wiped afterwards and the team's Twelve Labs allowance is spent, so the studio runs from the committed analysis. Nothing on the page claims a write that did not happen.
+
+Works with no keys:
+
+- The run's 14 stages, the 76 moments with their evidence, and the timeline.
+- The 93 dropped candidates with their reasons, and the storage panel.
+- The 18 planned clips, the club check, and an EDL download for every clip and the recap.
+- Search, from the recorded Twelve Labs results and then the run's own moments.
+- Approve, Reject and "Make a clip anyway", held on the page until reload.
+
+Needs the platforms: video playback, the club's own videos and the uploads in the library, writing tags and logs to ScorePlay, live Twelve Labs search, and the live view at `/studio/130852725/live`.
 
 ## What one run produced
 
@@ -28,13 +59,7 @@ Status: the studio works end to end on Tottenham's full match against Manchester
 | Twelve Labs | Pegasus describes each moment for the clip plan | `scripts/studio/descriptions.ts` |
 | Twelve Labs | MatchWatch segmentation and editorial review | `scripts/studio/matchwatch.ts` |
 
-The team's Twelve Labs allowance ran out on the morning of 23 October. Since then, search in the studio answers from results recorded before that (`src/lib/studio/search-recorded.ts`), and the page says so.
-
 The `/api/rundown` engine in `src/lib/rundown` is an earlier, separate pipeline for any match on the platform. [docs/engine.md](docs/engine.md) describes it.
-
-## Studio
-
-Built with [MatchWatch](https://github.com/Jazzbai/matchwatch/tree/hacketong). The studio ports the soccer event prompts from `HtownKickoff-main/src/components/stream/HighlightStudio.tsx` and the Jev review prompt, schema, and 50/30/20 score renormalization from `HtownKickoff-main/src/lib/jev.ts`. `HtownKickoff-main/src/lib/highlight-plan.ts` and `HtownKickoff-main/HIGHLIGHTS.md` explain their selection workflow. Rundown keeps its ranking unchanged and stores Jev estimates alongside its scores.
 
 ## What the producer gets
 
@@ -60,17 +85,22 @@ flowchart LR
 
 ScorePlay is the system of record. If a decision is not written onto the asset there, the club does not know it happened. Every Twelve Labs asset carries its ScorePlay asset ID in its custom ID field, which is how results find their way back.
 
+## MatchWatch
+
+Built with [MatchWatch](https://github.com/Jazzbai/matchwatch/tree/hacketong). The studio ports the soccer event prompts from `HtownKickoff-main/src/components/stream/HighlightStudio.tsx` and the Jev review prompt, schema, and 50/30/20 score renormalization from `HtownKickoff-main/src/lib/jev.ts`. `HtownKickoff-main/src/lib/highlight-plan.ts` and `HtownKickoff-main/HIGHLIGHTS.md` explain their selection workflow. Rundown keeps its ranking unchanged and stores Jev estimates alongside its scores.
+
 ## Run it
 
-You need [bun](https://bun.sh) 1.3 and Node 22 or later. Next.js still runs on Node; bun installs packages and runs scripts.
+You need [bun](https://bun.sh) 1.3 and Node 22 or later. No keys are needed.
 
 ```sh
 bun install
-cp .env.example .env.local   # then fill in your team's keys
 bun dev
 ```
 
-Open http://localhost:3000. The landing page is `/` and the studio is `/studio`. Without keys the studio still opens from the committed run: the sections that need ScorePlay say it did not answer, and search says there is no Twelve Labs key. `bun scripts/studio/validate.ts` checks the committed run file.
+Open http://localhost:3000/studio. Press **Present the demo** for the seven-step walkthrough the team gave the judges ([docs/demo-script.md](docs/demo-script.md)). `bun scripts/studio/validate.ts` checks the committed run file.
+
+Keys are optional and only help against a ScorePlay platform and Twelve Labs index someone still has. Copy `.env.example` to `.env.local` to set them.
 
 | Variable | Where it comes from |
 | --- | --- |
@@ -79,17 +109,12 @@ Open http://localhost:3000. The landing page is `/` and the studio is `/studio`.
 | `TWELVELABS_API_KEY` | Your team's Twelve Labs org. Give it an expiry of a few months, not never. |
 | `TWELVELABS_INDEX_ID` | The pre-built base index shared at onboarding |
 
-To put the app online, follow [docs/deploy.md](docs/deploy.md).
+[docs/deploy.md](docs/deploy.md) covers running it on Fly.io.
 
 ## Content rules
 
-The match footage, photos and logos belong to the clubs and leagues. For this event:
-
-- The organizers expect teams to process the media. Rundown may download, clip, transform and render it, locally or in the cloud, but it does not keep it. Working copies are deleted when the job finishes, nothing is committed or re-hosted, and derived clips go back into ScorePlay.
-- Nothing posts outside the event. Social publishing is demo only.
-- Platforms are wiped after the event.
-- Only registered teammates use the team's credentials.
+The match footage, photos and logos belong to the clubs and leagues. At the event, teams could process the media but not keep, post or re-host it, and the platforms were wiped afterwards. This repo holds no media, only IDs, timecodes, text and metadata. The EDLs are timecodes and the master's file name, which an editor relinks to their own copy.
 
 ## Working in this repo
 
-Branch, open a PR, squash-merge once CI passes. [CONTRIBUTING.md](CONTRIBUTING.md) covers the one-time Coordigent setup and lists the checks. [AGENTS.md](AGENTS.md) holds the conventions and says which skill in `.claude/skills` to use for each task.
+Run `bun run lint && bun run typecheck && bun run test && bun run build`, then push to `main` once all four pass. CI runs the same checks with no API keys. [AGENTS.md](AGENTS.md) holds the conventions for anyone, or any agent, working here.
