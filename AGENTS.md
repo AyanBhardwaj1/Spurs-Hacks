@@ -1,15 +1,18 @@
 # Agent guide
 
-Rundown is a Next.js app for the Spurs² hackathon (Problem 1, Assisted Auto-Production). The README explains the product and the data rules. Five people's agents edit this repo at the same time.
+Rundown is a Next.js app built by Team 7 at the Spurs² Hackathon (Problem 1, Assisted Auto-Production) and continued here by Ayan alone. The README explains the product, what works without the event's platforms, and the content rules.
 
-## Coordinate through Coordigent
+## Working here
 
-Coordigent shows each agent which files the others are in and carries messages between them. Its tools come from the `coordigent` MCP server. If they are missing, stop and point your person at "Set up Coordigent" in CONTRIBUTING.md.
+- One person works in this repo. There is no coordination server, no bot review and no `gh` CLI.
+- Branch from `main` as `ayan/<topic>`. One Conventional Commit per change, `type(scope): subject`, with scopes such as `studio`, `rundown`, `docs`, `agents` or `ci`.
+- Before merging, run `bun run lint && bun run typecheck && bun run test && bun run build`. All four must pass. Then fast-forward `main` and push it. CI (`.github/workflows/ci.yml`) runs the same checks on the push. It has no API keys and never calls ScorePlay or Twelve Labs.
 
-- At session start, call `coordigent_session_register` with your current task, written as your branch plus the area you touch, such as `sam/workspace-ui: src/app/**`. Then read `coordigent_message_inbox`.
-- When you switch tasks, call `coordigent_session_heartbeat` with the new task and read the inbox again.
-- When a conflict warning names a file another agent is in, find that agent with `coordigent_session_list` and send it a `coordigent_message_send` saying what you plan to change, before you edit the file.
-- When you change something every agent depends on, such as a shared type, an env variable, a script or a dependency, run `coord msg everyone "<text>"` with what changed, the branch, and what others must do.
+## The platforms are gone
+
+The event's ScorePlay platform was wiped and the Twelve Labs allowance is spent. Treat both as unavailable. Keep the code that calls them, because it works again with a key. Every feature must also work without a key and say on the page what it could not do. Never present a write that did not happen as one that did.
+
+The studio reads `src/lib/studio/data/mnu-tot.json`. Change it only through a script in `scripts/studio`, then run `bun scripts/studio/validate.ts`.
 
 ## Skills
 
@@ -18,23 +21,11 @@ Coordigent shows each agent which files the others are in and carries messages b
 | Task | Skill |
 | --- | --- |
 | Any prose: docs, UI copy, code comments, commit messages | `unslop` |
-| README, CONTRIBUTING or other docs | `technical-writing` |
+| README or other docs | `technical-writing` |
 | Editing AGENTS.md or a skill, or briefing another agent | `prompt-writing` |
 | Reviewing your diff | `deslop` |
 | Committing (it runs `deslop` first) | `commit-changes` |
-| Branching, pushing and opening the PR for finished work | `ship-pr` |
-| Watching an open PR through CI and CodeRabbit review until it's ready | `babysit` |
-| PR title and body, using `.github/pull_request_template.md` | `pr-writing` |
 | Writing or changing a test | `test-audit` |
-
-## Branches, commits and PRs
-
-- Pull `main` before you start and again before you push. Branch from it as `<your-name>/<topic>`.
-- Write commit subjects and PR titles as Conventional Commits: `type(scope): subject`, such as `feat(workspace): add the match clock`. The scope is the area you touched, such as `workspace`, `scoreplay`, `twelvelabs`, `ci` or `agents`. `main` takes squash merges, which keep the PR title, or the commit subject when the PR has one commit. The PR title check flags anything else.
-- Open a PR against `main`. Before you push, run `bun run lint && bun run typecheck && bun run test && bun run build`.
-- Every PR waits for code review before it merges. Codex reviews when the PR opens; after each later push, comment `@codex review` once. Every PR that changes more than Markdown also needs CodeRabbit, unless Sam has added the `coderabbit: waived` label, which skips only the CodeRabbit wait; Codex, CI and every review thread still apply. If Codex acknowledges a review request but never posts the review, Sam can add `codex: waived`, which skips only the Codex wait. When it says it is rate-limited, wait for the time it gives, then comment `@coderabbitai review`. Address every comment from either bot: fix it, or reply with the evidence for leaving it, then resolve the thread. Leave a thread open when the finding needs Sam's decision, and tell him. Write `@codex` only in the review request comment itself, never in a PR description or any other comment: Codex treats any other mention as a request to run a cloud task.
-- Squash-merge when `Lint, typecheck, build` and `Code review` are green and no review thread is open. The `babysit` skill runs this loop.
-- Leave files outside your task alone. A merge conflict across five branches costs more than the cleanup was worth.
 
 ## Tests
 
