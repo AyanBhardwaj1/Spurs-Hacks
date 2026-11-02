@@ -1,8 +1,22 @@
 # Rundown
 
-Rundown takes every asset from one game and drafts the content a club should make from it. A producer gets a short list of proposed pieces, each aimed at an audience, and approves or spikes them. Rundown also lists what it considered and dropped, with a reason, so a person can rescue the clip the model got wrong.
+Rundown turns a full match video into clips cut for each social platform. Upload the game, and it finds the moments from the crowd and the commentary, cuts each one differently for TikTok, Reels, Shorts, X and YouTube, writes the captions, and puts every clip in front of you to approve. It also lists what each platform left out, with a reason, so you can rescue the clip it got wrong.
 
-It was built in two days at the Spurs² Hackathon (UT Austin, October 22 to 23, 2026) for Problem 1 of the [builder brief](https://scoreplay.notion.site/Spurs-Hackathon-Builder-Brief-3fb9d8f0d4ce815096d4dc8294142346), Assisted Auto-Production, on the [ScorePlay](https://developer.scoreplay.io/) and [Twelve Labs](https://docs.twelvelabs.io/) APIs, with Tottenham Hotspur's full match against Manchester United.
+It started at the Spurs² Hackathon (UT Austin, October 22 to 23, 2026) as a tool for Problem 1 of the [builder brief](https://scoreplay.notion.site/Spurs-Hackathon-Builder-Brief-3fb9d8f0d4ce815096d4dc8294142346), Assisted Auto-Production, built on the [ScorePlay](https://developer.scoreplay.io/) and [Twelve Labs](https://docs.twelvelabs.io/) APIs with Tottenham Hotspur's full match against Manchester United. That run is still in the studio as a case study.
+
+## Make clips from any match
+
+Open `/studio`, press **Upload a match**, and pick the platforms. Each gets its own cut:
+
+| Platform | Shape | Cut | Moments |
+| --- | --- | --- | --- |
+| TikTok | 9:16 | 18 s, opening 8 s before the roar | top 5 |
+| Instagram Reels | 9:16 | 18 s, short enough to loop | top 4 |
+| YouTube Shorts | 9:16 | 28 s, with the build-up and the reaction | top 4 |
+| X | 16:9 and 1:1 | 15 s, newsy | top 3 |
+| YouTube | 16:9 | one highlights cut of the top 8 moments | 1 |
+
+It runs with no keys: moments come from the crowd's noise, and the copy follows rules. Add `OPENAI_API_KEY` and it also transcribes the commentary, which finds moments the crowd missed and captions every clip, and the model writes each platform's hook and caption. [docs/jobs.md](docs/jobs.md) covers how each stage works, the rules, and the settings.
 
 ## Team and this repo
 
@@ -22,12 +36,18 @@ This repo imports that code as one commit and carries it on. Every commit after 
 | `feat(studio)` edit decision lists | Every planned clip downloads as a CMX 3600 EDL for Premiere, Resolve or Avid |
 | `fix(studio)` decisions without ScorePlay | Approve, Reject and rescues work offline, held on the page and labelled as not written |
 | `fix(studio)` say why the footage is dark | The page says ScorePlay is not connected and explains the missing video |
+| `feat(jobs)` moments from any match | Crowd-noise peaks and commentary calls, fused into ranked moments that snap to camera cuts |
+| `feat(jobs)` a cut for every platform | Per-platform cuts, counts, captions and hashtag limits, with the model's copy held to them |
+| `feat(jobs)` the engine, end to end | Chunked upload, a job runner with saved stages, and an end-to-end test on a synthetic match |
+| `feat(jobs)` the API | Upload with resume, clip streaming with seeking, downloads and decisions |
+| `fix(render)` 48 kHz audio | Clips shipped 96 kHz audio from the loudness filter; both renderers now resample |
+| `feat(studio)` upload and review | `/studio/new` and `/studio/jobs/{id}`: progress, clips by platform, approve, copy, download |
 
 ## What works now
 
-The event's ScorePlay platform was wiped afterwards and the team's Twelve Labs allowance is spent, so the studio runs from the committed analysis. Nothing on the page claims a write that did not happen.
+Uploading a match and getting clips works with no keys. With `OPENAI_API_KEY` set, the job also transcribes the commentary and the model writes the copy.
 
-Works with no keys:
+The hackathon case study is different. The event's ScorePlay platform was wiped afterwards and the team's Twelve Labs allowance is spent, so that run plays from the committed analysis, and nothing on the page claims a write that did not happen. Works with no keys:
 
 - The run's 14 stages, the 76 moments with their evidence, and the timeline.
 - The 93 dropped candidates with their reasons, and the storage panel.
@@ -37,7 +57,7 @@ Works with no keys:
 
 Needs the platforms: video playback, the club's own videos and the uploads in the library, writing tags and logs to ScorePlay, live Twelve Labs search, and the live view at `/studio/130852725/live`.
 
-## What one run produced
+## What the hackathon run produced
 
 `scripts/studio/analyze.ts` read the 1 hour 45 minute match in 14 stages, in 13 minutes 34 seconds. The result is committed as `src/lib/studio/data/mnu-tot.json`, so the studio opens without waiting on any API.
 
@@ -98,9 +118,11 @@ bun install
 bun dev
 ```
 
-Open http://localhost:3000/studio. Press **Present the demo** for the seven-step walkthrough the team gave the judges ([docs/demo-script.md](docs/demo-script.md)). `bun scripts/studio/validate.ts` checks the committed run file.
+Open http://localhost:3000/studio and press **Upload a match**. The bundled ffmpeg cuts the clips, so nothing else needs installing. Jobs and their clips are kept in `.rundown/jobs/` until you delete them.
 
-Keys are optional and only help against a ScorePlay platform and Twelve Labs index someone still has. Copy `.env.example` to `.env.local` to set them.
+Copy `.env.example` to `.env.local` to set keys. `OPENAI_API_KEY` turns on transcripts and model-written copy. The ScorePlay and Twelve Labs keys only help against a platform and index someone still has.
+
+For the hackathon case study, press **Present the demo** on the Tottenham match for the seven-step walkthrough the team gave the judges ([docs/demo-script.md](docs/demo-script.md)). `bun scripts/studio/validate.ts` checks its committed run file.
 
 | Variable | Where it comes from |
 | --- | --- |
@@ -108,12 +130,15 @@ Keys are optional and only help against a ScorePlay platform and Twelve Labs ind
 | `SCOREPLAY_API_URL` | `https://media.scoreplay.io/v1` |
 | `TWELVELABS_API_KEY` | Your team's Twelve Labs org. Give it an expiry of a few months, not never. |
 | `TWELVELABS_INDEX_ID` | The pre-built base index shared at onboarding |
+| `OPENAI_API_KEY` | Your own OpenAI key, for transcripts and copy. See [docs/jobs.md](docs/jobs.md) for the model settings. |
 
 [docs/deploy.md](docs/deploy.md) covers running it on Fly.io.
 
 ## Content rules
 
-The match footage, photos and logos belong to the clubs and leagues. At the event, teams could process the media but not keep, post or re-host it, and the platforms were wiped afterwards. This repo holds no media, only IDs, timecodes, text and metadata. The EDLs are timecodes and the master's file name, which an editor relinks to their own copy.
+Upload only video you have the rights to. A job keeps its video and clips in its own folder until you delete it, posts nothing, and sends nothing anywhere except the audio to OpenAI when a key is set.
+
+The hackathon's match footage, photos and logos belong to the clubs and leagues. At the event, teams could process the media but not keep, post or re-host it, and the platforms were wiped afterwards. This repo holds no media, only IDs, timecodes, text and metadata. The EDLs are timecodes and the master's file name, which an editor relinks to their own copy.
 
 ## Working in this repo
 
