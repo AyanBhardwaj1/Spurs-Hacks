@@ -1,4 +1,6 @@
+import type { FocusKey } from "@/lib/studio/types";
 import { assDocument, assText, type AssEvent, type AssStyle } from "./ass";
+import { focusExpr } from "./focus";
 import type { Word } from "./types";
 
 // Burned-in captions and the ffmpeg command that cuts a clip. Phones play social video muted, so every
@@ -73,17 +75,19 @@ type Render = {
   output: string;
   /** A source with no audio gets a silent track, so every clip plays the same way. */
   hasAudio?: boolean;
+  /** Where a narrow crop centres, in source seconds. Without it the crop is centred. */
+  focus?: FocusKey[];
 };
 
 /** ffmpeg arguments that cut, crop, join, caption and loudness-level one clip. Pure, so it can be tested. */
-export function renderArgs({ source, segments, width: W, height: H, captions, fontsDir, output, hasAudio = true }: Render): string[] {
+export function renderArgs({ source, segments, width: W, height: H, captions, fontsDir, output, hasAudio = true, focus = [] }: Render): string[] {
   const aspect = (W / H).toFixed(5);
   const total = segments.reduce((n, s) => n + (s.end - s.start), 0);
   const inputs = segments.flatMap((s) => ["-ss", s.start.toFixed(3), "-t", (s.end - s.start).toFixed(3), "-i", source]);
   const silent = hasAudio ? [] : ["-f", "lavfi", "-t", total.toFixed(3), "-i", "anullsrc=r=48000:cl=stereo"];
   const video = segments.map(
-    (_, i) =>
-      `[${i}:v]crop=w='if(gt(a,${aspect}),ih*${aspect},iw)':h='if(gt(a,${aspect}),ih,iw/${aspect})':x='(iw-ow)/2':y='(ih-oh)/2',` +
+    (seg, i) =>
+      `[${i}:v]crop=w='if(gt(a,${aspect}),ih*${aspect},iw)':h='if(gt(a,${aspect}),ih,iw/${aspect})':x='${focusExpr(focus.filter((k) => k.t >= seg.start - 2 && k.t <= seg.end + 2), seg.start)}':y='(ih-oh)/2',` +
       `scale=${W}:${H},setsar=1,fps=30,format=yuv420p[v${i}];`,
   );
   const fonts = fontsDir ? `:fontsdir=${escapeFilterValue(fontsDir)}` : "";

@@ -16,6 +16,7 @@ Each stage saves `job.json`, so the page can follow along and a restart keeps fi
 | Transcribe | OpenAI speech-to-text with word timings, in 10-minute pieces. | `OPENAI_API_KEY` |
 | Find the moments | A rise of 6 dB or more over the minute before is a roar, placed at its onset. A commentary call ("what a", "goal", "touchdown", "dunk", ...) is another signal. Both together score highest. Edges snap to a camera cut within 3 s. | Audio or a transcript |
 | Plan | Each platform gets its own cut and its own number of moments. Every moment a platform passes on is kept with the reason. With a key, the model rewrites the hook, caption and title. | Nothing, or a key for copy |
+| Follow the play | For each moment that a vertical or square clip uses, the vision model marks where the play is once a second, and the measured camera pan carries the crop between marks. A cut lets the crop jump, and a pan-speed limit stops it jittering. The pan and cut rules are the hackathon's, shared in `focus.ts`. | `OPENAI_API_KEY`; otherwise the crop is centred |
 | Render | ffmpeg crops to the platform's shape, joins the segments, burns in the hook and the commentary as captions, and levels loudness to -14 LUFS at 48 kHz. | ffmpeg |
 
 With no audio and no transcript, the job samples six evenly spaced moments and says so on each one.
@@ -36,7 +37,7 @@ Captions keep to each platform's caption and hashtag limits from `src/lib/rundow
 
 ## What the model may do
 
-Only write copy. It sees each clip's moment, what was said and the platform's limits. It cannot move a cut, add a clip or change hashtags. Its answer is checked against a schema in code, every field is cut to its platform's limit, and a blank or missing field keeps the rule-written copy. If the call fails, the job uses the rule copy and says why on the Plan stage.
+Write copy, and mark where the play is on sampled frames. It sees each clip's moment, what was said and the platform's limits. It cannot move a cut, add a clip or change hashtags. Its answer is checked against a schema in code, every field is cut to its platform's limit, and a blank or missing field keeps the rule-written copy. If the call fails, the job uses the rule copy and says why on the Plan stage. Its frame marks are checked the same way: a frame it skips, repeats or numbers out of range gets no mark, the camera's pan fills the gap, and a moment whose call fails keeps a centred crop.
 
 ## Settings
 
@@ -54,10 +55,10 @@ Only write copy. It sees each clip's moment, what was said and the platform's li
 ## Limits
 
 - Jobs run one at a time on one server, and the lock that keeps their writes in order lives in that process. A second machine would need a shared queue and storage.
-- The crop is centred. The hackathon run found the action with Pegasus; this engine has no video model, so a play near the touchline can fall outside a 9:16 crop.
+- Without an OpenAI key the crop is centred, so a play near the touchline can fall outside a 9:16 crop. With a key it follows the play from one mark a second, which can lag a very fast switch of play.
 - The commentary calls are an English word list. Other languages still get crowd moments and transcripts, but not call matching.
 - Nothing is posted anywhere. A producer downloads an approved clip and posts it.
 
 ## Footage
 
-Upload only video you have the rights to: your own recordings, or a club's footage you are allowed to process. The video stays in its job's folder until you delete the job, and nothing is sent anywhere except the audio to OpenAI when a key is set.
+Upload only video you have the rights to: your own recordings, or a club's footage you are allowed to process. The video stays in its job's folder until you delete the job, and nothing is sent anywhere except, when a key is set, the audio and one small frame a second of each cropped moment to OpenAI.

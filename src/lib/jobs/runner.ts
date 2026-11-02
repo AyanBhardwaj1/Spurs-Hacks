@@ -5,15 +5,17 @@ import path from "node:path";
 import { PLACEMENTS } from "@/lib/rundown/platforms";
 import { defaultFont } from "@/lib/rundown/render";
 import { clipAss, captionEvents, fontFamily, renderArgs } from "./captions";
+import { anchorsFrom, ANCHOR_SCHEMA, ANCHOR_SYSTEM, isAnchorAnswer } from "./anchors";
 import { applyCopy, copyPrompt, COPY_SCHEMA, isCopyAnswer } from "./copy";
 import { findPeaks } from "./energy";
+import { cropShare, focusKeys, MOTION, motionSteps, type Anchor } from "./focus";
 import { lastLine, runFfmpeg } from "./ffmpeg";
-import { audioPieces, crowdFloor, probe, sceneCuts } from "./media";
+import { audioPieces, crowdFloor, motionFrames, probe, sampledJpegs, sceneCuts } from "./media";
 import { fuseMoments, matchClock } from "./moments";
 import { openaiConfigured, structured, transcribePiece } from "./openai";
 import { planClips } from "./planner";
 import { dataDir, jobFile, listJobs, setStage, updateJob } from "./store";
-import type { Job, JobMoment, StageId, Word } from "./types";
+import type { Job, JobMoment, SourceInfo, StageId, Word } from "./types";
 
 // Runs a job's stages in order, saving after each so the page can follow along. Jobs run one at a time:
 // a render is a full ffmpeg encode, and a laptop or a single small server should not run two at once.
@@ -193,6 +195,28 @@ async function runStages(id: string) {
     return { value: undefined, detail };
   });
 
+  await stage(id, "focus", async (job) => {
+    // The narrowest crop any clip of a moment needs decides whether the moment needs following at all.
+    const windows = cropWindows(job, info);
+    if (windows.size === 0) return { value: undefined, skipped: true, detail: "No clip crops the picture, so there is nothing to follow." };
+    if (!openaiConfigured()) return { value: undefined, skipped: true, detail: "No OpenAI key on the server; vertical and square cuts are centred." };
+    let followed = 0;
+    const failures: string[] = [];
+    for (const [momentId, w] of windows) {
+      try {
+        const keys = await followPlay(source, w.start, w.end, w.share);
+        await updateJob(id, (j) => ({ ...j, moments: j.moments.map((m) => (m.id === momentId ? { ...m, focus: keys } : m)) }));
+        followed += 1;
+      } catch (err) {
+        // A moment the model could not follow keeps a centred crop; the rest still follow.
+        console.warn(`[jobs] ${id} focus for ${momentId} failed:`, err);
+        failures.push(momentId);
+      }
+    }
+    const missed = failures.length ? `; ${failures.length} kept a centred crop after the vision call failed` : "";
+    return { value: undefined, detail: `Followed the play in ${followed} of ${windows.size} moments${missed}` };
+  });
+
   await stage(id, "render", async (job) => {
     const font = defaultFont();
     let ready = 0;
@@ -230,9 +254,46 @@ async function renderOne(id: string, clipId: string, source: string, words: Word
     captions: captionEvents(words, clip.segments),
   });
   await writeFile(path.join(dir, "captions.ass"), captions);
-  const args = renderArgs({ source, segments: clip.segments, width: p.width, height: p.height, captions: "captions.ass", fontsDir: font ? path.dirname(font) : undefined, output, hasAudio });
+  const focus = job.moments.find((m) => m.id === clip.momentId)?.focus;
+  const args = renderArgs({ source, segments: clip.segments, width: p.width, height: p.height, captions: "captions.ass", fontsDir: font ? path.dirname(font) : undefined, output, hasAudio, focus });
   const run = await runFfmpeg(args, { cwd: dir, timeoutMs: 900_000 });
   await rm(dir, { recursive: true, force: true });
   if (run.code !== 0) throw new Error(`ffmpeg failed: ${lastLine(run.stderr)}`);
   return path.basename(output);
+}
+
+/** Vision marks one frame a second; the camera's pan is measured five times a second between them. */
+const ANCHOR_FPS = 1;
+const ANCHORS_PER_CALL = 20;
+
+/** For each moment that a cropped clip uses: the stretch of source its cropped clips cover, and the narrowest crop. */
+function cropWindows(job: Job, info: SourceInfo) {
+  const windows = new Map<string, { start: number; end: number; share: number }>();
+  for (const clip of job.clips) {
+    const share = cropShare(info, PLACEMENTS[clip.placement]);
+    if (share >= 0.99 || clip.segments.length !== 1) continue;
+    const [seg] = clip.segments;
+    const w = windows.get(clip.momentId);
+    windows.set(clip.momentId, w ? { start: Math.min(w.start, seg.start), end: Math.max(w.end, seg.end), share: Math.min(w.share, share) } : { ...seg, share });
+  }
+  return windows;
+}
+
+/** Focus keys for one window: the model marks the play on sampled frames, the measured camera pan fills in. */
+async function followPlay(source: string, start: number, end: number, share: number) {
+  const [frames, jpegs] = await Promise.all([motionFrames(source, start, end, MOTION.fps), sampledJpegs(source, start, end, ANCHOR_FPS)]);
+  const anchors: Anchor[] = [];
+  for (let from = 0; from < jpegs.length; from += ANCHORS_PER_CALL) {
+    const batch = jpegs.slice(from, from + ANCHORS_PER_CALL);
+    const answer = await structured({
+      name: "play_position",
+      system: ANCHOR_SYSTEM,
+      user: `Give x for each of the ${batch.length} frames that follow, numbered 0 to ${batch.length - 1}.`,
+      schema: ANCHOR_SCHEMA,
+      check: isAnchorAnswer,
+      images: batch,
+    });
+    anchors.push(...anchorsFrom(answer, batch.length));
+  }
+  return focusKeys(motionSteps(frames), anchors, start, MOTION.fps, ANCHOR_FPS, share);
 }

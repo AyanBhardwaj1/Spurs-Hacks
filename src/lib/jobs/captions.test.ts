@@ -47,3 +47,19 @@ test("the render crops to the platform, burns captions from the job folder, and 
   expect(args.at(-1)).toBe("clip.mp4");
   expect(args).toContain("-shortest");
 });
+
+test("each segment's crop follows its own stretch of the focus path, in that segment's time", () => {
+  const args = renderArgs({
+    source: "s.mp4",
+    segments: [{ start: 10, end: 20 }, { start: 100, end: 110 }],
+    width: 1080,
+    height: 1920,
+    captions: "c.ass",
+    output: "o.mp4",
+    focus: [{ t: 10, x: 0.2 }, { t: 20, x: 0.4 }, { t: 100, x: 0.8 }],
+  });
+  const graph = args[args.indexOf("-filter_complex") + 1];
+  expect(graph).toContain("[0:v]crop=");
+  expect(graph).toContain("if(lt(t,0),0.2,if(lt(t,10),0.2+(0.2000)*(t-0)/10.00,0.4))");
+  expect(graph).toContain("iw*(0.8)-ow/2");
+});

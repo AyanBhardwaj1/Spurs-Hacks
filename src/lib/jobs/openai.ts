@@ -91,10 +91,12 @@ type StructuredAsk<T> = {
   schema: Record<string, unknown>;
   /** The code-side check every answer must pass. */
   check: (value: unknown) => value is T;
+  /** Base64 JPEGs sent after the question, in order, at low detail to keep vision calls cheap. */
+  images?: string[];
 };
 
 /** One chat call that must answer JSON matching `schema`, then `check`. */
-export async function structured<T>({ name, system, user, schema, check }: StructuredAsk<T>): Promise<T> {
+export async function structured<T>({ name, system, user, schema, check, images = [] }: StructuredAsk<T>): Promise<T> {
   const reply = (await call(
     "/chat/completions",
     JSON.stringify({
@@ -102,7 +104,12 @@ export async function structured<T>({ name, system, user, schema, check }: Struc
       temperature: 0.4,
       messages: [
         { role: "system", content: system },
-        { role: "user", content: user },
+        {
+          role: "user",
+          content: images.length
+            ? [{ type: "text", text: user }, ...images.map((b64) => ({ type: "image_url", image_url: { url: `data:image/jpeg;base64,${b64}`, detail: "low" } }))]
+            : user,
+        },
       ],
       response_format: { type: "json_schema", json_schema: { name, strict: true, schema } },
     }),

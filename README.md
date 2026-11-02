@@ -16,7 +16,7 @@ Open `/studio`, press **Upload a match**, and pick the platforms. Each gets its 
 | X | 16:9 and 1:1 | 15 s, newsy | top 3 |
 | YouTube | 16:9 | one highlights cut of the top 8 moments | 1 |
 
-It runs with no keys: moments come from the crowd's noise, and the copy follows rules. Add `OPENAI_API_KEY` and it also transcribes the commentary, which finds moments the crowd missed and captions every clip, and the model writes each platform's hook and caption. [docs/jobs.md](docs/jobs.md) covers how each stage works, the rules, and the settings.
+It runs with no keys: moments come from the crowd's noise, and the copy follows rules. Add `OPENAI_API_KEY` and it also transcribes the commentary, which finds moments the crowd missed and captions every clip, the vertical and square crops follow the play instead of staying centred, and the model writes each platform's hook and caption. [docs/jobs.md](docs/jobs.md) covers how each stage works, the rules, and the settings.
 
 ## Team and this repo
 
@@ -136,7 +136,7 @@ For the hackathon case study, press **Present the demo** on the Tottenham match 
 
 ## Content rules
 
-Upload only video you have the rights to. A job keeps its video and clips in its own folder until you delete it, posts nothing, and sends nothing anywhere except the audio to OpenAI when a key is set.
+Upload only video you have the rights to. A job keeps its video and clips in its own folder until you delete it and posts nothing. With an OpenAI key it sends the audio, and one small frame a second of each cropped moment, to OpenAI; without one it sends nothing.
 
 The hackathon's match footage, photos and logos belong to the clubs and leagues. At the event, teams could process the media but not keep, post or re-host it, and the platforms were wiped afterwards. This repo holds no media, only IDs, timecodes, text and metadata. The EDLs are timecodes and the master's file name, which an editor relinks to their own copy.
 

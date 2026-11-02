@@ -34,7 +34,7 @@ Run them with `bun run test`. Put a test next to the code it covers as `<name>.t
 ## Rules
 
 - The hackathon's match media belongs to the clubs and leagues. Process it only while a job runs: write it to a temp directory or a gitignored `.media/` folder, delete it when the job finishes, and never commit, publish or re-host it. Store IDs, timecodes and metadata.
-- A video someone uploads to the job engine (`src/lib/jobs`) is theirs. It stays in its job's folder under `RUNDOWN_DATA_DIR`, with its clips, until they delete the job, so a match can be cut again. Never commit job folders, never post a clip, and send nothing to a third party except the audio to OpenAI when a key is set.
+- A video someone uploads to the job engine (`src/lib/jobs`) is theirs. It stays in its job's folder under `RUNDOWN_DATA_DIR`, with its clips, until they delete the job, so a match can be cut again. Never commit job folders, never post a clip, and send nothing to a third party except, when a key is set, the audio and sampled frames to OpenAI.
 - Keep API keys in `.env.local`. Call ScorePlay and Twelve Labs from server code only, never from the browser.
 - Use bun for installs and scripts (`bun add`, `bun run`). Do not add a pnpm, npm or yarn lockfile.
 

@@ -3,6 +3,7 @@ import "server-only";
 import { readFile, rm } from "node:fs/promises";
 import path from "node:path";
 import { FRAME_SEC, floorPerSecond, parseRmsPrint } from "./energy";
+import { MOTION } from "./focus";
 import { lastLine, runFfmpeg } from "./ffmpeg";
 import { parseProbe, parseSceneCuts } from "./probe";
 import type { SourceInfo } from "./types";
@@ -70,4 +71,30 @@ export async function sceneCuts(file: string, workDir: string): Promise<number[]
   } finally {
     await rm(printed, { force: true });
   }
+}
+
+/** Small RGB frames of one window, for measuring the camera's pan and finding cuts. */
+export async function motionFrames(file: string, start: number, end: number, fps: number): Promise<Uint8Array[]> {
+  const run = await runFfmpeg([
+    "-v", "error", "-ss", start.toFixed(2), "-t", (end - start).toFixed(2), "-i", file,
+    "-an", "-vf", `fps=${fps},scale=${MOTION.width}:${MOTION.height}:flags=area`, "-pix_fmt", "rgb24", "-f", "rawvideo", "-",
+  ], { timeoutMs: 300_000 });
+  if (run.code !== 0) throw new Error(`Reading frames failed: ${lastLine(run.stderr)}`);
+  const size = MOTION.width * MOTION.height * 3;
+  const frames: Uint8Array[] = [];
+  for (let at = 0; at + size <= run.stdout.length; at += size) frames.push(new Uint8Array(run.stdout.subarray(at, at + size)));
+  return frames;
+}
+
+/** Sampled JPEGs of one window as base64; ffmpeg's MJPEG frames each start with an SOI marker, where the stream is split. */
+export async function sampledJpegs(file: string, start: number, end: number, fps: number, width = 512): Promise<string[]> {
+  const run = await runFfmpeg([
+    "-v", "error", "-ss", start.toFixed(2), "-t", (end - start).toFixed(2), "-i", file,
+    "-an", "-vf", `fps=${fps},scale=${width}:-2`, "-q:v", "5", "-f", "image2pipe", "-c:v", "mjpeg", "-",
+  ], { timeoutMs: 300_000 });
+  if (run.code !== 0) throw new Error(`Sampling frames failed: ${lastLine(run.stderr)}`);
+  const bytes = run.stdout;
+  const starts: number[] = [];
+  for (let i = 0; i + 2 < bytes.length; i++) if (bytes[i] === 0xff && bytes[i + 1] === 0xd8 && bytes[i + 2] === 0xff) starts.push(i);
+  return starts.map((s, k) => bytes.subarray(s, starts[k + 1] ?? bytes.length).toString("base64"));
 }

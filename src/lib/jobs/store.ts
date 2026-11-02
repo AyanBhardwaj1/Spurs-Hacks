@@ -42,6 +42,7 @@ const STAGES: { id: StageId; label: string }[] = [
   { id: "transcript", label: "Transcribe the commentary" },
   { id: "moments", label: "Find the moments" },
   { id: "plan", label: "Plan a cut for each platform" },
+  { id: "focus", label: "Follow the play" },
   { id: "render", label: "Render the clips" },
 ];
 

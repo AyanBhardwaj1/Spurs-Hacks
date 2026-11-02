@@ -62,3 +62,19 @@ test("structured output is parsed and checked before it is used, and a reply tha
   reply("not json");
   await expect(ask()).rejects.toThrow(/did not match/);
 });
+
+test("frames go with the question as low-detail images, in order", async () => {
+  process.env.OPENAI_API_KEY = "test-key";
+  const sent = spyOn(globalThis, "fetch").mockImplementation(
+    Object.assign(async () => Response.json({ choices: [{ message: { content: '{"score": 1}' } }] }), { preconnect: fetch.preconnect }),
+  );
+  const isScore = (v: unknown): v is { score: number } => typeof (v as { score?: unknown })?.score === "number";
+  await structured({ name: "score", system: "s", user: "u", schema: { type: "object" }, check: isScore, images: ["QUJD", "REVG"] });
+  const body = JSON.parse(String((sent.mock.calls[0][1] as RequestInit).body));
+  const content = body.messages[1].content;
+  expect(content[0]).toEqual({ type: "text", text: "u" });
+  expect(content.slice(1)).toEqual([
+    { type: "image_url", image_url: { url: "data:image/jpeg;base64,QUJD", detail: "low" } },
+    { type: "image_url", image_url: { url: "data:image/jpeg;base64,REVG", detail: "low" } },
+  ]);
+});

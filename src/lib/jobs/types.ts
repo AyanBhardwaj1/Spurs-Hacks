@@ -1,4 +1,5 @@
 import type { PLACEMENTS } from "@/lib/rundown/platforms";
+import type { FocusKey } from "@/lib/studio/types";
 
 // A job is one uploaded match video and everything Rundown makes from it. It is written to
 // RUNDOWN_DATA_DIR/jobs/<id>/job.json after every stage, so the page can poll it and a restart does
@@ -14,7 +15,7 @@ export type JobPlacement = (typeof JOB_PLACEMENTS)[number];
 export const SPORTS = ["soccer", "basketball", "american-football", "other"] as const;
 export type JobSport = (typeof SPORTS)[number];
 
-export type StageId = "upload" | "probe" | "audio" | "transcript" | "moments" | "plan" | "render";
+export type StageId = "upload" | "probe" | "audio" | "transcript" | "moments" | "plan" | "focus" | "render";
 export type StageState = "waiting" | "running" | "done" | "skipped" | "failed";
 export type JobStage = { id: StageId; label: string; state: StageState; detail?: string; startedAt?: string; endedAt?: string };
 
@@ -38,6 +39,8 @@ export type JobMoment = {
   title: string;
   /** The words spoken across the moment, if there is a transcript. */
   quote?: string;
+  /** Where a narrow crop centres over time, in source seconds; absent means centred. */
+  focus?: FocusKey[];
 };
 
 export type ClipDecision = "approved" | "rejected";
