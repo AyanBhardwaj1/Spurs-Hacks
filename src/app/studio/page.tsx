@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { HoverPreview } from "@/components/studio/hover-preview";
 import { DOWN_COPY, OFF_COPY, SLOW_COPY } from "@/components/studio/extras";
+import { YourMatches } from "@/components/studio/jobs/your-matches";
 import { LibraryPresenter } from "@/components/studio/library-presenter";
 import { RunBadge, StudioBar, recordedLabel, studioContainer } from "@/components/studio/studio-bar";
 import { clubClipName, clubVideos, type ClubRange } from "@/lib/studio/clips";
@@ -56,8 +57,10 @@ export default function LibraryPage() {
         <RunBadge recordedAt={summary.recordedAt} />
       </StudioBar>
       <main className={`${studioContainer} pb-28 pt-10`}>
-        <p className="text-caption font-semibold uppercase tracking-[0.06em] text-secondary">ScorePlay library</p>
-        <h1 className="mt-1 text-[34px] font-semibold leading-tight tracking-tight">{MATCH_LABEL}</h1>
+        <h1 className="text-[34px] font-semibold leading-tight tracking-tight">Studio</h1>
+        <YourMatches />
+        <p className="mt-14 text-caption font-semibold uppercase tracking-[0.06em] text-secondary">Where it started: the hackathon run in the club&rsquo;s ScorePlay</p>
+        <h2 className="mt-1 text-[34px] font-semibold leading-tight tracking-tight">{MATCH_LABEL}</h2>
         {/* The match and its run come from the committed analysis, so they show at once; only the club's
             videos and the uploads wait on ScorePlay. */}
         <FullMatch item={summary.source} summary={summary} />

@@ -19,7 +19,8 @@ export type FfmpegResult = { code: number; stdout: Buffer; stderr: string };
  */
 export function runFfmpeg(args: string[], { timeoutMs = 600_000, cwd }: { timeoutMs?: number; cwd?: string } = {}): Promise<FfmpegResult> {
   return new Promise((resolve, reject) => {
-    const child = spawn(ffmpegPath(), ["-hide_banner", "-nostdin", ...args], { cwd, stdio: ["ignore", "pipe", "pipe"] });
+    // The binary is found at run time; the ignore keeps Turbopack from tracing the whole project for it.
+    const child = spawn(/*turbopackIgnore: true*/ ffmpegPath(), ["-hide_banner", "-nostdin", ...args], { cwd, stdio: ["ignore", "pipe", "pipe"] });
     const out: Buffer[] = [];
     let stderr = "";
     child.stdout.on("data", (chunk: Buffer) => out.push(chunk));

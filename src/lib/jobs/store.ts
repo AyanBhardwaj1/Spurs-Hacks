@@ -84,7 +84,8 @@ export async function getJob(id: string): Promise<Job | undefined> {
   const hit = jobs.get(id);
   if (hit) return hit;
   try {
-    const job = JSON.parse(await readFile(jobFile.json(id), "utf8")) as Job;
+    // Job folders are run-time data under RUNDOWN_DATA_DIR, not code to trace into the build.
+    const job = JSON.parse(await readFile(/*turbopackIgnore: true*/ jobFile.json(id), "utf8")) as Job;
     jobs.set(id, job);
     return job;
   } catch {
@@ -115,7 +116,7 @@ export async function appendChunk(job: Job, bytes: Uint8Array): Promise<Job> {
   const done = received === job.upload.size;
   if (done) {
     const partial = jobFile.partial(job.id);
-    const size = (await stat(partial)).size;
+    const size = (await stat(/*turbopackIgnore: true*/ partial)).size;
     if (size !== job.upload.size) throw new Error(`The upload holds ${size} bytes, not the ${job.upload.size} announced.`);
     await rename(partial, jobFile.source(job.id, job.upload.fileName));
   }
