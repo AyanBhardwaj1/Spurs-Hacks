@@ -91,7 +91,7 @@ export function renderArgs({ source, segments, width: W, height: H, captions, fo
   if (hasAudio) {
     const audio = segments.map((_, i) => `[${i}:a]aresample=48000,aformat=channel_layouts=stereo,asetpts=PTS-STARTPTS[a${i}];`);
     const pairs = segments.map((_, i) => `[v${i}][a${i}]`).join("");
-    graph = `${video.join("")}${audio.join("")}${pairs}concat=n=${segments.length}:v=1:a=1[vc][ac];[ac]loudnorm=I=-14:TP=-1.5:LRA=11[aout];`;
+    graph = `${video.join("")}${audio.join("")}${pairs}concat=n=${segments.length}:v=1:a=1[vc][ac];[ac]loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000[aout];`;
   } else {
     graph = `${video.join("")}${segments.map((_, i) => `[v${i}]`).join("")}concat=n=${segments.length}:v=1:a=0[vc];[${segments.length}:a]anull[aout];`;
   }

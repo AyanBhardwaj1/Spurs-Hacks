@@ -42,7 +42,8 @@ test("the render crops to the platform, burns captions from the job folder, and 
   expect(graph).toContain("scale=1080:1920");
   expect(graph).toContain("concat=n=2:v=1:a=1");
   expect(graph).toContain("ass=captions.ass:fontsdir=/System/Library/Fonts/Supplemental");
-  expect(graph).toContain("loudnorm=I=-14");
+  // loudnorm works at 192 kHz inside; without the resample the clip would ship 96 kHz audio.
+  expect(graph).toContain("loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000");
   expect(args.at(-1)).toBe("clip.mp4");
   expect(args).toContain("-shortest");
 });

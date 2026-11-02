@@ -83,7 +83,7 @@ export function ffmpegArgs(spec: RenderSpec, output: string): string[] {
     ].join(""),
   );
   const pairs = spec.sources.map((_, i) => `[v${i}][a${i}]`).join("");
-  let graph = `${chains.join("")}${pairs}concat=n=${spec.sources.length}:v=1:a=1[vc][ac];[ac]loudnorm=I=-14:TP=-1.5:LRA=11[aout];`;
+  let graph = `${chains.join("")}${pairs}concat=n=${spec.sources.length}:v=1:a=1[vc][ac];[ac]loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000[aout];`;
 
   const fontSize = Math.round(Math.min(W, H) * 0.06);
   const lines = spec.hook && spec.fontFile ? wrapHook(spec.hook, W, fontSize) : [];
