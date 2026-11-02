@@ -26,11 +26,17 @@ const FALLBACK_SAMPLES = 6;
 const queue = globalThis as unknown as { rundownJobQueue?: { ids: string[]; busy: boolean } };
 const state = (queue.rundownJobQueue ??= { ids: [], busy: false });
 
-/** Puts a fully uploaded job in line. Safe to call twice: a job in line or running is not added again. */
+/**
+ * Puts a fully uploaded job in line. Safe to call twice: a job in line or running is not added again.
+ * RUNDOWN_RUNNER=off takes uploads without running them, for tests or a server that only receives.
+ */
 export function enqueue(id: string) {
   if (!state.ids.includes(id)) state.ids.push(id);
-  void drain();
+  if (process.env.RUNDOWN_RUNNER !== "off") void drain();
 }
+
+/** The ids waiting to run, oldest first. */
+export const queuedJobs = () => [...state.ids];
 
 async function drain() {
   if (state.busy) return;
