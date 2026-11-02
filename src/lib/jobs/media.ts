@@ -28,7 +28,8 @@ export async function crowdFloor(file: string, durationSec: number, workDir: str
     "astats=metadata=1:reset=1:measure_overall=RMS_level:measure_perchannel=none",
     `ametadata=mode=print:key=lavfi.astats.Overall.RMS_level:file=${printFile}[out]`,
   ].join(",");
-  const run = await runFfmpeg(["-v", "error", "-i", file, "-vn", "-filter_complex", filter, "-map", "[out]", "-f", "null", "-"], { cwd: workDir });
+  // Decoding a two-hour match's audio takes minutes, not seconds; the default 10 minutes is too tight.
+  const run = await runFfmpeg(["-v", "error", "-i", file, "-vn", "-filter_complex", filter, "-map", "[out]", "-f", "null", "-"], { cwd: workDir, timeoutMs: 1_800_000 });
   const printed = path.join(workDir, printFile);
   try {
     if (run.code !== 0) throw new Error(`Measuring the crowd failed: ${lastLine(run.stderr)}`);

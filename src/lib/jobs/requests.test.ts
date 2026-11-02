@@ -37,4 +37,6 @@ test("byte ranges for seeking a video", () => {
   expect(parseRange("bytes=1000-", 1000)).toBe("unsatisfiable");
   expect(parseRange("bytes=0-1,5-9", 1000)).toBeNull();
   expect(parseRange("items=0-1", 1000)).toBeNull();
+  expect(parseRange("bytes=-0", 1000)).toBe("unsatisfiable");
+  expect(parseRange("bytes=0-", 0)).toBe("unsatisfiable");
 });

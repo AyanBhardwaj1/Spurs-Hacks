@@ -69,6 +69,8 @@ export type Job = {
   placements: JobPlacement[];
   createdAt: string;
   status: "uploading" | "queued" | "running" | "done" | "failed";
+  /** Runs started for this job; a restart mid-run starts another, up to a limit. */
+  attempts?: number;
   error?: string;
   upload: { fileName: string; size: number; received: number };
   source?: SourceInfo;

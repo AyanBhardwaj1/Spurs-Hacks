@@ -1,7 +1,7 @@
 import "server-only";
 
 import { randomUUID } from "node:crypto";
-import { appendFile, mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
+import { mkdir, open, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { NewJob } from "./requests";
 import type { Job, JobStage, StageId } from "./types";
@@ -10,7 +10,7 @@ import type { Job, JobStage, StageId } from "./types";
 // clips. The video is the uploader's own and stays until the job is deleted. Every path is built here from
 // a checked id and an allow-listed name, never from a raw request value.
 
-const DATA_DIR = () => process.env.RUNDOWN_DATA_DIR ?? path.join(process.cwd(), ".rundown");
+export const dataDir = () => process.env.RUNDOWN_DATA_DIR ?? path.join(process.cwd(), ".rundown");
 const JOB_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const CLIP_ID = /^[a-z0-9-]{1,80}$/;
 
@@ -19,7 +19,7 @@ export const isClipId = (id: string) => CLIP_ID.test(id);
 
 export function jobDir(id: string) {
   if (!isJobId(id)) throw new Error(`Not a job id: ${id}`);
-  return path.join(DATA_DIR(), "jobs", id);
+  return path.join(dataDir(), "jobs", id);
 }
 
 /** The files a job may hold, by name. Anything else is not served. */
@@ -50,13 +50,13 @@ const memory = globalThis as unknown as { rundownJobs?: Map<string, Job> };
 const jobs = (memory.rundownJobs ??= new Map<string, Job>());
 
 export async function saveJob(job: Job) {
-  jobs.set(job.id, job);
   const file = jobFile.json(job.id);
-  await mkdir(path.dirname(file), { recursive: true });
-  // Write then rename, so a poll never reads half a file.
+  // No mkdir: createJob makes the folder, so a save that lands after a delete fails instead of bringing
+  // the job back. Write then rename, so a poll never reads half a file.
   const tmp = `${file}.${process.pid}.tmp`;
   await writeFile(tmp, JSON.stringify(job, null, 2));
   await rename(tmp, file);
+  jobs.set(job.id, job);
 }
 
 export async function createJob(input: NewJob): Promise<Job> {
@@ -96,7 +96,7 @@ export async function getJob(id: string): Promise<Job | undefined> {
 export async function listJobs(): Promise<Job[]> {
   let ids: string[] = [];
   try {
-    ids = (await readdir(path.join(DATA_DIR(), "jobs"))).filter(isJobId);
+    ids = (await readdir(path.join(dataDir(), "jobs"))).filter(isJobId);
   } catch {
     // No jobs folder yet means no jobs.
   }
@@ -104,15 +104,27 @@ export async function listJobs(): Promise<Job[]> {
   return all.filter((j): j is Job => Boolean(j)).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export async function deleteJob(id: string) {
-  jobs.delete(id);
-  await rm(jobDir(id), { recursive: true, force: true });
+/** Deletes the job's folder under its lock, so no chunk or decision is half-written into it. */
+export function deleteJob(id: string) {
+  return withJob(id, async () => {
+    jobs.delete(id);
+    await rm(jobDir(id), { recursive: true, force: true });
+  });
 }
 
 /** Appends a checked chunk to the partial upload and moves the file into place once it is whole. */
 export async function appendChunk(job: Job, bytes: Uint8Array): Promise<Job> {
-  await appendFile(jobFile.partial(job.id), bytes);
-  const received = job.upload.received + bytes.byteLength;
+  // Written at the chunk's own offset and cut there, so a chunk repeated after a crash between this write
+  // and the save below overwrites itself instead of piling up past `received`.
+  const offset = job.upload.received;
+  const received = offset + bytes.byteLength;
+  const handle = await open(/*turbopackIgnore: true*/ jobFile.partial(job.id), offset === 0 ? "w" : "r+");
+  try {
+    await handle.write(bytes, 0, bytes.byteLength, offset);
+    await handle.truncate(received);
+  } finally {
+    await handle.close();
+  }
   const done = received === job.upload.size;
   if (done) {
     const partial = jobFile.partial(job.id);

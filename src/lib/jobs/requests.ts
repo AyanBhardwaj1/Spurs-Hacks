@@ -44,8 +44,10 @@ export function checkChunk(upload: { received: number; size: number }, offset: n
 export function parseRange(header: string | null, size: number): { start: number; end: number } | "unsatisfiable" | null {
   const m = header ? /^bytes=(\d*)-(\d*)$/.exec(header.trim()) : null;
   if (!m || (m[1] === "" && m[2] === "")) return null;
+  if (size === 0) return "unsatisfiable";
   if (m[1] === "") {
     const suffix = Number(m[2]);
+    if (suffix === 0) return "unsatisfiable";
     return { start: Math.max(0, size - suffix), end: size - 1 };
   }
   const start = Number(m[1]);

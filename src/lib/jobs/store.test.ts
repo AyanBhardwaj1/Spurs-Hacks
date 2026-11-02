@@ -1,12 +1,13 @@
 import { afterAll, expect, mock, test } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
+import { appendFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
 mock.module("server-only", () => ({}));
 const dir = mkdtempSync(path.join(tmpdir(), "rundown-jobs-"));
 process.env.RUNDOWN_DATA_DIR = dir;
-const { appendChunk, createJob, getJob, jobFile, updateJob, withJob } = await import("./store");
+const { appendChunk, createJob, deleteJob, getJob, jobFile, saveJob, updateJob, withJob } = await import("./store");
 
 afterAll(() => rmSync(dir, { recursive: true, force: true }));
 
@@ -33,4 +34,21 @@ test("changes to one job apply in order, so concurrent writers do not lose each 
 test("ids that are not a job's or a clip's never reach the filesystem", async () => {
   expect(await getJob("../../etc/passwd")).toBeUndefined();
   expect(() => jobFile.clip("00000000-0000-0000-0000-000000000000", "../x")).toThrow();
+});
+
+test("a chunk lands at its offset, so a repeat after a crash overwrites instead of piling up", async () => {
+  const job = await createJob({ title: "T", sport: "soccer", placements: ["tiktok"], fileName: "m.mp4", size: 4 });
+  const first = await appendChunk(job, new Uint8Array([1, 2]));
+  // The server died after writing the next chunk but before saving: the file is ahead of job.json.
+  await appendFile(jobFile.partial(job.id), new Uint8Array([9, 9]));
+  const done = await appendChunk(first, new Uint8Array([3, 4]));
+  expect(done.status).toBe("queued");
+  expect([...new Uint8Array(await Bun.file(jobFile.source(job.id, "m.mp4")).arrayBuffer())]).toEqual([1, 2, 3, 4]);
+});
+
+test("a deleted job stays deleted when a save was already on its way", async () => {
+  const job = await createJob({ title: "T", sport: "soccer", placements: ["tiktok"], fileName: "m.mp4", size: 1 });
+  await deleteJob(job.id);
+  await expect(saveJob(job)).rejects.toThrow();
+  expect(await getJob(job.id)).toBeUndefined();
 });

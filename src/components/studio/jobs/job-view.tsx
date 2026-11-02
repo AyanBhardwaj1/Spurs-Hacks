@@ -10,6 +10,9 @@ import { PLACEMENT_LABEL } from "./new-job-form";
 import { uploadFile } from "./upload";
 
 const POLL_MS = 2000;
+
+/** A 404: the job was deleted or never existed, so the page stops asking. */
+class Gone extends Error {}
 const live = (job: Job | null) => !job || job.status === "queued" || job.status === "running";
 
 const STAGE_MARK: Record<JobStage["state"], string> = { waiting: "○", running: "◐", done: "●", skipped: "–", failed: "×" };
@@ -22,10 +25,14 @@ export function JobView() {
   const router = useRouter();
   const [job, setJob] = useState<Job | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [missing, setMissing] = useState(false);
+  // Bumped when something outside the poll, such as a resumed upload, makes the job live again.
+  const [pollKey, setPollKey] = useState(0);
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/jobs/${id}`, { cache: "no-store" });
     const body = await res.json();
+    if (res.status === 404) throw new Gone(body.error ?? "There is no such job.");
     if (!res.ok) throw new Error(body.error ?? `The server answered ${res.status}.`);
     return body as Job;
   }, [id]);
@@ -43,7 +50,9 @@ export function JobView() {
       } catch (err) {
         if (stopped) return;
         setError((err as Error).message);
-        timer = setTimeout(tick, POLL_MS * 2);
+        // A job that is gone stays gone; anything else is worth another look.
+        if (err instanceof Gone) setMissing(true);
+        else timer = setTimeout(tick, POLL_MS * 2);
       }
     };
     void tick();
@@ -51,8 +60,17 @@ export function JobView() {
       stopped = true;
       clearTimeout(timer);
     };
-  }, [load]);
+  }, [load, pollKey]);
 
+  if (missing)
+    return (
+      <p className="mt-10 text-footnote text-secondary">
+        {error}{" "}
+        <Link href="/studio" className="font-semibold text-tint hover:underline">
+          Back to the studio
+        </Link>
+      </p>
+    );
   if (!job) return <p className="mt-10 text-footnote text-secondary">{error ?? "Loading the job…"}</p>;
 
   const byPlacement = job.placements.map((p) => ({ placement: p, clips: job.clips.filter((c) => c.placement === p) })).filter((g) => g.clips.length > 0);
@@ -73,7 +91,7 @@ export function JobView() {
         {!live(job) && <DeleteJob id={job.id} onDeleted={() => router.push("/studio")} />}
       </header>
 
-      {job.status === "uploading" && <ResumeUpload job={job} onDone={() => load().then(setJob)} />}
+      {job.status === "uploading" && <ResumeUpload job={job} onDone={() => setPollKey((k) => k + 1)} />}
       {job.status === "failed" && (
         <p role="alert" className="mt-6 text-footnote text-tally">
           The job stopped: {job.error ?? "see the stage that failed below."}

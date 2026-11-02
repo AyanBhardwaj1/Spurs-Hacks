@@ -107,7 +107,14 @@ export function planClips({ moments, placements, durationSec, sport, title }: Pl
     if (placement === "youtube-video") {
       const top = strong.slice(0, HIGHLIGHTS_MOMENTS).sort((a, b) => a.peak - b.peak);
       if (top.length === 0) continue;
-      const segments = top.map((m) => ({ start: round(clamp(m.start, durationSec)), end: round(clamp(m.end, durationSec)) }));
+      // In match order, a window that overlaps the one before extends it, so no footage plays twice.
+      const segments: { start: number; end: number }[] = [];
+      for (const m of top) {
+        const seg = { start: round(clamp(m.start, durationSec)), end: round(clamp(m.end, durationSec)) };
+        const last = segments.at(-1);
+        if (last && seg.start <= last.end) last.end = Math.max(last.end, seg.end);
+        else if (seg.end > seg.start) segments.push(seg);
+      }
       const sec = Math.round(segments.reduce((n, s) => n + s.end - s.start, 0));
       clips.push({
         id: `${placement}-highlights`,

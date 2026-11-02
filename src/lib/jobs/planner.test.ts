@@ -61,3 +61,8 @@ test("captions keep to each platform's hashtag and length limits", () => {
   }
   expect(clips.find((c) => c.placement === "x-video")!.hashtags).toEqual(["football", "soccer"]);
 });
+
+test("the highlights cut never plays the same footage twice", () => {
+  const { clips } = planClips({ ...base, moments: [moment(1000, 1), moment(1020, 0.9)], placements: ["youtube-video"] });
+  expect(clips[0].segments).toEqual([{ start: 985, end: 1030 }]);
+});

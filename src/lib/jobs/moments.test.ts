@@ -43,3 +43,21 @@ test("titles say what happened and when, in match time", () => {
   expect(moments[0].title).toBe("“What a goal!” at 62:05");
   expect(fuseMoments({ durationSec: 900, peaks: [{ peak: 65, start: 50, end: 75, score: 1 }], words: [], cuts: [] })[0].title).toBe("Crowd erupts at 1:05");
 });
+
+test("a shot and a goal call around one roar make one moment, and every moment has its own id", () => {
+  const transcript = [...words(90, "oh my"), ...words(99.8, "goal")];
+  const moments = fuseMoments({ durationSec: 900, peaks: [{ peak: 100, start: 85, end: 110, score: 1 }], words: transcript, cuts: [] });
+  expect(moments).toHaveLength(1);
+  expect(moments[0].signals).toEqual(["crowd", "commentary"]);
+});
+
+test("moments closer than the gap merge into the stronger one, and ids never repeat", () => {
+  const moments = fuseMoments({
+    durationSec: 900,
+    peaks: [{ peak: 300, start: 285, end: 310, score: 1 }, { peak: 300.4, start: 285, end: 310, score: 0.5 }],
+    words: words(330, "what a save"),
+    cuts: [],
+  });
+  expect(moments.map((m) => m.peak)).toEqual([300, 330]);
+  expect(new Set(moments.map((m) => m.id)).size).toBe(moments.length);
+});

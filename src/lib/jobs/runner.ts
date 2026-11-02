@@ -12,7 +12,7 @@ import { audioPieces, crowdFloor, probe, sceneCuts } from "./media";
 import { fuseMoments, matchClock } from "./moments";
 import { openaiConfigured, structured, transcribePiece } from "./openai";
 import { planClips } from "./planner";
-import { jobFile, setStage, updateJob } from "./store";
+import { dataDir, jobFile, listJobs, setStage, updateJob } from "./store";
 import type { Job, JobMoment, StageId, Word } from "./types";
 
 // Runs a job's stages in order, saving after each so the page can follow along. Jobs run one at a time:
@@ -23,8 +23,15 @@ import type { Job, JobMoment, StageId, Word } from "./types";
 /** With no crowd or commentary signal at all, this many evenly spaced samples stand in for moments. */
 const FALLBACK_SAMPLES = 6;
 
-const queue = globalThis as unknown as { rundownJobQueue?: { ids: string[]; busy: boolean } };
-const state = (queue.rundownJobQueue ??= { ids: [], busy: false });
+/** A job that a restart interrupts this many times is failed rather than run again: it may be what crashes. */
+const MAX_ATTEMPTS = 2;
+
+type QueueState = { ids: string[]; busy: boolean; running?: string; recovered: Map<string, Promise<void>> };
+const queue = globalThis as unknown as { rundownJobQueue?: QueueState };
+const state: QueueState = (queue.rundownJobQueue ??= { ids: [], busy: false, recovered: new Map() });
+
+/** Whether this server process has the job in line or running. The saved status can outlive the process. */
+export const isActive = (id: string) => state.running === id || state.ids.includes(id);
 
 /**
  * Puts a fully uploaded job in line. Safe to call twice: a job in line or running is not added again.
@@ -43,16 +50,49 @@ async function drain() {
   state.busy = true;
   try {
     for (let id = state.ids.shift(); id; id = state.ids.shift()) {
+      state.running = id;
       try {
         await runJob(id);
       } catch (err) {
         console.error(`[jobs] ${id} failed:`, err);
-        await updateJob(id, (j) => ({ ...j, status: "failed", error: (err as Error).message })).catch(() => undefined);
+        await updateJob(id, (j) => ({ ...j, status: "failed", error: (err as Error).message })).catch((e) => console.error(`[jobs] ${id} could not be marked failed:`, e));
+      } finally {
+        state.running = undefined;
       }
     }
   } finally {
     state.busy = false;
   }
+}
+
+/**
+ * Picks up after a restart, once per data folder: a job saved as queued or running that this process is
+ * not running is started again from the top, until it has been interrupted MAX_ATTEMPTS times.
+ */
+export function recoverJobs(): Promise<void> {
+  const key = dataDir();
+  let done = state.recovered.get(key);
+  if (!done) {
+    done = (async () => {
+      for (const job of await listJobs()) {
+        if (isActive(job.id) || (job.status !== "queued" && job.status !== "running")) continue;
+        const attempts = job.attempts ?? 0;
+        if (job.status === "running" && attempts >= MAX_ATTEMPTS) {
+          await updateJob(job.id, (j) => ({ ...j, status: "failed", error: `The server stopped during this job ${attempts} times; it was not started again.` }));
+          continue;
+        }
+        await updateJob(job.id, (j) => ({
+          ...j,
+          status: "queued",
+          attempts: j.status === "running" ? attempts + 1 : attempts,
+          stages: j.stages.map((st) => (st.id === "upload" ? st : { id: st.id, label: st.label, state: "waiting" })),
+        }));
+        enqueue(job.id);
+      }
+    })();
+    state.recovered.set(key, done);
+  }
+  return done;
 }
 
 const now = () => new Date().toISOString();
@@ -73,11 +113,20 @@ async function stage<T>(id: string, stageId: StageId, work: (job: Job) => Promis
 function samples(durationSec: number): JobMoment[] {
   return Array.from({ length: FALLBACK_SAMPLES }, (_, i) => {
     const peak = Math.round((durationSec * (i + 1)) / (FALLBACK_SAMPLES + 1));
-    return { id: `m-${peak}`, peak, start: Math.max(0, peak - 15), end: Math.min(durationSec, peak + 10), score: 0.3, signals: [], title: `Sampled at ${matchClock(peak)}, no crowd or commentary to go on` };
+    return { id: `m-${peak}-s${i + 1}`, peak, start: Math.max(0, peak - 15), end: Math.min(durationSec, peak + 10), score: 0.3, signals: [], title: `Sampled at ${matchClock(peak)}, no crowd or commentary to go on` };
   });
 }
 
 export async function runJob(id: string) {
+  try {
+    await runStages(id);
+  } finally {
+    // Audio pieces and per-clip folders go whether the job finished or failed.
+    await rm(jobFile.work(id), { recursive: true, force: true });
+  }
+}
+
+async function runStages(id: string) {
   const first = await updateJob(id, (j) => j);
   const source = jobFile.source(id, first.upload.fileName);
   const work = jobFile.work(id);
@@ -159,7 +208,6 @@ export async function runJob(id: string) {
     return { value: undefined, detail: `${ready} of ${job.clips.length} rendered` };
   });
 
-  await rm(work, { recursive: true, force: true });
   await updateJob(id, (j) => ({ ...j, status: "done" }));
 }
 

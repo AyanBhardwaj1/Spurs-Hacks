@@ -20,6 +20,8 @@ const AGREE_BEFORE_SEC = 12;
 const AGREE_AFTER_SEC = 5;
 const LEAD_SEC = 15;
 const TAIL_SEC = 10;
+/** Two moments closer than this are one play. Matches the crowd's own gap between roars. */
+const MERGE_SEC = 20;
 /** How far an edge may move to land on a camera cut. */
 const SNAP_SEC = 3;
 
@@ -77,27 +79,36 @@ export function fuseMoments({ durationSec, peaks, words, cuts }: Fuse): JobMomen
   const raw: { peak: number; start: number; end: number; score: number; signals: Signal[] }[] = [];
 
   for (const p of peaks) {
-    const call = calls.findIndex((c) => c.at >= p.peak - AGREE_BEFORE_SEC && c.at <= p.peak + AGREE_AFTER_SEC);
-    if (call >= 0) used.add(call);
-    raw.push({
-      ...p,
-      score: CROWD_WEIGHT * p.score + (call >= 0 ? AGREE_BONUS : 0),
-      signals: call >= 0 ? ["crowd", "commentary"] : ["crowd"],
+    // A shot and then a goal call are both about this roar: every call in its window counts for it.
+    let agreed = false;
+    calls.forEach((c, i) => {
+      if (c.at >= p.peak - AGREE_BEFORE_SEC && c.at <= p.peak + AGREE_AFTER_SEC) {
+        used.add(i);
+        agreed = true;
+      }
     });
+    raw.push({ ...p, score: CROWD_WEIGHT * p.score + (agreed ? AGREE_BONUS : 0), signals: agreed ? ["crowd", "commentary"] : ["crowd"] });
   }
   calls.forEach((c, i) => {
     if (used.has(i)) return;
     raw.push({ peak: c.at, start: Math.max(0, c.at - LEAD_SEC), end: Math.min(durationSec, c.at + TAIL_SEC), score: CALL_ONLY_SCORE, signals: ["commentary"] });
   });
 
-  return raw
+  // Strongest first, and anything within MERGE_SEC of a stronger moment is the same play.
+  raw.sort((a, b) => b.score - a.score || a.peak - b.peak);
+  const kept = raw.filter((m, i) => raw.slice(0, i).every((k) => Math.abs(k.peak - m.peak) >= MERGE_SEC));
+  const ids = new Set<string>();
+  return kept
     .map((m) => {
       const start = snap(m.start, cuts, (t) => t < m.peak);
       const end = snap(m.end, cuts, (t) => t > m.peak && t <= durationSec);
       const quote = spoken(words, start, end);
       const said = spoken(words, m.peak - AGREE_BEFORE_SEC + 4, m.peak + 3, TITLE_WORDS);
+      let id = `m-${Math.round(m.peak)}`;
+      for (let n = 2; ids.has(id); n++) id = `m-${Math.round(m.peak)}-${n}`;
+      ids.add(id);
       return {
-        id: `m-${Math.round(m.peak)}`,
+        id,
         peak: m.peak,
         start,
         end,
