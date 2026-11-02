@@ -44,10 +44,11 @@ export type ClipDecision = "approved" | "rejected";
 
 export type JobClip = {
   id: string;
+  /** The moment the clip is cut around; a highlights cut lists its first. */
   momentId: string;
   placement: JobPlacement;
-  start: number;
-  end: number;
+  /** Source ranges in play order. One for a single moment, several for a highlights cut. */
+  segments: { start: number; end: number }[];
   title: string;
   hook: string;
   caption: string;
