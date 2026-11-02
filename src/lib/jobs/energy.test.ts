@@ -49,3 +49,11 @@ test("caps the number of moments to about one per three minutes, at least five",
   expect(findPeaks(crowd(2460, bursts)).length).toBe(Math.round(2460 / 180));
   expect(findPeaks(crowd(400, bursts.slice(0, 6))).length).toBe(5);
 });
+
+test("a moment is placed where the roar starts, not where it tops out", () => {
+  const floor = new Array<number>(600).fill(-30);
+  [-24, -22, -18, -16, -15, -15, -20].forEach((db, i) => (floor[300 + i] = db));
+  const [p] = findPeaks(floor);
+  expect(p.peak).toBe(301);
+  expect(p.start).toBe(286);
+});

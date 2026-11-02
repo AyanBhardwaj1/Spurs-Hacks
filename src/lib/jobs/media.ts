@@ -62,8 +62,9 @@ export async function sceneCuts(file: string, workDir: string): Promise<number[]
     const run = await runFfmpeg(["-v", "error", "-i", file, "-an", "-vf", filter, "-f", "null", "-"], { cwd: workDir, timeoutMs: 1_800_000 });
     if (run.code !== 0) return [];
     return parseSceneCuts(await readFile(printed, "utf8"));
-  } catch {
+  } catch (err) {
     // Cuts only tidy a clip's edges; without them the clip keeps its timed edges.
+    console.warn("[jobs] scene detection failed:", err);
     return [];
   } finally {
     await rm(printed, { force: true });

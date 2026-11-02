@@ -21,6 +21,9 @@ const GAP_SEC = 20;
 /** The play comes before the roar: a window opens this long before the peak and runs this long after. */
 const LEAD_SEC = 15;
 const TAIL_SEC = 10;
+/** A roar's onset: walk back from its loudest second while the rise stays above this share of it. */
+const ONSET_SHARE = 0.5;
+const ONSET_MAX_SEC = 8;
 /** About one moment per three minutes of video, never fewer than five. */
 const SEC_PER_MOMENT = 180;
 const MIN_MOMENTS = 5;
@@ -69,19 +72,18 @@ function median(values: number[]) {
 
 /**
  * The loud stretches in a per-second crowd floor, loudest first. Each second's rise is measured against
- * the median of the minute before it, so a match that gets louder overall does not flood the list.
- * Scores are relative to the loudest rise, which scores 1.
+ * the median of the minute before it, so a match that gets louder overall does not flood the list. A
+ * moment is placed at its roar's onset. Scores are relative to the loudest rise, which scores 1.
  */
 export function findPeaks(floor: number[]): Peak[] {
   const duration = floor.length;
   if (duration === 0) return [];
   const overall = median(floor);
-  const rises: { s: number; rise: number }[] = [];
-  for (let s = 0; s < duration; s++) {
+  const riseAt = floor.map((db, s) => {
     const before = floor.slice(Math.max(0, s - BASELINE_FROM_SEC), Math.max(0, s - BASELINE_TO_SEC));
-    const rise = floor[s] - (before.length ? median(before) : overall);
-    if (rise >= MIN_RISE_DB) rises.push({ s, rise });
-  }
+    return db - (before.length ? median(before) : overall);
+  });
+  const rises = riseAt.flatMap((rise, s) => (rise >= MIN_RISE_DB ? [{ s, rise }] : []));
   rises.sort((a, b) => b.rise - a.rise || a.s - b.s);
   const limit = Math.max(MIN_MOMENTS, Math.round(duration / SEC_PER_MOMENT));
   const picked: { s: number; rise: number }[] = [];
@@ -90,10 +92,15 @@ export function findPeaks(floor: number[]): Peak[] {
     if (picked.every((p) => Math.abs(p.s - r.s) >= GAP_SEC)) picked.push(r);
   }
   const top = picked[0]?.rise ?? 1;
-  return picked.map(({ s, rise }) => ({
-    peak: s,
-    start: Math.max(0, s - LEAD_SEC),
-    end: Math.min(duration, s + TAIL_SEC),
-    score: Math.round((rise / top) * 1000) / 1000,
-  }));
+  return picked.map(({ s, rise }) => {
+    // The loudest second can sit anywhere in a long roar; the play is just before the roar starts.
+    let onset = s;
+    while (onset > 0 && s - onset < ONSET_MAX_SEC && riseAt[onset - 1] >= rise * ONSET_SHARE) onset -= 1;
+    return {
+      peak: onset,
+      start: Math.max(0, onset - LEAD_SEC),
+      end: Math.min(duration, onset + TAIL_SEC),
+      score: Math.round((rise / top) * 1000) / 1000,
+    };
+  });
 }
