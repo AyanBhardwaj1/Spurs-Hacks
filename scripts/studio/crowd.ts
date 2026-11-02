@@ -1,5 +1,8 @@
 import { readFileSync, rmSync } from "node:fs";
+import { parseRmsPrint, type CrowdFrames } from "../../src/lib/jobs/energy";
 import { cachePath, writeCache } from "./cache";
+
+export { floorPerSecond, type CrowdFrames } from "../../src/lib/jobs/energy";
 
 // Crowd loudness from the broadcast audio. The proxy's audio is dual mono, so
 // commentary cannot be removed by cancelling the centre channel. Crowd noise
@@ -8,29 +11,7 @@ import { cachePath, writeCache } from "./cache";
 // On the Mbeumo goal the floor rises from about -30 dB to -21 dB within three
 // seconds of the commentator's call.
 
-/** Length of one RMS frame. */
 const FRAME_SEC = 0.1;
-/** Frames around each second that the floor percentile is taken over. */
-const FLOOR_WINDOW_SEC = 3;
-const FLOOR_PERCENTILE = 0.2;
-/** Stand-in for digital silence, which astats reports as -inf. */
-const SILENCE_DB = -90;
-
-export type CrowdFrames = { frameSec: number; durationSec: number; rmsDb: number[] };
-
-/** Per-second crowd floor in dB: the 20th percentile of the frames in a window centred on each second. */
-export function floorPerSecond(frames: CrowdFrames): number[] {
-  const perSec = Math.round(1 / frames.frameSec);
-  const half = Math.round((FLOOR_WINDOW_SEC * perSec) / 2);
-  const seconds = Math.ceil(frames.rmsDb.length / perSec);
-  const out: number[] = [];
-  for (let s = 0; s < seconds; s++) {
-    const centre = s * perSec + Math.floor(perSec / 2);
-    const window = frames.rmsDb.slice(Math.max(0, centre - half), centre + half).sort((a, b) => a - b);
-    out.push(window.length ? window[Math.floor(window.length * FLOOR_PERCENTILE)] : SILENCE_DB);
-  }
-  return out;
-}
 
 /** Streams the rendition's audio through ffmpeg and returns 100 ms RMS frames. Nothing but numbers touches disk. */
 export async function measureCrowdFrames(url: string, durationSec: number): Promise<CrowdFrames> {
@@ -57,24 +38,4 @@ export async function measureCrowdFrames(url: string, durationSec: number): Prom
   const text = readFileSync(cachePath(printFile), "utf8");
   rmSync(cachePath(printFile));
   return { frameSec: FRAME_SEC, durationSec, rmsDb: parseRmsPrint(text, FRAME_SEC, durationSec) };
-}
-
-/** Parses ametadata print output into one RMS value per frame slot, placed by pts_time. */
-function parseRmsPrint(text: string, frameSec: number, durationSec: number): number[] {
-  const slots = Math.ceil(durationSec / frameSec);
-  const out = new Array<number>(slots).fill(SILENCE_DB);
-  let slot = -1;
-  for (const line of text.split("\n")) {
-    const pts = /pts_time:([\d.]+)/.exec(line);
-    if (pts) {
-      slot = Math.round(Number(pts[1]) / frameSec);
-      continue;
-    }
-    const rms = /RMS_level=(\S+)/.exec(line);
-    if (rms && slot >= 0 && slot < slots) {
-      const db = Number(rms[1]);
-      out[slot] = Number.isFinite(db) ? Math.max(SILENCE_DB, db) : SILENCE_DB;
-    }
-  }
-  return out;
 }
