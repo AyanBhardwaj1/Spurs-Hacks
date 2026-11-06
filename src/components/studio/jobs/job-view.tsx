@@ -150,6 +150,8 @@ export function JobView() {
         />
       )}
 
+      {job.status === "done" && <PostFirst groups={byPlacement} order={order} />}
+
       {byPlacement.length > 0 && (
         <p className="mt-10 text-caption text-secondary">
           Review from the keyboard: <Kbd>J</Kbd> and <Kbd>K</Kbd> move between clips, <Kbd>A</Kbd> approves, <Kbd>R</Kbd> rejects, <Kbd>U</Kbd> undoes.
@@ -184,6 +186,36 @@ export function JobView() {
 
       {job.moments.length > 0 && <MomentsAndSkips job={job} />}
     </>
+  );
+}
+
+// The answer to "what do I post now": each platform's clip to post first, one line each, linked to its card.
+function PostFirst({ groups, order }: { groups: { placement: JobPlacement; clips: JobClip[] }[]; order: Map<string, Strength & { rank: number }> }) {
+  const firsts = groups.flatMap((g) => {
+    const clip = g.clips.find((c) => c.render.state === "ready" && c.decision?.value !== "rejected");
+    return clip ? [{ placement: g.placement, clip, score: order.get(clip.id)?.score }] : [];
+  });
+  if (firsts.length === 0) return null;
+  return (
+    <section aria-labelledby="post-first" className="mt-10 rounded-[14px] bg-grouped p-4">
+      <h2 id="post-first" className="text-footnote font-semibold">
+        Post first
+      </h2>
+      <ul className="mt-2 grid gap-1">
+        {firsts.map(({ placement, clip, score }) => (
+          <li key={placement}>
+            <a href={`#clip-${clip.id}`} className="press flex items-baseline gap-3 rounded-lg px-2 py-1.5 hover:bg-fill/60">
+              <span className="w-36 shrink-0 text-caption font-semibold">{PLACEMENT_LABEL[placement]}</span>
+              <span className="min-w-0 truncate text-footnote">{clip.hook}</span>
+              <span className="num ml-auto shrink-0 text-caption text-secondary">
+                {length(clip)} s{score !== undefined ? ` · strength ${score}` : ""}
+                {clip.decision?.value === "approved" ? " · approved" : ""}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
@@ -254,6 +286,27 @@ function StrengthLine({ strength }: { strength: Strength & { rank: number } }) {
   );
 }
 
+/** Where a vertical feed puts its like, comment and share buttons: a rail down the right, above the caption. */
+const RAIL = { width: 0.15, top: 0.42, bottom: 0.82 };
+
+// What the app draws over a clip, shaded: the top band, the caption and account at the bottom and, on a
+// vertical feed, the button rail. Burned-in text stays out of all three; this shows a producer the play does too.
+function SafeZones({ placement }: { placement: JobPlacement }) {
+  const p = PLACEMENTS[placement];
+  const band = "pointer-events-none absolute inset-x-0 bg-tally/35 outline outline-1 outline-tally/70";
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0">
+      <div className={`${band} top-0`} style={{ height: `${p.safeTop * 100}%` }} />
+      <div className={`${band} bottom-0 grid place-items-center`} style={{ height: `${p.safeBottom * 100}%` }}>
+        <span className="rounded bg-black/60 px-1.5 text-[10px] font-semibold text-white">{p.platform}&apos;s caption and buttons</span>
+      </div>
+      {p.aspect === "9:16" && (
+        <div className="pointer-events-none absolute right-0 bg-tally/35 outline outline-1 outline-tally/70" style={{ width: `${RAIL.width * 100}%`, top: `${RAIL.top * 100}%`, height: `${(RAIL.bottom - RAIL.top) * 100}%` }} />
+      )}
+    </div>
+  );
+}
+
 const ASPECT_CLASS: Record<string, string> = { "9:16": "aspect-[9/16]", "1:1": "aspect-square", "16:9": "aspect-video" };
 
 type ClipCardProps = { jobId: string; clip: JobClip; strength?: Strength & { rank: number }; editable: boolean; hasCaptions: boolean; durationSec: number; onChange: (clip: JobClip) => void; onQueued: () => void };
@@ -262,6 +315,7 @@ function ClipCard({ jobId, clip, strength, editable, hasCaptions, durationSec, o
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [zones, setZones] = useState(false);
   const src = `/api/jobs/${jobId}/clips/${clip.id}`;
   const post = postText(clip);
 
@@ -282,15 +336,20 @@ function ClipCard({ jobId, clip, strength, editable, hasCaptions, durationSec, o
 
   return (
     <article
+      id={`clip-${clip.id}`}
       data-clip-card
       tabIndex={-1}
       aria-label={`${PLACEMENT_LABEL[clip.placement]}: ${clip.hook}`}
       className="flex scroll-m-24 flex-col rounded-[14px] bg-grouped p-3 outline-none focus:ring-2 focus:ring-tint"
       data-decision={clip.decision?.value ?? "none"}
     >
-      <div className={`${ASPECT_CLASS[PLACEMENTS[clip.placement].aspect]} max-h-[440px] overflow-hidden rounded-lg bg-black`}>
+      <div className={`${ASPECT_CLASS[PLACEMENTS[clip.placement].aspect]} flex max-h-[440px] justify-center overflow-hidden rounded-lg bg-black`}>
         {clip.render.state === "ready" ? (
-          <video src={src} poster={clip.render.cover ? `${src}/cover` : undefined} controls playsInline preload="metadata" className="size-full object-contain" aria-label={clip.title} />
+          // The inner box keeps the clip's own shape when the card caps its height, so the zones line up.
+          <div className={`${ASPECT_CLASS[PLACEMENTS[clip.placement].aspect]} relative h-full max-w-full`}>
+            <video src={src} poster={clip.render.cover ? `${src}/cover` : undefined} controls playsInline preload="metadata" className="size-full object-contain" aria-label={clip.title} />
+            {zones && <SafeZones placement={clip.placement} />}
+          </div>
         ) : (
           <p className="grid size-full place-items-center p-4 text-center text-caption text-secondary">
             {clip.render.state === "failed" ? `Render failed: ${clip.render.error}` : clip.render.state === "rendering" ? "Rendering…" : "Waiting to render"}
@@ -319,6 +378,11 @@ function ClipCard({ jobId, clip, strength, editable, hasCaptions, durationSec, o
           <a href={`${src}?download=1`} className="press rounded-md text-caption font-semibold text-tint hover:underline">
             Download
           </a>
+        )}
+        {clip.render.state === "ready" && (
+          <button type="button" aria-pressed={zones} onClick={() => setZones((z) => !z)} className="press rounded-md text-caption font-semibold text-tint hover:underline">
+            {zones ? "Hide app zones" : "App zones"}
+          </button>
         )}
         {clip.render.cover && (
           <a href={`${src}/cover?download=1`} className="press rounded-md text-caption font-semibold text-tint hover:underline">

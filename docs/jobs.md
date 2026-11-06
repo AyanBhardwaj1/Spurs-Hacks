@@ -50,6 +50,8 @@ Captions keep to each platform's caption and hashtag limits from `src/lib/rundow
 
 Above the clips, a timeline draws the crowd's loudness across the whole match with every moment marked; filled marks became clips. Click a second the rules missed (or move along it with the arrow keys and press Enter) and Rundown makes it a moment, with a clip for every short platform, rendered with the copy and the crop like the rest. `POST /api/jobs/{id}/moments` with `{ "at": seconds }` does the same.
 
+A "Post first" list above the clips names each platform's clip to post first, skipping rejected ones. On any rendered clip, "App zones" shades what the app draws over it (the top bar, the caption and account at the bottom, and on a vertical feed the button rail), so you can check the play is not hidden under them.
+
 Review from the keyboard: J and K move between clips in the order the page shows them, A approves and moves on, R rejects and moves on, U undoes. Each finished stage shows how long it took.
 
 Each platform's clips are shown in posting order, and the card says why: a clip's strength is half its moment's score, plus points for evidence the job has about the clip (the crowd and the commentary agreed, the commentary called it, the cut ends as the crowd settles, the crop follows the play or nothing is cropped, the clip is short enough to watch twice). It is a rule you can check, not a prediction of views. The rule is in `src/lib/jobs/rank.ts`, and the manifest in the zip carries each clip's place in the order.
