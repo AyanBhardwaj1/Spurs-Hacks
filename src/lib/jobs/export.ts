@@ -1,7 +1,8 @@
 import { PLACEMENTS } from "@/lib/rundown/platforms";
 import { captionEvents } from "./captions";
 import { postText } from "./post";
-import type { JobClip, Word } from "./types";
+import { postOrder } from "./rank";
+import type { JobClip, JobMoment, Word } from "./types";
 
 // Getting approved clips out of Rundown in one go: an SRT per clip for platforms that take a captions
 // file, a manifest a scheduling tool can read, and a zip to carry them. The zip uses the "stored" method:
@@ -85,8 +86,9 @@ export function zipStored(files: { name: string; data: Uint8Array }[]): Uint8Arr
   return out;
 }
 
-/** What a scheduling tool needs per clip: the files, the platform and the post, ready to paste. */
-export function exportManifest(match: string, clips: JobClip[]) {
+/** What a scheduling tool needs per clip: the files, the platform, the post ready to paste, and where it comes in that platform's posting order. */
+export function exportManifest(match: string, clips: JobClip[], moments: JobMoment[] = []) {
+  const order = postOrder(clips, moments);
   return {
     match,
     clips: clips.map((c) => {
@@ -104,6 +106,7 @@ export function exportManifest(match: string, clips: JobClip[]) {
         hashtags: c.hashtags,
         post: postText(c),
         ...(c.chapters && { chapters: c.chapters }),
+        order: order.get(c.id)?.rank,
         source: c.segments,
       };
     }),

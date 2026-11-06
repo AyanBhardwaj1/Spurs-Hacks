@@ -28,6 +28,6 @@ test("the manifest lists each clip's file, platform and post copy", () => {
   const clip: JobClip = { id: "tiktok-m-30", momentId: "m-30", placement: "tiktok", segments: [{ start: 22, end: 40 }], title: "T", hook: "H", caption: "C", hashtags: ["football"], why: "w", render: { state: "ready", file: "tiktok-m-30.mp4" } };
   expect(exportManifest("City v United", [clip])).toEqual({
     match: "City v United",
-    clips: [{ file: "tiktok-m-30.mp4", captions: "tiktok-m-30.srt", platform: "TikTok", placement: "Video", aspect: "9:16", seconds: 18, title: "T", hook: "H", caption: "C", hashtags: ["football"], post: "C #football", source: [{ start: 22, end: 40 }] }],
+    clips: [{ file: "tiktok-m-30.mp4", captions: "tiktok-m-30.srt", platform: "TikTok", placement: "Video", aspect: "9:16", seconds: 18, title: "T", hook: "H", caption: "C", hashtags: ["football"], post: "C #football", order: 1, source: [{ start: 22, end: 40 }] }],
   });
 });

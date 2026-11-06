@@ -21,7 +21,7 @@ export async function GET(request: Request, ctx: RouteContext<"/api/jobs/[id]/ex
 
   const enc = new TextEncoder();
   const words = await jobWords(id);
-  const manifest = exportManifest(job.title, clips);
+  const manifest = exportManifest(job.title, clips, job.moments);
   const files: { name: string; data: Uint8Array }[] = [];
   for (const c of clips) {
     files.push({ name: `clips/${c.id}.mp4`, data: new Uint8Array(await readFile(/*turbopackIgnore: true*/ jobFile.clip(id, c.id))) });

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useId, useState } from "react";
 import { PLACEMENTS } from "@/lib/rundown/platforms";
 import { matchClock } from "@/lib/jobs/moments";
 import { postText } from "@/lib/jobs/post";
+import { postOrder, type Strength } from "@/lib/jobs/rank";
 import { JOB_PLACEMENTS, PLACEMENT_LABEL, type Job, type JobClip, type JobPlacement, type JobStage } from "@/lib/jobs/types";
 import { uploadFile } from "./upload";
 
@@ -73,7 +74,11 @@ export function JobView() {
     );
   if (!job) return <p className="mt-10 text-footnote text-secondary">{error ?? "Loading the job…"}</p>;
 
-  const byPlacement = job.placements.map((p) => ({ placement: p, clips: job.clips.filter((c) => c.placement === p) })).filter((g) => g.clips.length > 0);
+  const order = postOrder(job.clips, job.moments);
+  const rankOf = (c: JobClip) => order.get(c.id)?.rank ?? Infinity;
+  const byPlacement = job.placements
+    .map((p) => ({ placement: p, clips: job.clips.filter((c) => c.placement === p).sort((a, b) => rankOf(a) - rankOf(b)) }))
+    .filter((g) => g.clips.length > 0);
   const based = [job.services.transcript ? "the crowd and a commentary transcript" : "the crowd's noise", job.services.model ? "with copy written by the model" : "with rule-written copy"].join(", ");
 
   return (
@@ -137,6 +142,7 @@ export function JobView() {
                 key={c.id}
                 jobId={job.id}
                 clip={c}
+                strength={g.clips.length > 1 ? order.get(c.id) : undefined}
                 editable={job.status === "done" && Boolean(job.source)}
                 hasCaptions={job.services.transcript}
                 durationSec={job.source?.durationSec ?? 0}
@@ -153,11 +159,28 @@ export function JobView() {
   );
 }
 
+const ordinal = (n: number) => `${n}${n === 1 ? "st" : n === 2 ? "nd" : n === 3 ? "rd" : "th"}`;
+
+// Where the clip sits in its platform's posting order, and the evidence that put it there.
+function StrengthLine({ strength }: { strength: Strength & { rank: number } }) {
+  return (
+    <details className="mt-3 text-caption">
+      <summary className="flex cursor-pointer list-none items-center gap-2">
+        <span className={`num rounded-full px-2 py-0.5 font-semibold ${strength.rank === 1 ? "bg-tint text-white" : "bg-fill text-label"}`}>Post {ordinal(strength.rank)}</span>
+        <span className="num text-secondary">strength {strength.score} of 100</span>
+      </summary>
+      <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-secondary">
+        {strength.reasons.length ? strength.reasons.map((r) => <li key={r}>{r}</li>) : <li>Only the moment&apos;s own score.</li>}
+      </ul>
+    </details>
+  );
+}
+
 const ASPECT_CLASS: Record<string, string> = { "9:16": "aspect-[9/16]", "1:1": "aspect-square", "16:9": "aspect-video" };
 
-type ClipCardProps = { jobId: string; clip: JobClip; editable: boolean; hasCaptions: boolean; durationSec: number; onChange: (clip: JobClip) => void; onQueued: () => void };
+type ClipCardProps = { jobId: string; clip: JobClip; strength?: Strength & { rank: number }; editable: boolean; hasCaptions: boolean; durationSec: number; onChange: (clip: JobClip) => void; onQueued: () => void };
 
-function ClipCard({ jobId, clip, editable, hasCaptions, durationSec, onChange, onQueued }: ClipCardProps) {
+function ClipCard({ jobId, clip, strength, editable, hasCaptions, durationSec, onChange, onQueued }: ClipCardProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -190,6 +213,7 @@ function ClipCard({ jobId, clip, editable, hasCaptions, durationSec, onChange, o
           </p>
         )}
       </div>
+      {strength && <StrengthLine strength={strength} />}
       <p className="mt-3 text-footnote font-semibold text-pretty">{clip.hook}</p>
       <p className="num mt-0.5 text-caption text-secondary">
         {length(clip)} s · from {matchClock(clip.segments[0].start)}
