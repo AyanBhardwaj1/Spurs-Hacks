@@ -142,7 +142,19 @@ export function fit(text: string, max: number) {
 }
 
 /** The words a moment's title quotes, or a plain line when nothing was said. */
-const hookOf = (m: JobMoment) => fit(/“(.+)”/.exec(m.title)?.[1] ?? (m.signals.includes("crowd") ? "Listen to this crowd" : "Watch this"), HOOK_MAX);
+const hookOf = (m: JobMoment) => hookOptions(m, "")[0];
+
+/** Hooks a producer can swap in: the commentary's words first, then lines that suit any moment. */
+export function hookOptions(m: JobMoment, jobTitle: string): string[] {
+  const quote = /“(.+)”/.exec(m.title)?.[1];
+  const options = [
+    ...(quote ? [fit(quote, HOOK_MAX)] : []),
+    m.signals.includes("crowd") ? "Listen to this crowd" : "Watch this",
+    "Wait for it…",
+    ...(jobTitle ? [fit(`${jobTitle}, ${matchClock(m.peak)}`, HOOK_MAX)] : []),
+  ];
+  return [...new Set(options)];
+}
 
 function copy(placement: JobPlacement, hook: string, jobTitle: string, sport: JobSport, when: number) {
   const p = spec(placement);
@@ -244,6 +256,7 @@ export function planClips({ moments, placements, durationSec, sport, title, repl
         placement,
         segments: [{ start: round(start), end: round(end) }],
         ...(replay && { replay: replayWindow(m.peak, { start: round(start), end: round(end) }) }),
+        hooks: hookOptions(m, title),
         title: fit(m.title, spec(placement).titleLimit ?? 100),
         hook,
         ...copy(placement, hook, title, sport, m.peak),

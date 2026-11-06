@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { CHUNK_BYTES, checkChunk, checkLogo, parsePick, parseAddPlacements, parseNewJob, parseRange, parseTrim, type NewJob } from "./requests";
+import { CHUNK_BYTES, checkChunk, checkLogo, parseHook, parsePick, parseAddPlacements, parseNewJob, parseRange, parseTrim, type NewJob } from "./requests";
 
 const valid: NewJob = { title: "City v United", sport: "soccer", placements: ["tiktok", "x-video"], fileName: "match.mp4", size: 2_000_000_000 };
 
@@ -82,4 +82,11 @@ test("a picked second is a number inside the video", () => {
   expect(parsePick({ at: 700 }, 600)).toMatchObject({ ok: false });
   expect(parsePick({ at: "12" }, 600)).toMatchObject({ ok: false });
   expect(parsePick(null, 600)).toMatchObject({ ok: false });
+});
+
+test("a hook is 1 to 60 characters of text, trimmed", () => {
+  expect(parseHook({ hook: "  Wait for it…  " })).toEqual({ ok: true, value: "Wait for it…" });
+  expect(parseHook({ hook: " " })).toMatchObject({ ok: false });
+  expect(parseHook({ hook: "x".repeat(61) })).toMatchObject({ ok: false });
+  expect(parseHook({})).toMatchObject({ ok: false });
 });

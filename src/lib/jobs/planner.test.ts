@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { PLACEMENTS } from "@/lib/rundown/platforms";
-import { clipSeconds, cutRange, highlightChapters, planClips, replayWindow } from "./planner";
+import { clipSeconds, cutRange, highlightChapters, hookOptions, planClips, replayWindow } from "./planner";
 import type { JobMoment } from "./types";
 
 const moment = (peak: number, score: number, extra: Partial<JobMoment> = {}): JobMoment => ({
@@ -139,4 +139,12 @@ test("the vertical recap strings the top six moments in match order, a few secon
   expect(length(recap)).toBeLessThanOrEqual(60);
   expect(recap.hook).toBe("City v United in 46 seconds");
   expect(skipped).toContainEqual({ momentId: "m-2100", placement: "vertical-recap", reason: "Ranked 7th; the recap takes the top 6." });
+});
+
+test("each short clip offers other hooks to pick from: the quote, then lines that fit any moment", () => {
+  const quoted = moment(1000, 1, { title: "“what a hit” at 16:40", signals: ["crowd", "commentary"] });
+  expect(hookOptions(quoted, "City v United")).toEqual(["what a hit", "Listen to this crowd", "Wait for it…", "City v United, 16:40"]);
+  expect(hookOptions(moment(1000, 1, { signals: ["producer"], title: "Picked at 16:40" }), "City v United")).toEqual(["Watch this", "Wait for it…", "City v United, 16:40"]);
+  const { clips } = planClips({ ...base, moments: [quoted], placements: ["tiktok"] });
+  expect(clips[0].hooks).toEqual(hookOptions(quoted, "City v United"));
 });

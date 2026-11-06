@@ -52,6 +52,7 @@ Review from the keyboard: J and K move between clips in the order the page shows
 
 Each platform's clips are shown in posting order, and the card says why: a clip's strength is half its moment's score, plus points for evidence the job has about the clip (the crowd and the commentary agreed, the commentary called it, the cut ends as the crowd settles, the crop follows the play or nothing is cropped, the clip is short enough to watch twice). It is a rule you can check, not a prediction of views. The rule is in `src/lib/jobs/rank.ts`, and the manifest in the zip carries each clip's place in the order.
 
+- **Change the hook.** Each clip offers other hooks (the commentary's words, a line that suits any moment such as "Wait for it…", the match and the time), or type your own of up to 60 characters. The clip and its cover render again with it, and its approval is cleared. `POST /api/jobs/{id}/clips/{clipId}/hook` with `{ hook }`.
 - **Adjust a cut.** On any single-moment clip, move the start and end a second at a time and render it again. The new edges must stay inside the video, run at least 3 s and keep to the platform's length limit. The clip's approval is cleared, since it was given for the old cut. `POST /api/jobs/{id}/clips/{clipId}/trim` with `{ start, end }`.
 - **Add platforms.** "Also cut it for" plans the missing platforms from the moments the job already found and renders only those clips, with the model's copy and play-following when a key is set. `POST /api/jobs/{id}/placements` with `{ placements }`.
 

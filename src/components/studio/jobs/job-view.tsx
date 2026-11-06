@@ -329,7 +329,12 @@ function ClipCard({ jobId, clip, strength, editable, hasCaptions, durationSec, o
           </a>
         )}
       </div>
-      {editable && clip.segments.length === 1 && <TrimControl jobId={jobId} clip={clip} durationSec={durationSec} onChange={onChange} onQueued={onQueued} />}
+      {editable && (
+        <div className="flex flex-wrap gap-x-4">
+          {clip.segments.length === 1 && <TrimControl jobId={jobId} clip={clip} durationSec={durationSec} onChange={onChange} onQueued={onQueued} />}
+          <HookControl jobId={jobId} clip={clip} durationSec={durationSec} onChange={onChange} onQueued={onQueued} />
+        </div>
+      )}
       <div className="mt-3 flex items-center gap-2 border-t border-separator/60 pt-3">
         {clip.decision ? (
           <>
@@ -388,7 +393,7 @@ function TrimControl({ jobId, clip, durationSec, onChange, onQueued }: Omit<Clip
     </div>
   );
   return (
-    <div className="mt-3 grid gap-2 rounded-lg bg-fill/50 p-2">
+    <div className="mt-3 grid w-full gap-2 rounded-lg bg-fill/50 p-2">
       {row("start", "Start")}
       {row("end", "End")}
       <p className="num text-caption text-secondary">{Math.round(edges.end - edges.start)} s</p>
@@ -415,6 +420,77 @@ function TrimControl({ jobId, clip, durationSec, onChange, onQueued }: Omit<Clip
           className="press inline-flex h-8 items-center rounded-full bg-button px-3 text-caption font-semibold text-white hover:bg-button-hover disabled:opacity-40"
         >
           Render this cut
+        </button>
+        <button type="button" onClick={() => setOpen(false)} className="press rounded-md px-2 text-caption font-semibold text-secondary hover:text-label">
+          Cancel
+        </button>
+      </div>
+      {error && (
+        <p role="alert" className="text-caption text-tally">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// Swap the words burned on screen for a clip's first seconds: one of its options, or the producer's own.
+function HookControl({ jobId, clip, onChange, onQueued }: Omit<ClipCardProps, "editable" | "hasCaptions">) {
+  const [open, setOpen] = useState(false);
+  const [hook, setHook] = useState(clip.hook);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const inputId = useId();
+  if (!open) {
+    return (
+      <button type="button" onClick={() => setOpen(true)} className="press mt-2 self-start rounded-md text-caption font-semibold text-tint hover:underline">
+        Change the hook
+      </button>
+    );
+  }
+  const options = [...new Set([clip.hook, ...(clip.hooks ?? [])])];
+  return (
+    <div className="mt-3 grid w-full gap-2 rounded-lg bg-fill/50 p-2">
+      <div className="flex flex-wrap gap-1.5">
+        {options.map((o) => (
+          <button
+            key={o}
+            type="button"
+            aria-pressed={hook === o}
+            onClick={() => setHook(o)}
+            className={`press rounded-full border px-2.5 py-1 text-caption ${hook === o ? "border-tint bg-tint/15 text-label" : "border-separator text-secondary hover:bg-fill"}`}
+          >
+            {o}
+          </button>
+        ))}
+      </div>
+      <label htmlFor={inputId} className="sr-only">
+        Your own hook
+      </label>
+      <input id={inputId} value={hook} maxLength={60} onChange={(e) => setHook(e.target.value)} className="h-9 rounded-md bg-fill px-2 text-caption text-label" />
+      <div className="flex gap-2">
+        <button
+          type="button"
+          disabled={saving || !hook.trim() || hook.trim() === clip.hook}
+          onClick={async () => {
+            setSaving(true);
+            setError(null);
+            try {
+              const res = await fetch(`/api/jobs/${jobId}/clips/${clip.id}/hook`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ hook }) });
+              const body = await res.json();
+              if (!res.ok) throw new Error(body.error ?? `The server answered ${res.status}.`);
+              onChange(body);
+              onQueued();
+              setOpen(false);
+            } catch (err) {
+              setError((err as Error).message);
+            } finally {
+              setSaving(false);
+            }
+          }}
+          className="press inline-flex h-8 items-center rounded-full bg-button px-3 text-caption font-semibold text-white hover:bg-button-hover disabled:opacity-40"
+        >
+          Render with this hook
         </button>
         <button type="button" onClick={() => setOpen(false)} className="press rounded-md px-2 text-caption font-semibold text-secondary hover:text-label">
           Cancel

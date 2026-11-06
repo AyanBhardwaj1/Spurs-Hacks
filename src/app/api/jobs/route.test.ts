@@ -122,3 +122,22 @@ test("a second the producer picks becomes a moment with a clip for each short pl
   expect(queuedJobs()).toContain(job.id);
   expect((await pick({ at: 200 })).status).toBe(409);
 });
+
+test("a new hook re-renders the clip and clears its approval", async () => {
+  const hookRoute = await import("./[id]/clips/[clipId]/hook/route");
+  const { job } = await (await jobs.POST(new Request("http://localhost/api/jobs", { method: "POST", body: JSON.stringify({ title: "F", sport: "soccer", placements: ["tiktok"], fileName: "m.mp4", size: 1 }) }))).json();
+  await updateJob(job.id, (j) => ({
+    ...j,
+    status: "done",
+    clips: [{ id: "tiktok-m-30", momentId: "m-30", placement: "tiktok", segments: [{ start: 22, end: 40 }], title: "T", hook: "Listen to this crowd", caption: "C", hashtags: [], why: "w", render: { state: "ready", file: "tiktok-m-30.mp4" }, decision: { value: "approved", at: "2026-11-06T00:00:00Z" } }],
+  }));
+  const send = (body: unknown) => hookRoute.POST(new Request("http://localhost", { method: "POST", body: JSON.stringify(body) }), ctx({ id: job.id, clipId: "tiktok-m-30" }) as never);
+  expect((await send({ hook: "" })).status).toBe(400);
+  const res = await send({ hook: "Wait for it…" });
+  expect(res.status).toBe(200);
+  expect(await res.json()).toMatchObject({ hook: "Wait for it…", render: { state: "waiting" } });
+  const saved = (await listJobs()).find((j) => j.id === job.id)!;
+  expect(saved.clips[0].decision).toBeUndefined();
+  expect(saved.status).toBe("queued");
+  expect((await send({ hook: "Again" })).status).toBe(409);
+});

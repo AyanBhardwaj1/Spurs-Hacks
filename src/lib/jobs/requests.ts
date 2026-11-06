@@ -106,3 +106,11 @@ export function parsePick(body: unknown, durationSec: number): Parsed<number> {
   if (typeof at !== "number" || !Number.isFinite(at) || at < 0 || at > durationSec) return { ok: false, error: `at must be a second between 0 and ${Math.floor(durationSec)}.` };
   return { ok: true, value: Math.round(at) };
 }
+
+/** POST /hook: { hook }, the text burned on screen for a clip's first seconds. */
+export function parseHook(body: unknown): Parsed<string> {
+  const hook = (body as { hook?: unknown } | null)?.hook;
+  const text = typeof hook === "string" ? hook.trim() : "";
+  if (!text || text.length > 60) return { ok: false, error: "hook must be 1 to 60 characters." };
+  return { ok: true, value: text };
+}
