@@ -1,3 +1,4 @@
+import { replayWindow } from "@/lib/jobs/planner";
 import { parseTrim } from "@/lib/jobs/requests";
 import { enqueueRender, isActive } from "@/lib/jobs/runner";
 import { getJob, updateJob } from "@/lib/jobs/store";
@@ -13,10 +14,12 @@ export async function POST(request: Request, ctx: RouteContext<"/api/jobs/[id]/c
   if (isActive(id)) return Response.json({ error: "The job is still running; trim the clip when it finishes." }, { status: 409 });
   const parsed = parseTrim(await request.json().catch(() => null), clip, job.source.durationSec);
   if (!parsed.ok) return Response.json({ error: parsed.error }, { status: 400 });
+  // A replay follows the cut: it shows the play if the cut still holds it, or the nearest seconds that do.
+  const peak = job.moments.find((m) => m.id === clip.momentId)?.peak ?? parsed.value[0].start;
   const next = await updateJob(id, (j) => ({
     ...j,
     status: "queued",
-    clips: j.clips.map((c) => (c.id === clipId ? { ...c, segments: parsed.value, decision: undefined, render: { state: "waiting" } } : c)),
+    clips: j.clips.map((c) => (c.id === clipId ? { ...c, segments: parsed.value, ...(c.replay && { replay: replayWindow(peak, parsed.value[0]) }), decision: undefined, render: { state: "waiting" } } : c)),
   }));
   enqueueRender(id, [clipId]);
   return Response.json(next.clips.find((c) => c.id === clipId));

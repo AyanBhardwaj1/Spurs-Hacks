@@ -70,6 +70,7 @@ export async function createJob(input: NewJob): Promise<Job> {
     title: input.title,
     sport: input.sport,
     placements: input.placements,
+    ...(input.replay && { replay: true }),
     createdAt: new Date().toISOString(),
     status: "uploading",
     upload: { fileName: input.fileName, size: input.size, received: 0 },

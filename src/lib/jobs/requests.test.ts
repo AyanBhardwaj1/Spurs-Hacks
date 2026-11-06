@@ -5,6 +5,9 @@ const valid: NewJob = { title: "City v United", sport: "soccer", placements: ["t
 
 test("a new job needs a title, a known sport, known platforms and a video file under the size cap", () => {
   expect(parseNewJob(valid)).toEqual({ ok: true, value: valid });
+  expect(parseNewJob({ ...valid, replay: true })).toEqual({ ok: true, value: { ...valid, replay: true } });
+  expect(parseNewJob({ ...valid, replay: false })).toEqual({ ok: true, value: valid });
+  expect(parseNewJob({ ...valid, replay: "yes" })).toMatchObject({ ok: false });
   expect(parseNewJob({ ...valid, title: "  " })).toMatchObject({ ok: false });
   expect(parseNewJob({ ...valid, sport: "curling" })).toMatchObject({ ok: false });
   expect(parseNewJob({ ...valid, placements: [] })).toMatchObject({ ok: false });

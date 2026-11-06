@@ -1,5 +1,6 @@
 import { PLACEMENTS } from "@/lib/rundown/platforms";
 import { captionEvents } from "./captions";
+import { clipSeconds } from "./planner";
 import { postText } from "./post";
 import { postOrder } from "./rank";
 import type { JobClip, JobMoment, Word } from "./types";
@@ -100,7 +101,7 @@ export function exportManifest(match: string, clips: JobClip[], moments: JobMome
         platform: p.platform,
         placement: p.placement,
         aspect: p.aspect,
-        seconds: Math.round(c.segments.reduce((n, s) => n + s.end - s.start, 0)),
+        seconds: Math.round(clipSeconds(c)),
         title: c.title,
         hook: c.hook,
         caption: c.caption,

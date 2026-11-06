@@ -13,12 +13,12 @@ const maxUploadBytes = () => Number(process.env.RUNDOWN_MAX_UPLOAD_GB || 12) * 1
 const VIDEO_FILE = /\.(mp4|mov|m4v|mkv|webm|mts|ts)$/i;
 const TITLE_MAX = 120;
 
-export type NewJob = { title: string; sport: JobSport; placements: JobPlacement[]; fileName: string; size: number };
+export type NewJob = { title: string; sport: JobSport; placements: JobPlacement[]; fileName: string; size: number; replay?: boolean };
 type Parsed<T> = { ok: true; value: T } | { ok: false; error: string };
 
 export function parseNewJob(body: unknown): Parsed<NewJob> {
   if (typeof body !== "object" || body === null) return { ok: false, error: "Send a JSON body." };
-  const { title, sport, placements, fileName, size } = body as Record<string, unknown>;
+  const { title, sport, placements, fileName, size, replay } = body as Record<string, unknown>;
   if (typeof title !== "string" || !title.trim() || title.trim().length > TITLE_MAX) return { ok: false, error: `Give the match a title of 1 to ${TITLE_MAX} characters.` };
   if (!SPORTS.includes(sport as JobSport)) return { ok: false, error: `sport must be one of ${SPORTS.join(", ")}.` };
   if (!Array.isArray(placements) || placements.length === 0 || !placements.every((p) => JOB_PLACEMENTS.includes(p as JobPlacement))) {
@@ -27,7 +27,8 @@ export function parseNewJob(body: unknown): Parsed<NewJob> {
   if (typeof fileName !== "string" || !VIDEO_FILE.test(fileName)) return { ok: false, error: "Upload a video file: mp4, mov, m4v, mkv, webm or ts." };
   if (typeof size !== "number" || !Number.isInteger(size) || size <= 0) return { ok: false, error: "size must be the file's size in bytes." };
   if (size > maxUploadBytes()) return { ok: false, error: `The file is over the ${maxUploadBytes() / 1024 ** 3} GB upload limit.` };
-  return { ok: true, value: { title: title.trim(), sport: sport as JobSport, placements: [...new Set(placements as JobPlacement[])], fileName, size } };
+  if (replay !== undefined && typeof replay !== "boolean") return { ok: false, error: "replay must be true or false." };
+  return { ok: true, value: { title: title.trim(), sport: sport as JobSport, placements: [...new Set(placements as JobPlacement[])], fileName, size, ...(replay && { replay }) } };
 }
 
 type ChunkCheck = { ok: true } | { ok: false; status: 400 | 409 | 413; received?: number; error?: string };

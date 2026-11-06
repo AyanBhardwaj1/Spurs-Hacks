@@ -1,5 +1,5 @@
 import type { FocusKey } from "@/lib/studio/types";
-import { assDocument, assText, type AssEvent, type AssStyle } from "./ass";
+import { assDocument, assText, colourTag, type AssEvent, type AssStyle } from "./ass";
 import { focusExpr } from "./focus";
 import type { Word } from "./types";
 
@@ -10,18 +10,37 @@ import type { Word } from "./types";
 /** A pause longer than this starts a new caption, so a chunk never spans a silence. */
 const PAUSE_SEC = 0.6;
 const HOOK_SEC = 2.8;
+/** A replay plays this many times slower than real time. */
+export const REPLAY_SLOWDOWN = 2;
 
 type Segment = { start: number; end: number };
 const round = (t: number) => Math.round(t * 1000) / 1000;
 
-/** Caption chunks in clip time: segments play back to back, and words outside every segment are dropped. */
-export function captionEvents(words: Word[], segments: Segment[], maxWords = 3): { start: number; end: number; text: string }[] {
+/**
+ * Caption chunks in clip time: segments play back to back, and words outside every segment are dropped.
+ * With a highlight colour, a chunk becomes one event per word, the word being said in that colour.
+ */
+export function captionEvents(words: Word[], segments: Segment[], maxWords = 3, { highlight }: { highlight?: string } = {}): { start: number; end: number; text: string }[] {
   const events: { start: number; end: number; text: string }[] = [];
   let offset = 0;
   for (const seg of segments) {
     let chunk: Word[] = [];
     const flush = () => {
       if (chunk.length === 0) return;
+      if (highlight) {
+        const said = chunk.map((w) => assText(w.text).toUpperCase());
+        const end = Math.min(chunk.at(-1)!.end, seg.end);
+        chunk.forEach((w, i) => {
+          const until = i + 1 < chunk.length ? chunk[i + 1].start : end;
+          events.push({
+            start: round(w.start - seg.start + offset),
+            end: round(until - seg.start + offset),
+            text: said.map((t, j) => (j === i ? `{\\c${colourTag(highlight)}}${t}{\\c${colourTag("#FFFFFF")}}` : t)).join(" "),
+          });
+        });
+        chunk = [];
+        return;
+      }
       events.push({
         start: round(chunk[0].start - seg.start + offset),
         end: round(Math.min(chunk.at(-1)!.end, seg.end) - seg.start + offset),
@@ -41,10 +60,20 @@ export function captionEvents(words: Word[], segments: Segment[], maxWords = 3):
   return events;
 }
 
-type ClipAss = { width: number; height: number; safeTop: number; safeBottom: number; hook: string; font: string; captions: { start: number; end: number; text: string }[] };
+type ClipAss = {
+  width: number;
+  height: number;
+  safeTop: number;
+  safeBottom: number;
+  hook: string;
+  font: string;
+  captions: { start: number; end: number; text: string }[];
+  /** When the slow-motion replay plays, in clip time, so it can be labelled. */
+  replayAt?: { start: number; end: number };
+};
 
 /** The ASS document for one clip: captions above the bottom safe zone, the hook below the top one. */
-export function clipAss({ width, height, safeTop, safeBottom, hook, font, captions }: ClipAss): string {
+export function clipAss({ width, height, safeTop, safeBottom, hook, font, captions, replayAt }: ClipAss): string {
   const base = Math.min(width, height);
   const styles: AssStyle[] = [
     { name: "Caption", font, size: Math.round(base * 0.075), colour: "#FFFFFF", outline: { colour: "#000000", width: Math.round(base * 0.006) }, alignment: 2, marginH: Math.round(width * 0.06), marginV: Math.round(height * safeBottom) },
@@ -53,6 +82,7 @@ export function clipAss({ width, height, safeTop, safeBottom, hook, font, captio
   const events: AssEvent[] = [
     ...captions.map((c) => ({ ...c, style: "Caption" })),
     ...(hook.trim() ? [{ start: 0, end: HOOK_SEC, style: "Hook", text: assText(hook), layer: 1 }] : []),
+    ...(replayAt ? [{ ...replayAt, style: "Hook", text: "REPLAY", layer: 1 }] : []),
   ];
   return assDocument(width, height, styles, events);
 }
@@ -73,6 +103,8 @@ type Render = {
   captions: string;
   fontsDir?: string;
   output: string;
+  /** Source seconds replayed at half speed after the segments. */
+  replay?: Segment;
   /** A source with no audio gets a silent track, so every clip plays the same way. */
   hasAudio?: boolean;
   /** Where a narrow crop centres, in source seconds. Without it the crop is centred. */
@@ -80,24 +112,27 @@ type Render = {
 };
 
 /** ffmpeg arguments that cut, crop, join, caption and loudness-level one clip. Pure, so it can be tested. */
-export function renderArgs({ source, segments, width: W, height: H, captions, fontsDir, output, hasAudio = true, focus = [] }: Render): string[] {
+export function renderArgs({ source, segments, replay, width: W, height: H, captions, fontsDir, output, hasAudio = true, focus = [] }: Render): string[] {
   const aspect = (W / H).toFixed(5);
-  const total = segments.reduce((n, s) => n + (s.end - s.start), 0);
-  const inputs = segments.flatMap((s) => ["-ss", s.start.toFixed(3), "-t", (s.end - s.start).toFixed(3), "-i", source]);
+  // The replay is one more input, played at half speed after the segments.
+  const parts = replay ? [...segments, replay] : segments;
+  const slow = (i: number) => replay !== undefined && i === segments.length;
+  const total = parts.reduce((n, s, i) => n + (s.end - s.start) * (slow(i) ? REPLAY_SLOWDOWN : 1), 0);
+  const inputs = parts.flatMap((s) => ["-ss", s.start.toFixed(3), "-t", (s.end - s.start).toFixed(3), "-i", source]);
   const silent = hasAudio ? [] : ["-f", "lavfi", "-t", total.toFixed(3), "-i", "anullsrc=r=48000:cl=stereo"];
-  const video = segments.map(
+  const video = parts.map(
     (seg, i) =>
       `[${i}:v]crop=w='if(gt(a,${aspect}),ih*${aspect},iw)':h='if(gt(a,${aspect}),ih,iw/${aspect})':x='${focusExpr(focus.filter((k) => k.t >= seg.start - 2 && k.t <= seg.end + 2), seg.start)}':y='(ih-oh)/2',` +
-      `scale=${W}:${H},setsar=1,fps=30,format=yuv420p[v${i}];`,
+      `${slow(i) ? `setpts=${REPLAY_SLOWDOWN}*PTS,` : ""}scale=${W}:${H},setsar=1,fps=30,format=yuv420p[v${i}];`,
   );
   const fonts = fontsDir ? `:fontsdir=${escapeFilterValue(fontsDir)}` : "";
   let graph: string;
   if (hasAudio) {
-    const audio = segments.map((_, i) => `[${i}:a]aresample=48000,aformat=channel_layouts=stereo,asetpts=PTS-STARTPTS[a${i}];`);
-    const pairs = segments.map((_, i) => `[v${i}][a${i}]`).join("");
-    graph = `${video.join("")}${audio.join("")}${pairs}concat=n=${segments.length}:v=1:a=1[vc][ac];[ac]loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000[aout];`;
+    const audio = parts.map((_, i) => `[${i}:a]${slow(i) ? `atempo=${1 / REPLAY_SLOWDOWN},` : ""}aresample=48000,aformat=channel_layouts=stereo,asetpts=PTS-STARTPTS[a${i}];`);
+    const pairs = parts.map((_, i) => `[v${i}][a${i}]`).join("");
+    graph = `${video.join("")}${audio.join("")}${pairs}concat=n=${parts.length}:v=1:a=1[vc][ac];[ac]loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000[aout];`;
   } else {
-    graph = `${video.join("")}${segments.map((_, i) => `[v${i}]`).join("")}concat=n=${segments.length}:v=1:a=0[vc];[${segments.length}:a]anull[aout];`;
+    graph = `${video.join("")}${parts.map((_, i) => `[v${i}]`).join("")}concat=n=${parts.length}:v=1:a=0[vc];[${parts.length}:a]anull[aout];`;
   }
   graph += `[vc]ass=${captions}${fonts}[vout]`;
   return [

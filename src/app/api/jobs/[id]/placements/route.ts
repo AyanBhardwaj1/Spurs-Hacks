@@ -13,7 +13,7 @@ export async function POST(request: Request, ctx: RouteContext<"/api/jobs/[id]/p
   if (isActive(id) || job.status !== "done") return Response.json({ error: "Add platforms once the job has finished." }, { status: 409 });
   const parsed = parseAddPlacements(await request.json().catch(() => null), job.placements);
   if (!parsed.ok) return Response.json({ error: parsed.error }, { status: 400 });
-  const { clips, skipped } = planClips({ moments: job.moments, placements: parsed.value, durationSec: job.source.durationSec, sport: job.sport, title: job.title });
+  const { clips, skipped } = planClips({ moments: job.moments, placements: parsed.value, durationSec: job.source.durationSec, sport: job.sport, title: job.title, replay: job.replay });
   const next = await updateJob(id, (j) => ({
     ...j,
     status: "queued",

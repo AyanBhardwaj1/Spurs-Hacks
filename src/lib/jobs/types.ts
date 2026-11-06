@@ -75,6 +75,8 @@ export type JobClip = {
   why: string;
   /** cover is the clip's cover image, made after the clip; a clip can be ready without one. */
   render: { state: "waiting" | "rendering" | "ready" | "failed"; file?: string; cover?: string; error?: string };
+  /** Source seconds replayed at half speed after the segments, when the job asked for replays. */
+  replay?: { start: number; end: number };
   /** YouTube chapters for a highlights cut: where each moment starts, in seconds into the cut. */
   chapters?: { at: number; label: string }[];
   decision?: { value: ClipDecision; reason?: string; at: string };
@@ -90,6 +92,8 @@ export type Job = {
   placements: JobPlacement[];
   createdAt: string;
   status: "uploading" | "queued" | "running" | "done" | "failed";
+  /** Whether short clips end with a slow-motion replay of their play. */
+  replay?: boolean;
   /** Runs started for this job; a restart mid-run starts another, up to a limit. */
   attempts?: number;
   error?: string;

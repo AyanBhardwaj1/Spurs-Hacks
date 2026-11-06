@@ -14,10 +14,11 @@ const mb = (bytes: number) => `${(bytes / 1024 ** 2).toFixed(bytes < 1024 ** 3 ?
 // the page moves to the job as soon as the last chunk lands.
 export function NewJobForm() {
   const router = useRouter();
-  const ids = { title: useId(), sport: useId(), file: useId() };
+  const ids = { title: useId(), sport: useId(), file: useId(), replay: useId() };
   const [title, setTitle] = useState("");
   const [sport, setSport] = useState<JobSport>("soccer");
   const [placements, setPlacements] = useState<JobPlacement[]>(DEFAULT_PLACEMENTS);
+  const [replay, setReplay] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [dragging, setDragging] = useState(false);
   const [sent, setSent] = useState<number | null>(null);
@@ -35,7 +36,7 @@ export function NewJobForm() {
       const res = await fetch("/api/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title.trim(), sport, placements, fileName: file.name, size: file.size }),
+        body: JSON.stringify({ title: title.trim(), sport, placements, replay, fileName: file.name, size: file.size }),
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? `The server answered ${res.status}.`);
@@ -104,6 +105,14 @@ export function NewJobForm() {
           })}
         </div>
       </fieldset>
+
+      <div className="flex items-start gap-3">
+        <input id={ids.replay} type="checkbox" checked={replay} onChange={(e) => setReplay(e.target.checked)} className="mt-1 size-4 accent-tint" />
+        <label htmlFor={ids.replay} className="grid gap-0.5">
+          <span className="text-footnote font-semibold">End each short clip with a slow-motion replay</span>
+          <span className="text-caption text-secondary">The three seconds around the play again at half speed, labelled Replay. Adds 6 s to each clip.</span>
+        </label>
+      </div>
 
       <div className="grid gap-2">
         <span className="text-footnote font-semibold">Full match video</span>

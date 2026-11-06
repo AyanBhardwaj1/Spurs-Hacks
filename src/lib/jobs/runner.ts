@@ -15,7 +15,7 @@ import { audioPieces, crowdFloor, motionFrames, probe, sampledJpegs, sceneCuts }
 import { fuseMoments, matchClock } from "./moments";
 import { SPORT } from "./sports";
 import { openaiConfigured, structured, transcribePiece } from "./openai";
-import { planClips } from "./planner";
+import { clipSeconds, planClips } from "./planner";
 import { dataDir, jobFile, jobWords, listJobs, setStage, updateJob } from "./store";
 import type { Job, JobMoment, SourceInfo, StageId, Word } from "./types";
 
@@ -196,7 +196,7 @@ async function runStages(id: string) {
   });
 
   await stage(id, "plan", async (job) => {
-    const plan = planClips({ moments, placements: job.placements, durationSec: info.durationSec, sport: job.sport, title: job.title });
+    const plan = planClips({ moments, placements: job.placements, durationSec: info.durationSec, sport: job.sport, title: job.title, replay: job.replay });
     const { skipped } = plan;
     let { clips } = plan;
     let detail = `${clips.length} clips across ${job.placements.length} platforms`;
@@ -297,6 +297,9 @@ async function renderClips(id: string, clipIds: string[], source: string, words:
   return ready;
 }
 
+/** The colour the word being said turns in burned-in captions. */
+const CAPTION_HIGHLIGHT = "#FFD60A";
+
 async function renderOne(id: string, clipId: string, source: string, words: Word[], hasAudio: boolean, font: string | undefined) {
   const job = await updateJob(id, (j) => j);
   const clip = job.clips.find((c) => c.id === clipId);
@@ -313,11 +316,12 @@ async function renderOne(id: string, clipId: string, source: string, words: Word
     safeBottom: p.safeBottom,
     hook: clip.hook,
     font: font ? fontFamily(font) : "Arial",
-    captions: captionEvents(words, clip.segments),
+    captions: captionEvents(words, clip.segments, 3, { highlight: CAPTION_HIGHLIGHT }),
+    ...(clip.replay && { replayAt: { start: clipSeconds({ segments: clip.segments }), end: clipSeconds(clip) } }),
   });
   await writeFile(path.join(dir, "captions.ass"), captions);
   const focus = job.moments.find((m) => m.id === clip.momentId)?.focus;
-  const args = renderArgs({ source, segments: clip.segments, width: p.width, height: p.height, captions: "captions.ass", fontsDir: font ? path.dirname(font) : undefined, output, hasAudio, focus });
+  const args = renderArgs({ source, segments: clip.segments, replay: clip.replay, width: p.width, height: p.height, captions: "captions.ass", fontsDir: font ? path.dirname(font) : undefined, output, hasAudio, focus });
   const run = await runFfmpeg(args, { cwd: dir, timeoutMs: 900_000 });
   if (run.code !== 0) {
     await rm(dir, { recursive: true, force: true });

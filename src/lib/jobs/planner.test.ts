@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { PLACEMENTS } from "@/lib/rundown/platforms";
-import { cutRange, highlightChapters, planClips } from "./planner";
+import { clipSeconds, cutRange, highlightChapters, planClips, replayWindow } from "./planner";
 import type { JobMoment } from "./types";
 
 const moment = (peak: number, score: number, extra: Partial<JobMoment> = {}): JobMoment => ({
@@ -98,4 +98,21 @@ test("the highlights cut gets YouTube chapters: from 0:00, in cut time, at least
     { at: 55, label: "Crowd erupts at 10:15" },
   ]);
   expect(highlightChapters([m("a", 115, 100, "a"), m("b", 312, 300, "b")], segments.slice(0, 2))).toEqual([]);
+});
+
+test("with a replay, each short clip replays the three seconds around its play, inside the cut; the highlights cut has none", () => {
+  const { clips } = planClips({ ...base, moments: [moment(1000, 1), moment(2000, 0.9), moment(3000, 0.8)], placements: ["tiktok", "youtube-video"], replay: true });
+  expect(clips.find((c) => c.id === "tiktok-m-1000")!.replay).toEqual({ start: 998, end: 1001 });
+  expect(clips.find((c) => c.placement === "youtube-video")!.replay).toBeUndefined();
+  expect(planClips({ ...base, moments: [moment(1000, 1)], placements: ["tiktok"] }).clips[0].replay).toBeUndefined();
+});
+
+test("a replay window stays inside its segment", () => {
+  expect(replayWindow(1000, { start: 999, end: 1010 })).toEqual({ start: 999, end: 1002 });
+  expect(replayWindow(1000, { start: 990, end: 1000.5 })).toEqual({ start: 997.5, end: 1000.5 });
+});
+
+test("a clip plays its segments and then its replay at half speed", () => {
+  expect(clipSeconds({ segments: [{ start: 10, end: 28 }] })).toBe(18);
+  expect(clipSeconds({ segments: [{ start: 10, end: 28 }], replay: { start: 20, end: 23 } })).toBe(24);
 });

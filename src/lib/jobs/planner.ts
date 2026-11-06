@@ -1,4 +1,5 @@
 import { PLACEMENTS, type Placement } from "@/lib/rundown/platforms";
+import { REPLAY_SLOWDOWN } from "./captions";
 import { matchClock } from "./moments";
 import { SPORT } from "./sports";
 import type { JobClip, JobMoment, JobPlacement, JobSkip, JobSport } from "./types";
@@ -94,6 +95,23 @@ export function highlightChapters(moments: JobMoment[], segments: { start: numbe
   return chapters.length >= CHAPTER_MIN ? chapters : [];
 }
 
+/** A replay shows this long a stretch around the play: two seconds of build-up and one after. */
+const REPLAY_BEFORE = 2;
+const REPLAY_AFTER = 1;
+
+/** The source stretch a clip replays: the seconds around its play, moved to sit inside its segment. */
+export function replayWindow(peak: number, seg: { start: number; end: number }): { start: number; end: number } {
+  const span = REPLAY_BEFORE + REPLAY_AFTER;
+  const start = Math.min(Math.max(peak - REPLAY_BEFORE, seg.start), seg.end - span);
+  return { start: round(Math.max(start, seg.start)), end: round(Math.min(start + span, seg.end)) };
+}
+
+/** How long a clip plays: its segments, then its replay at half speed. */
+export function clipSeconds(clip: Pick<JobClip, "segments" | "replay">): number {
+  const cut = clip.segments.reduce((n, s) => n + s.end - s.start, 0);
+  return cut + (clip.replay ? (clip.replay.end - clip.replay.start) * REPLAY_SLOWDOWN : 0);
+}
+
 /** Moments under this score are noise for every platform. */
 const MIN_SCORE = 0.3;
 /** The highlights cut takes this many of the top moments, at most. */
@@ -128,9 +146,9 @@ function copy(placement: JobPlacement, hook: string, jobTitle: string, sport: Jo
 const clamp = (t: number, durationSec: number) => Math.min(durationSec, Math.max(0, t));
 const round = (t: number) => Math.round(t * 1000) / 1000;
 
-type Plan = { moments: JobMoment[]; placements: JobPlacement[]; durationSec: number; sport: JobSport; title: string };
+type Plan = { moments: JobMoment[]; placements: JobPlacement[]; durationSec: number; sport: JobSport; title: string; replay?: boolean };
 
-export function planClips({ moments, placements, durationSec, sport, title }: Plan): { clips: JobClip[]; skipped: JobSkip[] } {
+export function planClips({ moments, placements, durationSec, sport, title, replay = false }: Plan): { clips: JobClip[]; skipped: JobSkip[] } {
   const ranked = [...moments].sort((a, b) => b.score - a.score || a.peak - b.peak);
   const strong = ranked.filter((m) => m.score >= MIN_SCORE);
   const clips: JobClip[] = [];
@@ -187,6 +205,7 @@ export function planClips({ moments, placements, durationSec, sport, title }: Pl
         momentId: m.id,
         placement,
         segments: [{ start: round(start), end: round(end) }],
+        ...(replay && { replay: replayWindow(m.peak, { start: round(start), end: round(end) }) }),
         title: fit(m.title, spec(placement).titleLimit ?? 100),
         hook,
         ...copy(placement, hook, title, sport, m.peak),

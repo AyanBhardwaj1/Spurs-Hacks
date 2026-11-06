@@ -17,7 +17,7 @@ Each stage saves `job.json`, so the page can follow along and a restart keeps fi
 | Find the moments | A rise of 6 dB or more over the minute before is a roar, placed at its onset. A commentary call is another signal: shared calls ("what a", "unbelievable") plus the sport's own ("wicket", "ace", "knockout", ...). Both together score highest. Roars closer than the sport's gap between plays are one moment. Edges snap to a camera cut within 3 s. | Audio or a transcript |
 | Plan | Each platform gets its own cut and its own number of moments. Every moment a platform passes on is kept with the reason. With a key, the model rewrites the hook, caption and title. | Nothing, or a key for copy |
 | Follow the play | For each moment that a vertical or square clip uses, the vision model marks where the play is once a second, and the measured camera pan carries the crop between marks. A cut lets the crop jump, and a pan-speed limit stops it jittering. The pan and cut rules are the hackathon's, shared in `focus.ts`. | `OPENAI_API_KEY`; otherwise the crop is centred |
-| Render | ffmpeg crops to the platform's shape, joins the segments, burns in the hook and the commentary as captions, and levels loudness to -14 LUFS at 48 kHz. Then it makes the clip's cover: the frame where the play happens, cropped the same way, with the hook across the middle in large type. | ffmpeg |
+| Render | ffmpeg crops to the platform's shape, joins the segments, burns in the hook and the commentary as captions (three words at a time, the word being said in yellow), and levels loudness to -14 LUFS at 48 kHz. Then it makes the clip's cover: the frame where the play happens, cropped the same way, with the hook across the middle in large type. | ffmpeg |
 
 With no audio and no transcript, the job samples six evenly spaced moments and says so on each one.
 
@@ -36,6 +36,8 @@ The play comes before the crowd, so every short cut opens on the build-up and la
 | YouTube Shorts | 9:16 | 22 to 44 s, with the build-up and the reaction | top 4 |
 | X | 16:9 and 1:1 | opens 10 s before, 14 to 20 s | top 3 |
 | YouTube | 16:9 | one highlights cut of the top 8 moments in match order | 1 |
+
+Tick "End each short clip with a slow-motion replay" on upload and every short clip ends with the three seconds around its play again at half speed, sound slowed with it and labelled Replay, which adds 6 s to the lengths above. The replay sits inside the cut, so trimming a clip moves its replay with it; the YouTube highlights cut never has one.
 
 Captions keep to each platform's caption and hashtag limits from `src/lib/rundown/platforms.ts`, and burned-in text stays out of the bands each app covers with its own buttons. Moments scoring under 0.30 are left out everywhere. The YouTube highlights cut's description lists a chapter for each moment, so viewers can jump between them; YouTube shows chapters only with three or more, each at least 10 s long, so a shorter cut has none. The rules are in `src/lib/jobs/planner.ts`; the tests next to it pin them.
 

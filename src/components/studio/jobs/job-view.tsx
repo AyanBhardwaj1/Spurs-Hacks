@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useId, useState } from "react";
 import { PLACEMENTS } from "@/lib/rundown/platforms";
 import { matchClock } from "@/lib/jobs/moments";
+import { clipSeconds } from "@/lib/jobs/planner";
 import { postText } from "@/lib/jobs/post";
 import { postOrder, type Strength } from "@/lib/jobs/rank";
 import { JOB_PLACEMENTS, PLACEMENT_LABEL, type Job, type JobClip, type JobPlacement, type JobStage } from "@/lib/jobs/types";
@@ -17,7 +18,7 @@ class Gone extends Error {}
 const live = (job: Job | null) => !job || job.status === "queued" || job.status === "running";
 
 const STAGE_MARK: Record<JobStage["state"], string> = { waiting: "○", running: "◐", done: "●", skipped: "–", failed: "×" };
-const length = (c: JobClip) => Math.round(c.segments.reduce((n, s) => n + s.end - s.start, 0));
+const length = (c: JobClip) => Math.round(clipSeconds(c));
 
 // One uploaded match: its progress while it runs, then every clip grouped by platform for a producer to
 // watch, copy, approve and download. The page polls the job while it runs and stops once it is done.
@@ -217,6 +218,7 @@ function ClipCard({ jobId, clip, strength, editable, hasCaptions, durationSec, o
       <p className="mt-3 text-footnote font-semibold text-pretty">{clip.hook}</p>
       <p className="num mt-0.5 text-caption text-secondary">
         {length(clip)} s · from {matchClock(clip.segments[0].start)}
+        {clip.replay && " · ends with a slow-motion replay"}
       </p>
       <p className="mt-2 whitespace-pre-line text-caption text-label/85 text-pretty">{post}</p>
       <p className="mt-2 text-caption text-secondary text-pretty">{clip.why}</p>
