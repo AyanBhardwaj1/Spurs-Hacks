@@ -1,17 +1,10 @@
 import type { Peak } from "./energy";
-import type { JobMoment, Signal, Word } from "./types";
+import { callsFor, SPORT } from "./sports";
+import type { JobMoment, JobSport, Signal, Word } from "./types";
 
 // A job's moments, from the crowd's roars and the commentators' calls. Either alone can find a moment;
 // both together rank it higher, the same rule the hackathon run used ("two independent hits on one
 // moment outrank one strong hit"). Rules only: the model may retitle moments later, never invent them.
-
-/** Phrases commentators reach for when something happens, in any of the sports a job can be. */
-const CALLS = [
-  "what a", "oh my", "unbelievable", "incredible", "sensational", "stunning", "brilliant", "amazing", "wow",
-  "goal", "goals", "scores", "scored", "he's done it", "she's done it", "red card", "penalty", "save", "saves",
-  "touchdown", "interception", "fumble", "sacked", "dunk", "slam", "three pointer", "and one", "buzzer", "game winner",
-];
-const CALL_WORDS = CALLS.map((c) => c.split(" "));
 
 /** Calls closer together than this are one call. */
 const CALL_GAP_SEC = 8;
@@ -20,8 +13,6 @@ const AGREE_BEFORE_SEC = 12;
 const AGREE_AFTER_SEC = 5;
 const LEAD_SEC = 15;
 const TAIL_SEC = 10;
-/** Two moments closer than this are one play. Matches the crowd's own gap between roars. */
-const MERGE_SEC = 20;
 /** How far an edge may move to land on a camera cut. */
 const SNAP_SEC = 3;
 
@@ -32,12 +23,13 @@ const TITLE_WORDS = 6;
 
 const norm = (text: string) => text.toLowerCase().replace(/[^a-z0-9' ]/g, "");
 
-/** Source seconds where a commentator makes a call, one per burst. */
-export function excitedCalls(words: Word[]): { at: number }[] {
+/** Source seconds where a commentator makes one of the sport's calls, one per burst. */
+export function excitedCalls(words: Word[], sport: JobSport = "other"): { at: number }[] {
+  const phrases = callsFor(sport).map((c) => c.split(" "));
   const tokens = words.map((w) => norm(w.text));
   const calls: { at: number }[] = [];
   for (let i = 0; i < words.length; i++) {
-    const hit = CALL_WORDS.some((phrase) => phrase.every((p, j) => tokens[i + j] === p));
+    const hit = phrases.some((phrase) => phrase.every((p, j) => tokens[i + j] === p));
     if (!hit) continue;
     const last = calls.at(-1);
     if (last && words[i].start - last.at < CALL_GAP_SEC) continue;
@@ -71,10 +63,12 @@ const spoken = (words: Word[], from: number, to: number, limit = Infinity) =>
     .map((w) => w.text)
     .join(" ");
 
-type Fuse = { durationSec: number; peaks: Peak[]; words: Word[]; cuts: number[] };
+type Fuse = { durationSec: number; peaks: Peak[]; words: Word[]; cuts: number[]; sport?: JobSport };
 
-export function fuseMoments({ durationSec, peaks, words, cuts }: Fuse): JobMoment[] {
-  const calls = excitedCalls(words);
+export function fuseMoments({ durationSec, peaks, words, cuts, sport = "other" }: Fuse): JobMoment[] {
+  const calls = excitedCalls(words, sport);
+  // Two moments closer than the sport's gap between plays are one play, as the crowd's roars are.
+  const mergeSec = SPORT[sport].gapSec;
   const used = new Set<number>();
   const raw: { peak: number; start: number; end: number; score: number; signals: Signal[] }[] = [];
 
@@ -94,9 +88,9 @@ export function fuseMoments({ durationSec, peaks, words, cuts }: Fuse): JobMomen
     raw.push({ peak: c.at, start: Math.max(0, c.at - LEAD_SEC), end: Math.min(durationSec, c.at + TAIL_SEC), score: CALL_ONLY_SCORE, signals: ["commentary"] });
   });
 
-  // Strongest first, and anything within MERGE_SEC of a stronger moment is the same play.
+  // Strongest first, and anything within the gap of a stronger moment is the same play.
   raw.sort((a, b) => b.score - a.score || a.peak - b.peak);
-  const kept = raw.filter((m, i) => raw.slice(0, i).every((k) => Math.abs(k.peak - m.peak) >= MERGE_SEC));
+  const kept = raw.filter((m, i) => raw.slice(0, i).every((k) => Math.abs(k.peak - m.peak) >= mergeSec));
   const ids = new Set<string>();
   return kept
     .map((m) => {

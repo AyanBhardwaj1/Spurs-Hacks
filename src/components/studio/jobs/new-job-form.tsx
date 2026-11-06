@@ -3,10 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { PLACEMENTS } from "@/lib/rundown/platforms";
+import { SPORT } from "@/lib/jobs/sports";
 import { DEFAULT_PLACEMENTS, JOB_PLACEMENTS, SPORTS, type JobPlacement, type JobSport } from "@/lib/jobs/types";
 import { uploadFile } from "./upload";
 
-const SPORT_LABEL: Record<JobSport, string> = { soccer: "Soccer", basketball: "Basketball", "american-football": "American football", other: "Another sport" };
 export const PLACEMENT_LABEL: Record<JobPlacement, string> = {
   tiktok: "TikTok",
   "instagram-reel": "Instagram Reels",
@@ -84,7 +84,7 @@ export function NewJobForm() {
         <select id={ids.sport} value={sport} onChange={(e) => setSport(e.target.value as JobSport)} className="h-11 w-fit rounded-lg bg-fill px-3 text-body text-label">
           {SPORTS.map((s) => (
             <option key={s} value={s}>
-              {SPORT_LABEL[s]}
+              {SPORT[s].label}
             </option>
           ))}
         </select>

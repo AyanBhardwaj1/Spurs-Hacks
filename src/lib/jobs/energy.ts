@@ -75,7 +75,7 @@ function median(values: number[]) {
  * the median of the minute before it, so a match that gets louder overall does not flood the list. A
  * moment is placed at its roar's onset. Scores are relative to the loudest rise, which scores 1.
  */
-export function findPeaks(floor: number[]): Peak[] {
+export function findPeaks(floor: number[], gapSec = GAP_SEC): Peak[] {
   const duration = floor.length;
   if (duration === 0) return [];
   const overall = median(floor);
@@ -89,7 +89,7 @@ export function findPeaks(floor: number[]): Peak[] {
   const picked: { s: number; rise: number }[] = [];
   for (const r of rises) {
     if (picked.length >= limit) break;
-    if (picked.every((p) => Math.abs(p.s - r.s) >= GAP_SEC)) picked.push(r);
+    if (picked.every((p) => Math.abs(p.s - r.s) >= gapSec)) picked.push(r);
   }
   const top = picked[0]?.rise ?? 1;
   return picked.map(({ s, rise }) => {

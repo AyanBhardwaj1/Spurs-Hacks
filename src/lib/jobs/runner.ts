@@ -12,6 +12,7 @@ import { cropShare, focusKeys, MOTION, motionSteps, type Anchor } from "./focus"
 import { lastLine, runFfmpeg } from "./ffmpeg";
 import { audioPieces, crowdFloor, motionFrames, probe, sampledJpegs, sceneCuts } from "./media";
 import { fuseMoments, matchClock } from "./moments";
+import { SPORT } from "./sports";
 import { openaiConfigured, structured, transcribePiece } from "./openai";
 import { planClips } from "./planner";
 import { dataDir, jobFile, jobWords, listJobs, setStage, updateJob } from "./store";
@@ -181,7 +182,7 @@ async function runStages(id: string) {
 
   const moments = await stage(id, "moments", async () => {
     const cuts = await sceneCuts(source, work);
-    let value = fuseMoments({ durationSec: info.durationSec, peaks: findPeaks(floor), words, cuts });
+    let value = fuseMoments({ durationSec: info.durationSec, peaks: findPeaks(floor, SPORT[first.sport].gapSec), words, cuts, sport: first.sport });
     if (value.length === 0) value = samples(info.durationSec);
     // How long each roar lasted decides how long its cuts run on.
     value = value.map((m) => {

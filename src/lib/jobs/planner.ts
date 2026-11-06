@@ -1,5 +1,6 @@
 import { PLACEMENTS, type Placement } from "@/lib/rundown/platforms";
 import { matchClock } from "./moments";
+import { SPORT } from "./sports";
 import type { JobClip, JobMoment, JobPlacement, JobSkip, JobSport } from "./types";
 
 /** A placement as the general type, so optional limits such as titleLimit can be read on any of them. */
@@ -68,13 +69,6 @@ const MIN_SCORE = 0.3;
 const HIGHLIGHTS_MOMENTS = 8;
 const HOOK_MAX = 60;
 
-const SPORT_TAGS: Record<JobSport, string[]> = {
-  soccer: ["football", "soccer", "goal", "matchday", "highlights"],
-  basketball: ["basketball", "nba", "hoops", "highlights", "buckets"],
-  "american-football": ["nfl", "football", "touchdown", "gameday", "highlights"],
-  other: ["sports", "highlights", "gameday", "replay", "clip"],
-};
-
 function ordinal(n: number) {
   const tens = n % 100;
   const suffix = tens >= 11 && tens <= 13 ? "th" : ({ 1: "st", 2: "nd", 3: "rd" } as Record<number, string>)[n % 10] ?? "th";
@@ -94,7 +88,7 @@ const hookOf = (m: JobMoment) => fit(/“(.+)”/.exec(m.title)?.[1] ?? "Listen 
 
 function copy(placement: JobPlacement, hook: string, jobTitle: string, sport: JobSport, when: number) {
   const p = spec(placement);
-  const hashtags = SPORT_TAGS[sport].slice(0, p.hashtagLimit);
+  const hashtags = SPORT[sport].tags.slice(0, p.hashtagLimit);
   const tags = hashtags.map((h) => `#${h}`).join(" ");
   const room = p.captionLimit - (tags ? tags.length + 1 : 0);
   return { hashtags, caption: fit(`${hook} · ${matchClock(when)} · ${jobTitle}`, room) };

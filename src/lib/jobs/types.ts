@@ -14,7 +14,9 @@ export type JobPlacement = (typeof JOB_PLACEMENTS)[number];
 /** What a new job is cut for unless someone picks otherwise: the four short-form feeds. */
 export const DEFAULT_PLACEMENTS: JobPlacement[] = ["tiktok", "instagram-reel", "youtube-short", "x-video"];
 
-export const SPORTS = ["soccer", "basketball", "american-football", "other"] as const;
+export const SPORTS = [
+  "soccer", "basketball", "american-football", "ice-hockey", "baseball", "tennis", "cricket", "rugby", "volleyball", "combat", "motorsport", "esports", "other",
+] as const;
 export type JobSport = (typeof SPORTS)[number];
 
 export type StageId = "upload" | "probe" | "audio" | "transcript" | "moments" | "plan" | "focus" | "render";

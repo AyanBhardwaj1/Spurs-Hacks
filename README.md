@@ -1,6 +1,6 @@
 # Rundown
 
-Rundown turns a full match video into clips cut for each social platform. Upload the game, and it finds the moments from the crowd and the commentary, cuts each one differently for TikTok, Reels, Shorts, X and YouTube, writes the captions, and puts every clip in front of you to approve. It also lists what each platform left out, with a reason, so you can rescue the clip it got wrong.
+Rundown turns a full match video, from any sport, into clips cut for each social platform. Upload the game, and it finds the moments from the crowd and the commentary, cuts each one differently for TikTok, Reels, Shorts, X and YouTube, writes the captions, and puts every clip in front of you to approve. It also lists what each platform left out, with a reason, so you can rescue the clip it got wrong.
 
 It started at the Spurs² Hackathon (UT Austin, October 22 to 23, 2026) as a tool for Problem 1 of the [builder brief](https://scoreplay.notion.site/Spurs-Hackathon-Builder-Brief-3fb9d8f0d4ce815096d4dc8294142346), Assisted Auto-Production, built on the [ScorePlay](https://developer.scoreplay.io/) and [Twelve Labs](https://docs.twelvelabs.io/) APIs with Tottenham Hotspur's full match against Manchester United. That run is still in the studio as a case study.
 

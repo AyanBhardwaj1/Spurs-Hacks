@@ -1,5 +1,6 @@
 import { PLACEMENTS, type Placement } from "@/lib/rundown/platforms";
 import { fit } from "./planner";
+import { SPORT } from "./sports";
 import type { JobClip, JobMoment, JobSport } from "./types";
 
 /** A placement as the general type, so optional limits such as titleLimit can be read on any of them. */
@@ -68,7 +69,7 @@ export function copyPrompt(clips: JobClip[], moments: JobMoment[], sport: JobSpo
   ].join(" ");
   const user = JSON.stringify({
     match: jobTitle,
-    sport,
+    sport: SPORT[sport].label,
     clips: clips.map((c) => {
       const m = byId.get(c.momentId);
       return { id: c.id, platform: spec(c.placement).platform, placement: spec(c.placement).placement, captionLimit: spec(c.placement).captionLimit, moment: m?.title, said: m?.quote?.slice(0, 600) };

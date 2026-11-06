@@ -14,12 +14,16 @@ Each stage saves `job.json`, so the page can follow along and a restart keeps fi
 | Read the video | ffmpeg reads the duration, the frame size (rotated phone video included), the frame rate and whether there is audio. | ffmpeg |
 | Measure the crowd | The audio is cut into 100 ms frames; the crowd floor is the 20th percentile of the frames around each second, which follows the crowd and mostly ignores speech. | Audio |
 | Transcribe | OpenAI speech-to-text with word timings, in 10-minute pieces. | `OPENAI_API_KEY` |
-| Find the moments | A rise of 6 dB or more over the minute before is a roar, placed at its onset. A commentary call ("what a", "goal", "touchdown", "dunk", ...) is another signal. Both together score highest. Edges snap to a camera cut within 3 s. | Audio or a transcript |
+| Find the moments | A rise of 6 dB or more over the minute before is a roar, placed at its onset. A commentary call is another signal: shared calls ("what a", "unbelievable") plus the sport's own ("wicket", "ace", "knockout", ...). Both together score highest. Roars closer than the sport's gap between plays are one moment. Edges snap to a camera cut within 3 s. | Audio or a transcript |
 | Plan | Each platform gets its own cut and its own number of moments. Every moment a platform passes on is kept with the reason. With a key, the model rewrites the hook, caption and title. | Nothing, or a key for copy |
 | Follow the play | For each moment that a vertical or square clip uses, the vision model marks where the play is once a second, and the measured camera pan carries the crop between marks. A cut lets the crop jump, and a pan-speed limit stops it jittering. The pan and cut rules are the hackathon's, shared in `focus.ts`. | `OPENAI_API_KEY`; otherwise the crop is centred |
 | Render | ffmpeg crops to the platform's shape, joins the segments, burns in the hook and the commentary as captions, and levels loudness to -14 LUFS at 48 kHz. | ffmpeg |
 
 With no audio and no transcript, the job samples six evenly spaced moments and says so on each one.
+
+### Sports
+
+A job names its sport, and `sports.ts` holds what changes with it: the commentary calls, the gap between two separate plays, and the hashtags. Thirteen are listed: soccer, basketball, American football, ice hockey, baseball, tennis, cricket, rugby, volleyball, boxing or MMA, motorsport, esports, and "another sport", which listens for every sport's calls. Fast sports get a short gap (8 s for tennis and volleyball, 10 s for basketball and esports), so back-to-back points stay separate clips; slow ones keep 20 to 25 s, so a long celebration stays one moment.
 
 ## How each platform is cut
 
