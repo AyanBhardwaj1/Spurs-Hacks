@@ -17,7 +17,23 @@ Open `/studio`, press **Upload a match**, and pick the platforms. No video to ha
 | Vertical recap | 9:16 | the top 6 moments, a few seconds each, under a minute | 1 |
 | YouTube | 16:9 | one highlights cut of the top 8 moments | 1 |
 
-It runs with no keys: moments come from the crowd's noise, and the copy follows rules. Add `OPENAI_API_KEY` and it also transcribes the commentary, which finds moments the crowd missed and captions every clip, the vertical and square crops follow the play instead of staying centred, and the model writes each platform's hook and caption. Once a job is done you can move any clip's start and end and render it again, or cut the same match for platforms you skipped, without uploading it again. Every clip gets a cover image cut from its play, with the hook on it. Captions light up word by word as they are said, and short clips can end with a slow-motion replay of the play. Add your club's logo and colour and every clip and cover carries them. "Download approved" puts every approved clip, its cover, its captions and its post copy in one zip with a manifest. [docs/jobs.md](docs/jobs.md) covers how each stage works, the rules, and the settings.
+It runs with no keys: moments come from the crowd's noise, and the copy follows rules. Add `OPENAI_API_KEY` and it also transcribes the commentary (which finds moments the crowd missed and captions every clip), follows the play with the vertical and square crops, and writes each platform's hook and caption, in any of twelve languages.
+
+What a job gives you:
+
+- **Thirteen sports.** Each has its own commentary calls, in English and five other languages, and its own pace, so back-to-back tennis points stay separate clips.
+- **Cuts that end when the crowd settles,** inside each platform's length range.
+- **Captions** three words at a time, the word being said lit up, inside each app's safe zones.
+- **A cover image** per clip, from the frame of the play, with the hook on it.
+- **An optional slow-motion replay** of the play at the end of each short clip.
+- **Your brand:** your logo on every clip and cover, your colour on the captions.
+- **A posting order** for each platform, with the evidence for it, and a "Post first" list.
+- **A crowd timeline** of the whole match. Click a second the rules missed to make it a clip.
+- **Edits that re-render only what changed:** move a cut's edges, swap the hook, add a platform.
+- **One zip out:** approved clips, covers, SRT captions, posts ready to paste and a manifest, plus chapters for the YouTube cut.
+- **A webhook** when a job finishes, for chat, a scheduler or an automation tool.
+
+[docs/jobs.md](docs/jobs.md) covers how each stage works, the rules, and the settings.
 
 ### From the command line
 

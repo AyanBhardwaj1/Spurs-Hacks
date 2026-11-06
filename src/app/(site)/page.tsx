@@ -15,12 +15,18 @@ const STEPS = [
 ];
 
 const FEATURES = [
-  { title: "Captions burned in", body: "The hook on screen for the first seconds and the commentary word by word, inside each platform's safe zone." },
-  { title: "Loudness levelled", body: "Every clip is levelled to -14 LUFS at 48 kHz, the level the feeds normalise to." },
-  { title: "Adjust any cut", body: "Move a clip's start or end and only that clip renders again." },
-  { title: "Add platforms later", body: "Cut the same match for a feed you skipped, from the moments already found. No new upload." },
-  { title: "One zip out", body: "Approved clips, their SRT captions, ready-to-paste posts and a manifest a scheduling tool can read." },
+  { title: "Captions that follow the voice", body: "The commentary burned in three words at a time, the word being said lit in your colour, inside each app's safe zones." },
+  { title: "A cover for every clip", body: "The frame where the play happens, cropped to the platform, with the hook across the middle." },
+  { title: "Slow-motion replay", body: "Optionally end each short clip with the three seconds around the play again at half speed." },
+  { title: "Your brand on it", body: "Your logo in the top corner of every clip and cover, and your colour on the captions." },
+  { title: "What to post first", body: "Each platform's clips in posting order, with the evidence for the order spelled out." },
+  { title: "The whole match on one line", body: "A timeline of the crowd's noise with every moment marked. Click a second the rules missed to make it a clip." },
+  { title: "Fix anything", body: "Move a cut's edges, swap the hook, or add a platform later. Only what changed renders again." },
+  { title: "Twelve languages", body: "With a key, hooks, captions and titles in Spanish, Arabic, Japanese and nine more, whatever the commentary's language." },
+  { title: "One zip out", body: "Approved clips with covers, SRT captions, ready-to-paste posts and a manifest. Chapters for the YouTube cut." },
+  { title: "Runs headless", body: "bun run rundown match.mp4 does it all from a terminal, and a webhook tells your tools when a job is done." },
   { title: "No keys needed", body: "The crowd alone finds the moments and rules write the copy. A key adds the commentary, the crop and the model's copy." },
+  { title: "Your video stays yours", body: "It stays on the server running Rundown until you delete the job. Nothing is ever posted for you." },
 ];
 
 // The product: any full match in, clips for every feed out. The hackathon run that started it is at /case-study.
