@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { parseProbe, parseSceneCuts } from "./probe";
+import { parseCopyTime, parseProbe, parseSceneCuts } from "./probe";
 
 const broadcast = `Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'source.mp4':
   Duration: 01:45:34.00, start: 0.000000, bitrate: 4210 kb/s
@@ -30,4 +30,14 @@ test("scene cuts come back sorted and once each from scdet's metadata print", ()
   const text = "frame:3 pts:3 pts_time:12.4\nlavfi.scd.score=40.1\nlavfi.scd.time=12.4\nframe:9 pts:9 pts_time:3.2\nlavfi.scd.time=3.2\nlavfi.scd.time=12.4\n";
   expect(parseSceneCuts(text)).toEqual([3.2, 12.4]);
   expect(parseSceneCuts("")).toEqual([]);
+});
+
+test("a stream-written file with no duration in its header reads as 0, to be measured", () => {
+  const banner = "Input #0, matroska,webm, from 'a.webm':\n  Duration: N/A, start: -0.007000, bitrate: N/A\n  Stream #0:0: Video: vp8, yuv420p(progressive), 320x180, SAR 1:1 DAR 16:9, 25 fps, 25 tbr, 1k tbn\n  Stream #0:1: Audio: opus, 48000 Hz, mono, fltp\n";
+  expect(parseProbe(banner)).toEqual({ durationSec: 0, width: 320, height: 180, fps: 25, hasAudio: true });
+});
+
+test("the last progress time of a copy pass is the file's length", () => {
+  expect(parseCopyTime("frame=  100 time=00:00:03.96 bitrate=N/A\rframe=  199 time=00:01:07.96 bitrate=N/A speed= 40x\n")).toBe(67.96);
+  expect(parseCopyTime("no progress here")).toBe(0);
 });

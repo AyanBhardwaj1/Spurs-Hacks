@@ -11,7 +11,7 @@ Each stage saves `job.json`, so the page can follow along and a restart keeps fi
 | Stage | What happens | Needs |
 | --- | --- | --- |
 | Upload | The browser sends the video in 8 MiB chunks. A chunk that does not start where the upload left off gets a 409 with the byte to resume from. | Nothing |
-| Read the video | ffmpeg reads the duration, the frame size (rotated phone video included), the frame rate and whether there is audio. | ffmpeg |
+| Read the video | ffmpeg reads the duration, the frame size (rotated phone video included), the frame rate and whether there is audio. A file written as a stream, such as a browser or phone WebM, has no length in its header, so it is measured with a copy pass that reads every packet without decoding. Variable frame rate video is fine: every clip renders at a constant 30 fps. | ffmpeg |
 | Measure the crowd | The audio is cut into 100 ms frames; the crowd floor is the 20th percentile of the frames around each second, which follows the crowd and mostly ignores speech. | Audio |
 | Transcribe | OpenAI speech-to-text with word timings, in 10-minute pieces. | `OPENAI_API_KEY` |
 | Find the moments | A rise of 6 dB or more over the minute before is a roar, placed at its onset. A commentary call is another signal: shared calls ("what a", "unbelievable") plus the sport's own ("wicket", "ace", "knockout", ...). Both together score highest. Roars closer than the sport's gap between plays are one moment. Edges snap to a camera cut within 3 s. | Audio or a transcript |

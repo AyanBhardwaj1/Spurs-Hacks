@@ -5,7 +5,7 @@ import path from "node:path";
 import { FRAME_SEC, floorPerSecond, parseRmsPrint } from "./energy";
 import { MOTION } from "./focus";
 import { lastLine, runFfmpeg } from "./ffmpeg";
-import { parseProbe, parseSceneCuts } from "./probe";
+import { parseCopyTime, parseProbe, parseSceneCuts } from "./probe";
 import type { SourceInfo } from "./types";
 
 // What the job engine reads from an uploaded video with ffmpeg. Every call takes the file's path and a
@@ -14,7 +14,13 @@ import type { SourceInfo } from "./types";
 export async function probe(file: string): Promise<SourceInfo> {
   // With no output file ffmpeg exits 1 after printing the banner, which is all this needs.
   const { stderr } = await runFfmpeg(["-i", file], { timeoutMs: 60_000 });
-  return parseProbe(stderr);
+  const info = parseProbe(stderr);
+  if (info.durationSec > 0) return info;
+  // No length in the header: copy every packet to nowhere, which reads the whole file without decoding it.
+  const pass = await runFfmpeg(["-v", "info", "-i", file, "-map", "0", "-c", "copy", "-f", "null", "-"], { timeoutMs: 30 * 60_000 });
+  const durationSec = parseCopyTime(pass.stderr);
+  if (durationSec <= 0) throw new Error("The file has no length ffmpeg can measure; it may be cut off.");
+  return { ...info, durationSec };
 }
 
 /** The per-second crowd floor in dB, from 100 ms RMS frames of the audio mixed to mono. */

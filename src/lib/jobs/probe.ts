@@ -5,10 +5,12 @@ import type { SourceInfo } from "./types";
 
 const toSeconds = (h: string, m: string, s: string) => Number(h) * 3600 + Number(m) * 60 + Number(s);
 
-/** Duration, frame size, frame rate and whether there is audio, from `ffmpeg -i` stderr. */
+/** Duration (0 when the header has none), frame size, frame rate and whether there is audio, from `ffmpeg -i` stderr. */
 export function parseProbe(banner: string): SourceInfo {
   const duration = /Duration:\s*(\d+):(\d{2}):(\d{2}(?:\.\d+)?)/.exec(banner);
-  if (!duration) throw new Error("The file has no duration; it is not a video ffmpeg can read.");
+  // A file written as a stream (a browser or phone recording, often WebM) has no length in its header.
+  const unknown = /Duration:\s*N\/A/.test(banner);
+  if (!duration && !unknown) throw new Error("The file has no duration; it is not a video ffmpeg can read.");
   const video = /Stream #\d+:\d+.*?: Video: .*?(\d{2,5})x(\d{2,5}).*?(\d+(?:\.\d+)?) (?:fps|tbr)/.exec(banner);
   if (!video) throw new Error("The file has no video stream.");
   // A phone records landscape pixels and a rotation flag; the picture people see is the rotated one.
@@ -16,7 +18,7 @@ export function parseProbe(banner: string): SourceInfo {
   const turned = rotation ? Math.abs(Number(rotation[1] ?? rotation[2])) % 180 === 90 : false;
   const [w, h] = [Number(video[1]), Number(video[2])];
   return {
-    durationSec: toSeconds(duration[1], duration[2], duration[3]),
+    durationSec: duration ? toSeconds(duration[1], duration[2], duration[3]) : 0,
     width: turned ? h : w,
     height: turned ? w : h,
     fps: Number(video[3]),
@@ -28,4 +30,11 @@ export function parseProbe(banner: string): SourceInfo {
 export function parseSceneCuts(text: string): number[] {
   const times = [...text.matchAll(/lavfi\.scd\.time=([\d.]+)/g)].map((m) => Number(m[1]));
   return [...new Set(times)].sort((a, b) => a - b);
+}
+
+/** The last time= in ffmpeg's progress output: how far a copy pass got, which is the file's length. */
+export function parseCopyTime(stderr: string): number {
+  const times = [...stderr.matchAll(/time=(\d+):(\d{2}):(\d{2}(?:\.\d+)?)/g)];
+  const last = times.at(-1);
+  return last ? toSeconds(last[1], last[2], last[3]) : 0;
 }

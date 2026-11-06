@@ -4,8 +4,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import ffmpegStatic from "ffmpeg-static";
 
-// The extras a clip can carry, through the real ffmpeg: the slow-motion replay's filters (setpts, atempo)
-// and the logo overlay have to fit the graph the clip already uses, with sound and without.
+// Through the real ffmpeg: the extras a clip can carry (the slow-motion replay's setpts and atempo, the
+// logo overlay) have to fit the graph the clip already uses, and messy sources have to read.
 
 mock.module("server-only", () => ({}));
 const dir = mkdtempSync(path.join(tmpdir(), "rundown-replay-"));
@@ -56,6 +56,21 @@ test.skipIf(!haveFfmpeg)(
     const shot = await runFfmpeg(coverArgs({ source, at: 1, width: 360, height: 640, captions: "l.ass", output: cover, logo: place }), { cwd: dir });
     expect(shot.stderr).toBe("");
     expect(await probe(cover)).toMatchObject({ width: 360, height: 640 });
+  },
+  120_000,
+);
+
+test.skipIf(!haveFfmpeg)(
+  "a WebM written as a stream, with no length in its header, is measured instead of refused",
+  async () => {
+    const webm = path.join(dir, "stream.webm");
+    // Writing to a pipe leaves the header without a duration, as a browser or phone recording does.
+    const made = Bun.spawnSync([process.env.FFMPEG_PATH || ffmpegStatic!, "-v", "error", "-f", "lavfi", "-i", "testsrc2=size=320x180:rate=25:duration=8", "-f", "lavfi", "-i", "sine=d=8", "-c:v", "libvpx", "-deadline", "realtime", "-c:a", "libopus", "-f", "webm", "pipe:1"]);
+    expect(made.exitCode).toBe(0);
+    writeFileSync(webm, made.stdout);
+    const info = await probe(webm);
+    expect(Math.abs(info.durationSec - 8)).toBeLessThan(0.2);
+    expect(info).toMatchObject({ width: 320, height: 180, hasAudio: true });
   },
   120_000,
 );
