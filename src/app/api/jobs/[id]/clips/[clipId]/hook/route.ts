@@ -14,6 +14,7 @@ export async function POST(request: Request, ctx: RouteContext<"/api/jobs/[id]/c
   const clip = job?.clips.find((c) => c.id === clipId);
   if (!job || !clip) return Response.json({ error: "No such clip." }, { status: 404 });
   if (isActive(id) || job.status !== "done") return Response.json({ error: "Change the hook once the job has finished." }, { status: 409 });
+  if (job.sourceDeleted) return Response.json({ error: "The match video was deleted, so it cannot be cut again." }, { status: 409 });
   const parsed = parseHook(await request.json().catch(() => null));
   if (!parsed.ok) return Response.json({ error: parsed.error }, { status: 400 });
   const next = await updateJob(id, (j) => ({

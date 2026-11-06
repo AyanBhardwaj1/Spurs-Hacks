@@ -11,6 +11,7 @@ export async function POST(request: Request, ctx: RouteContext<"/api/jobs/[id]/p
   const job = await getJob(id);
   if (!job || !job.source) return Response.json({ error: `No finished job ${id}.` }, { status: 404 });
   if (isActive(id) || job.status !== "done") return Response.json({ error: "Add platforms once the job has finished." }, { status: 409 });
+  if (job.sourceDeleted) return Response.json({ error: "The match video was deleted, so it cannot be cut again." }, { status: 409 });
   const parsed = parseAddPlacements(await request.json().catch(() => null), job.placements);
   if (!parsed.ok) return Response.json({ error: parsed.error }, { status: 400 });
   const { clips, skipped } = planClips({ moments: job.moments, placements: parsed.value, durationSec: job.source.durationSec, sport: job.sport, title: job.title, replay: job.replay });

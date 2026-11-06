@@ -12,6 +12,7 @@ export async function POST(request: Request, ctx: RouteContext<"/api/jobs/[id]/m
   const job = await getJob(id);
   if (!job || !job.source) return Response.json({ error: `No finished job ${id}.` }, { status: 404 });
   if (isActive(id) || job.status !== "done") return Response.json({ error: "Pick a moment once the job has finished." }, { status: 409 });
+  if (job.sourceDeleted) return Response.json({ error: "The match video was deleted, so it cannot be cut again." }, { status: 409 });
   const parsed = parsePick(await request.json().catch(() => null), job.source.durationSec);
   if (!parsed.ok) return Response.json({ error: parsed.error }, { status: 400 });
   const placements = job.placements.filter((p) => !isMontage(p));

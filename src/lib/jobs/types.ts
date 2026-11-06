@@ -112,6 +112,8 @@ export type Job = {
   language?: Language;
   /** Whether short clips end with a slow-motion replay of their play. */
   replay?: boolean;
+  /** The match video was deleted to free space; the clips stay, and nothing can cut the match again. */
+  sourceDeleted?: boolean;
   /** The process running this job when it is not the server, such as the command line; the server leaves it alone while that process lives. */
   owner?: { pid: number };
   /** Runs started for this job; a restart mid-run starts another, up to a limit. */

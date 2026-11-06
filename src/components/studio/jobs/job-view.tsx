@@ -82,6 +82,8 @@ export function JobView() {
     );
   if (!job) return <p className="mt-10 text-footnote text-secondary">{error ?? "Loading the job…"}</p>;
 
+  // Re-cutting needs the match video, which a producer may have deleted to free space.
+  const canCut = job.status === "done" && Boolean(job.source) && !job.sourceDeleted;
   const order = postOrder(job.clips, job.moments);
   const rankOf = (c: JobClip) => order.get(c.id)?.rank ?? Infinity;
   const byPlacement = job.placements
@@ -101,10 +103,16 @@ export function JobView() {
             </p>
           )}
         </div>
-        {!live(job) && <DeleteJob id={job.id} onDeleted={() => router.push("/studio")} />}
+        {!live(job) && (
+          <div className="flex flex-col items-end gap-1">
+            {canCut && <DeleteSource job={job} onDeleted={setJob} />}
+            <DeleteJob id={job.id} onDeleted={() => router.push("/studio")} />
+          </div>
+        )}
       </header>
       {job.status === "done" && job.clips.some((c) => c.render.state === "ready") && <ExportLinks job={job} />}
-      {job.status === "done" && (
+      {job.sourceDeleted && <p className="mt-4 text-caption text-secondary">The match video was deleted to free space. The clips stay; trimming, new hooks, new platforms and picked moments need the video, so they are off.</p>}
+      {canCut && (
         <AddPlatforms
           job={job}
           onQueued={(next) => {
@@ -137,7 +145,7 @@ export function JobView() {
         ))}
       </ol>
 
-      <EnergyTimeline job={job} onPick={job.status === "done" && job.placements.some((p) => !isMontage(p)) ? setPicked : undefined} />
+      <EnergyTimeline job={job} onPick={canCut && job.placements.some((p) => !isMontage(p)) ? setPicked : undefined} />
       {picked !== null && job.status === "done" && (
         <PickBar
           jobId={job.id}
@@ -174,7 +182,7 @@ export function JobView() {
                 jobId={job.id}
                 clip={c}
                 strength={g.clips.length > 1 ? order.get(c.id) : undefined}
-                editable={job.status === "done" && Boolean(job.source)}
+                editable={canCut}
                 hasCaptions={job.services.transcript}
                 durationSec={job.source?.durationSec ?? 0}
                 onChange={(next) => setJob((j) => j && { ...j, clips: j.clips.map((x) => (x.id === next.id ? next : x)) })}
@@ -727,6 +735,42 @@ function ResumeUpload({ job, onDone }: { job: Job; onDone: () => void }) {
           {error}
         </p>
       )}
+    </div>
+  );
+}
+
+const gb = (bytes: number) => (bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GB` : `${Math.round(bytes / 1024 ** 2)} MB`);
+
+// Frees most of a job's space: the match video goes, the clips stay.
+function DeleteSource({ job, onDeleted }: { job: Job; onDeleted: (job: Job) => void }) {
+  const [asking, setAsking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  if (!asking) {
+    return (
+      <button type="button" onClick={() => setAsking(true)} className="press rounded-md text-caption font-semibold text-secondary hover:text-label">
+        Free {gb(job.upload.size)}: delete the match video
+      </button>
+    );
+  }
+  return (
+    <div className="flex flex-wrap items-center justify-end gap-3 text-caption">
+      <span className="text-secondary">Keep the clips, and give up trimming and re-cutting?</span>
+      <button
+        type="button"
+        onClick={async () => {
+          const res = await fetch(`/api/jobs/${job.id}/source`, { method: "DELETE" });
+          const body = await res.json().catch(() => ({}));
+          if (res.ok) onDeleted(body.job);
+          else setError(body.error ?? `The server answered ${res.status}.`);
+        }}
+        className="press rounded-md font-semibold text-tally hover:underline"
+      >
+        Delete the video
+      </button>
+      <button type="button" onClick={() => setAsking(false)} className="press rounded-md font-semibold text-tint hover:underline">
+        Keep it
+      </button>
+      {error && <span className="text-tally">{error}</span>}
     </div>
   );
 }

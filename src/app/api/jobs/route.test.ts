@@ -185,3 +185,23 @@ test("trimming a one-segment highlights cut moves its chapters with the new star
   expect(res.status).toBe(200);
   expect((await res.json()).chapters.map((c: { at: number }) => c.at)).toEqual([0, 25, 40]);
 });
+
+test("deleting a finished job's video keeps its clips and refuses anything that would cut the match again", async () => {
+  const source = await import("./[id]/source/route");
+  const hookRoute = await import("./[id]/clips/[clipId]/hook/route");
+  const { writeFileSync, existsSync } = await import("node:fs");
+  const { job } = await (await jobs.POST(new Request("http://localhost/api/jobs", { method: "POST", body: JSON.stringify({ title: "F", sport: "soccer", placements: ["tiktok"], fileName: "m.mp4", size: 1 }) }))).json();
+  const video = path.join(dir, "jobs", job.id, "source.mp4");
+  writeFileSync(video, "video");
+  await updateJob(job.id, (j) => ({
+    ...j,
+    status: "done",
+    clips: [{ id: "tiktok-m-30", momentId: "m-30", placement: "tiktok", segments: [{ start: 22, end: 40 }], title: "T", hook: "H", caption: "C", hashtags: [], why: "w", render: { state: "ready" } }],
+  }));
+  const res = await source.DELETE(new Request("http://localhost", { method: "DELETE" }), ctx({ id: job.id }) as never);
+  expect(res.status).toBe(200);
+  expect((await res.json()).job).toMatchObject({ sourceDeleted: true, clips: [{ id: "tiktok-m-30" }] });
+  expect(existsSync(video)).toBe(false);
+  const hook = await hookRoute.POST(new Request("http://localhost", { method: "POST", body: JSON.stringify({ hook: "New" }) }), ctx({ id: job.id, clipId: "tiktok-m-30" }) as never);
+  expect(hook.status).toBe(409);
+});
