@@ -16,7 +16,8 @@ import { fuseMoments, matchClock } from "./moments";
 import { SPORT } from "./sports";
 import { openaiConfigured, structured, transcribePiece } from "./openai";
 import { clipSeconds, planClips } from "./planner";
-import { dataDir, jobFile, jobWords, listJobs, setStage, updateJob } from "./store";
+import { dataDir, getJob, jobFile, jobWords, listJobs, setStage, updateJob } from "./store";
+import { notifyWebhook } from "./webhook";
 import type { Job, JobMoment, SourceInfo, StageId, Word } from "./types";
 
 // Runs a job's stages in order, saving after each so the page can follow along. Jobs run one at a time:
@@ -76,6 +77,8 @@ async function drain() {
       } finally {
         state.running = undefined;
       }
+      const finished = await getJob(id);
+      if (finished && (finished.status === "done" || finished.status === "failed")) await notifyWebhook(finished);
     }
   } finally {
     state.busy = false;

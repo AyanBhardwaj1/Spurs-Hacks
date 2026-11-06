@@ -70,6 +70,8 @@ Write copy, and mark where the play is on sampled frames. It sees each clip's mo
 
 ## Settings
 
+Set `RUNDOWN_WEBHOOK_URL` and the server posts JSON there whenever a job, or a re-render of some of its clips, finishes or fails: the event (`job.done` or `job.failed`), the job's page, and each rendered clip's platform, place in the posting order, length, hook, post text and download links. Links are built on `RUNDOWN_PUBLIC_URL`. One try, ten seconds; a failed post is logged and never fails the job.
+
 | Variable | Default | Use |
 | --- | --- | --- |
 | `OPENAI_API_KEY` | unset | Turns on the transcript and the model's copy. Without it the job runs on the crowd alone and says so. |
