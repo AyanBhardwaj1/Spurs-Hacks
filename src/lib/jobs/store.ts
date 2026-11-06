@@ -77,6 +77,7 @@ export async function createJob(input: NewJob): Promise<Job> {
     ...(input.replay && { replay: true }),
     ...(input.colour && { brand: { colour: input.colour } }),
     ...(input.language && { language: input.language }),
+    ...(input.hashtags?.length && { hashtags: input.hashtags }),
     createdAt: new Date().toISOString(),
     status: "uploading",
     upload: { fileName: input.fileName, size: input.size, received: 0 },

@@ -96,3 +96,10 @@ test("a post language is one Rundown lists, and English is the same as none", ()
   expect(parseNewJob({ ...valid, language: "English" })).toEqual({ ok: true, value: valid });
   expect(parseNewJob({ ...valid, language: "Klingon" })).toMatchObject({ ok: false });
 });
+
+test("a job's own hashtags are up to five words, a leading # dropped", () => {
+  expect(parseNewJob({ ...valid, hashtags: ["#COYS", "THFC"] })).toEqual({ ok: true, value: { ...valid, hashtags: ["COYS", "THFC"] } });
+  expect(parseNewJob({ ...valid, hashtags: ["two words"] })).toMatchObject({ ok: false });
+  expect(parseNewJob({ ...valid, hashtags: ["a", "b", "c", "d", "e", "f"] })).toMatchObject({ ok: false });
+  expect(parseNewJob({ ...valid, hashtags: [] })).toEqual({ ok: true, value: valid });
+});

@@ -212,7 +212,7 @@ async function runStages(id: string) {
   });
 
   await stage(id, "plan", async (job) => {
-    const plan = planClips({ moments, placements: job.placements, durationSec: info.durationSec, sport: job.sport, title: job.title, replay: job.replay });
+    const plan = planClips({ moments, placements: job.placements, durationSec: info.durationSec, sport: job.sport, title: job.title, replay: job.replay, hashtags: job.hashtags });
     const { skipped } = plan;
     let { clips } = plan;
     let detail = `${clips.length} clips across ${job.placements.length} platforms`;

@@ -110,6 +110,8 @@ export type Job = {
   brand?: { colour?: string; logo?: "png" | "jpg" };
   /** The language the model writes the hooks, captions and titles in; English when absent. */
   language?: Language;
+  /** Hashtags the job adds before the sport's own, written without the #. */
+  hashtags?: string[];
   /** Whether short clips end with a slow-motion replay of their play. */
   replay?: boolean;
   /** The match video was deleted to free space; the clips stay, and nothing can cut the match again. */

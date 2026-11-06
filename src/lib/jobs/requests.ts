@@ -13,12 +13,12 @@ const maxUploadBytes = () => Number(process.env.RUNDOWN_MAX_UPLOAD_GB || 12) * 1
 const VIDEO_FILE = /\.(mp4|mov|m4v|mkv|webm|mts|ts)$/i;
 const TITLE_MAX = 120;
 
-export type NewJob = { title: string; sport: JobSport; placements: JobPlacement[]; fileName: string; size: number; replay?: boolean; colour?: string; language?: Language };
+export type NewJob = { title: string; sport: JobSport; placements: JobPlacement[]; fileName: string; size: number; replay?: boolean; colour?: string; language?: Language; hashtags?: string[] };
 type Parsed<T> = { ok: true; value: T } | { ok: false; error: string };
 
 export function parseNewJob(body: unknown): Parsed<NewJob> {
   if (typeof body !== "object" || body === null) return { ok: false, error: "Send a JSON body." };
-  const { title, sport, placements, fileName, size, replay, colour, language } = body as Record<string, unknown>;
+  const { title, sport, placements, fileName, size, replay, colour, language, hashtags } = body as Record<string, unknown>;
   if (typeof title !== "string" || !title.trim() || title.trim().length > TITLE_MAX) return { ok: false, error: `Give the match a title of 1 to ${TITLE_MAX} characters.` };
   if (!SPORTS.includes(sport as JobSport)) return { ok: false, error: `sport must be one of ${SPORTS.join(", ")}.` };
   if (!Array.isArray(placements) || placements.length === 0 || !placements.every((p) => JOB_PLACEMENTS.includes(p as JobPlacement))) {
@@ -29,10 +29,14 @@ export function parseNewJob(body: unknown): Parsed<NewJob> {
   if (size > maxUploadBytes()) return { ok: false, error: `The file is over the ${maxUploadBytes() / 1024 ** 3} GB upload limit.` };
   if (replay !== undefined && typeof replay !== "boolean") return { ok: false, error: "replay must be true or false." };
   if (colour !== undefined && (typeof colour !== "string" || !HEX.test(colour))) return { ok: false, error: "colour must be a hex colour such as #FFD60A." };
+  const tags = Array.isArray(hashtags) ? hashtags.map((h) => (typeof h === "string" ? h.trim().replace(/^#/, "") : "")) : [];
+  if (hashtags !== undefined && (!Array.isArray(hashtags) || tags.length > 5 || !tags.every((t) => /^[\p{L}\p{N}_]{1,30}$/u.test(t)))) {
+    return { ok: false, error: "hashtags must be up to five single words, letters, numbers or _." };
+  }
   if (language !== undefined && !LANGUAGES.includes(language as Language)) return { ok: false, error: `language must be one of ${LANGUAGES.join(", ")}.` };
   return {
     ok: true,
-    value: { title: title.trim(), sport: sport as JobSport, placements: [...new Set(placements as JobPlacement[])], fileName, size, ...(replay && { replay }), ...(colour && { colour: colour.toUpperCase() }), ...(language !== undefined && language !== "English" ? { language: language as Language } : {}) },
+    value: { title: title.trim(), sport: sport as JobSport, placements: [...new Set(placements as JobPlacement[])], fileName, size, ...(replay && { replay }), ...(colour && { colour: colour.toUpperCase() }), ...(language !== undefined && language !== "English" ? { language: language as Language } : {}), ...(tags.length ? { hashtags: tags } : {}) },
   };
 }
 

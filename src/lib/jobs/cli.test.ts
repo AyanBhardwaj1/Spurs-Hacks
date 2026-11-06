@@ -21,6 +21,8 @@ test("mistakes are named, so the user can fix them", () => {
   expect(parseCli(["a.mp4", "--sport", "chess"])).toMatchObject({ ok: false, error: expect.stringContaining("chess") });
   expect(parseCli(["a.mp4", "--platforms", "tiktok,myspace"])).toMatchObject({ ok: false, error: expect.stringContaining("myspace") });
   expect(parseCli(["a.mp4", "--colour", "red"])).toMatchObject({ ok: false });
+  expect(parseCli(["a.mp4", "--hashtags", "#COYS,THFC"])).toMatchObject({ ok: true, value: { hashtags: ["COYS", "THFC"] } });
+  expect(parseCli(["a.mp4", "--hashtags", "two words"])).toMatchObject({ ok: false });
   expect(parseCli(["a.mp4", "--language", "elvish"])).toMatchObject({ ok: false, error: expect.stringContaining("elvish") });
   expect(parseCli(["a.mp4", "--frobnicate"])).toMatchObject({ ok: false, error: expect.stringContaining("--frobnicate") });
   expect(parseCli(["a.txt"])).toMatchObject({ ok: false });

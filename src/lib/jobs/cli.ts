@@ -10,6 +10,7 @@ export const USAGE = `Usage: bun run rundown <video> [options]
   --title <text>         the match's name (default: the file name)
   --replay               end each short clip with a slow-motion replay
   --language <name>      write the copy in ${LANGUAGES.join(", ")} (needs OPENAI_API_KEY)
+  --hashtags <a,b>       your own hashtags, before the sport's (up to five)
   --colour <#RRGGBB>     the colour the caption word being said turns
   --logo <file>          a PNG or JPEG laid over every clip and cover
   --out <folder>         where the clips, covers and manifest go (default: rundown-<file name>)`;
@@ -21,6 +22,7 @@ export type CliJob = {
   placements: JobPlacement[];
   replay: boolean;
   language?: Language;
+  hashtags?: string[];
   colour?: string;
   logo?: string;
   out: string;
@@ -29,7 +31,7 @@ export type CliJob = {
 type Parsed<T> = { ok: true; value: T } | { ok: false; error: string };
 
 const VIDEO = /\.(mp4|mov|m4v|mkv|webm|ts|mts)$/i;
-const FLAGS = new Set(["sport", "platforms", "title", "colour", "color", "logo", "out", "language"]);
+const FLAGS = new Set(["sport", "platforms", "title", "colour", "color", "logo", "out", "language", "hashtags"]);
 
 export function parseCli(argv: string[]): Parsed<CliJob> {
   const opts: Record<string, string> = {};
@@ -63,6 +65,8 @@ export function parseCli(argv: string[]): Parsed<CliJob> {
   const unknown = placements.filter((p) => !JOB_PLACEMENTS.includes(p as JobPlacement));
   if (unknown.length || placements.length === 0) return { ok: false, error: `No platform called ${unknown.join(", ") || "(none)"}. Pick from ${JOB_PLACEMENTS.join(", ")}.` };
   if (opts.colour !== undefined && !/^#[0-9a-f]{6}$/i.test(opts.colour)) return { ok: false, error: "--colour must be a hex colour such as #FFD60A." };
+  const tags = opts.hashtags?.split(",").map((t) => t.trim().replace(/^#/, "")).filter(Boolean) ?? [];
+  if (tags.length > 5 || !tags.every((t) => /^[\p{L}\p{N}_]{1,30}$/u.test(t))) return { ok: false, error: "--hashtags takes up to five single words, separated by commas." };
   const language = opts.language && LANGUAGES.find((l) => l.toLowerCase() === opts.language.toLowerCase());
   if (opts.language && !language) return { ok: false, error: `No language called "${opts.language}". Pick one of ${LANGUAGES.join(", ")}.` };
 
@@ -76,6 +80,7 @@ export function parseCli(argv: string[]): Parsed<CliJob> {
       placements: [...new Set(placements as JobPlacement[])],
       replay,
       ...(language && language !== "English" && { language }),
+      ...(tags.length && { hashtags: tags }),
       ...(opts.colour && { colour: opts.colour.toUpperCase() }),
       ...(opts.logo && { logo: opts.logo }),
       out: opts.out ?? `rundown-${base}`,

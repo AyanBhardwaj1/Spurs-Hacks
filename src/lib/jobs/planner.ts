@@ -156,9 +156,10 @@ export function hookOptions(m: JobMoment, jobTitle: string): string[] {
   return [...new Set(options)];
 }
 
-function copy(placement: JobPlacement, hook: string, jobTitle: string, sport: JobSport, when: number) {
+function copy(placement: JobPlacement, hook: string, jobTitle: string, sport: JobSport, when: number, own: string[] = []) {
   const p = spec(placement);
-  const hashtags = SPORT[sport].tags.slice(0, p.hashtagLimit);
+  // The job's own tags first, then the sport's, so a club's tag survives a platform's short limit.
+  const hashtags = [...new Set([...own, ...SPORT[sport].tags])].slice(0, p.hashtagLimit);
   const tags = hashtags.map((h) => `#${h}`).join(" ");
   const room = p.captionLimit - (tags ? tags.length + 1 : 0);
   return { hashtags, caption: fit(`${hook} · ${matchClock(when)} · ${jobTitle}`, room) };
@@ -167,9 +168,9 @@ function copy(placement: JobPlacement, hook: string, jobTitle: string, sport: Jo
 const clamp = (t: number, durationSec: number) => Math.min(durationSec, Math.max(0, t));
 const round = (t: number) => Math.round(t * 1000) / 1000;
 
-type Plan = { moments: JobMoment[]; placements: JobPlacement[]; durationSec: number; sport: JobSport; title: string; replay?: boolean };
+type Plan = { moments: JobMoment[]; placements: JobPlacement[]; durationSec: number; sport: JobSport; title: string; replay?: boolean; hashtags?: string[] };
 
-export function planClips({ moments, placements, durationSec, sport, title, replay = false }: Plan): { clips: JobClip[]; skipped: JobSkip[] } {
+export function planClips({ moments, placements, durationSec, sport, title, replay = false, hashtags = [] }: Plan): { clips: JobClip[]; skipped: JobSkip[] } {
   const ranked = [...moments].sort((a, b) => b.score - a.score || a.peak - b.peak);
   const strong = ranked.filter((m) => m.score >= MIN_SCORE);
   const clips: JobClip[] = [];
@@ -199,7 +200,7 @@ export function planClips({ moments, placements, durationSec, sport, title, repl
         segments,
         title: fit(`${title}: the match in ${sec} seconds`, 100),
         hook,
-        ...copy(placement, hook, title, sport, top[0].peak),
+        ...copy(placement, hook, title, sport, top[0].peak, hashtags),
         why: `The top ${top.length} moments in match order, ${sec} s in all: the whole game for someone scrolling a vertical feed.`,
         render: { state: "waiting" },
       });
@@ -228,7 +229,7 @@ export function planClips({ moments, placements, durationSec, sport, title, repl
         segments,
         title: fit(`${title}: highlights`, spec(placement).titleLimit ?? 100),
         hook: fit(title, HOOK_MAX),
-        ...copy(placement, `${title}: the ${top.length} biggest moments`, title, sport, top[0].peak),
+        ...copy(placement, `${title}: the ${top.length} biggest moments`, title, sport, top[0].peak, hashtags),
         why: `One ${sec} s highlights cut of the top ${top.length} moments in match order, for viewers who missed the game.`,
         render: { state: "waiting" },
         ...(chapters.length > 0 && { chapters }),
@@ -259,7 +260,7 @@ export function planClips({ moments, placements, durationSec, sport, title, repl
         hooks: hookOptions(m, title),
         title: fit(m.title, spec(placement).titleLimit ?? 100),
         hook,
-        ...copy(placement, hook, title, sport, m.peak),
+        ...copy(placement, hook, title, sport, m.peak, hashtags),
         why: m.settle === undefined ? style.why(Math.round(end - start), Math.round(m.peak - start)) : `${style.why(Math.round(end - start), Math.round(m.peak - start)).replace(/ and ends while it is still loud/, "")} It ends a second after the crowd settles.`,
         render: { state: "waiting" },
       });

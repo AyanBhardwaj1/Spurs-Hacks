@@ -25,7 +25,7 @@ export async function POST(request: Request, ctx: RouteContext<"/api/jobs/[id]/m
   const next = await updateJob(id, (j) => {
     if (j.status !== "done" || !j.source) return j;
     const moment = pickedMoment(parsed.value, words, j.source.durationSec, new Set(j.moments.map((m) => m.id)));
-    const { clips } = planClips({ moments: [moment], placements, durationSec: j.source.durationSec, sport: j.sport, title: j.title, replay: j.replay });
+    const { clips } = planClips({ moments: [moment], placements, durationSec: j.source.durationSec, sport: j.sport, title: j.title, replay: j.replay, hashtags: j.hashtags });
     clipIds = clips.map((c) => c.id);
     return { ...j, status: "queued", moments: [...j.moments, moment], clips: [...j.clips, ...clips] };
   });

@@ -148,3 +148,9 @@ test("each short clip offers other hooks to pick from: the quote, then lines tha
   const { clips } = planClips({ ...base, moments: [quoted], placements: ["tiktok"] });
   expect(clips[0].hooks).toEqual(hookOptions(quoted, "City v United"));
 });
+
+test("a job's own hashtags come before the sport's, inside each platform's limit, without repeats", () => {
+  const { clips } = planClips({ ...base, moments: [moment(1000, 1)], placements: ["tiktok", "x-video"], hashtags: ["COYS", "football"] });
+  expect(clips.find((c) => c.placement === "tiktok")!.hashtags).toEqual(["COYS", "football", "soccer", "goal", "matchday"]);
+  expect(clips.find((c) => c.placement === "x-video")!.hashtags).toEqual(["COYS", "football"]);
+});

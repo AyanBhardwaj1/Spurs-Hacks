@@ -10,18 +10,22 @@ import { uploadFile } from "./upload";
 
 const DEFAULT_HIGHLIGHT = "#FFD60A";
 
+/** "#COYS, THFC" as ["COYS", "THFC"]: split on spaces and commas, the # dropped. */
+const splitTags = (text: string) => text.split(/[\s,]+/).map((t) => t.replace(/^#/, "")).filter(Boolean);
+
 const mb = (bytes: number) => `${(bytes / 1024 ** 2).toFixed(bytes < 1024 ** 3 ? 0 : 1)} MB`;
 
 // Upload a match and choose where its clips go. The video goes up in chunks the server can resume, and
 // the page moves to the job as soon as the last chunk lands.
 export function NewJobForm() {
   const router = useRouter();
-  const ids = { title: useId(), sport: useId(), file: useId(), replay: useId(), colour: useId(), logo: useId(), language: useId() };
+  const ids = { title: useId(), sport: useId(), file: useId(), replay: useId(), colour: useId(), logo: useId(), language: useId(), tags: useId() };
   const [title, setTitle] = useState("");
   const [sport, setSport] = useState<JobSport>("soccer");
   const [placements, setPlacements] = useState<JobPlacement[]>(DEFAULT_PLACEMENTS);
   const [replay, setReplay] = useState(false);
   const [language, setLanguage] = useState<Language>("English");
+  const [tags, setTags] = useState("");
   const [colour, setColour] = useState(DEFAULT_HIGHLIGHT);
   const [logo, setLogo] = useState<File | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -41,7 +45,7 @@ export function NewJobForm() {
       const res = await fetch("/api/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title.trim(), sport, placements, replay, colour, language, fileName: file.name, size: file.size }),
+        body: JSON.stringify({ title: title.trim(), sport, placements, replay, colour, language, hashtags: splitTags(tags), fileName: file.name, size: file.size }),
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? `The server answered ${res.status}.`);
@@ -127,6 +131,14 @@ export function NewJobForm() {
           ))}
         </select>
         <p className="text-caption text-secondary">The hooks, captions and titles are written in it. Any language but English needs an OpenAI key on the server.</p>
+      </div>
+
+      <div className="grid gap-2">
+        <label htmlFor={ids.tags} className="text-footnote font-semibold">
+          Your hashtags
+        </label>
+        <input id={ids.tags} value={tags} onChange={(e) => setTags(e.target.value)} placeholder="#COYS #THFC" className="h-11 max-w-[420px] rounded-lg bg-fill px-3 text-body text-label placeholder:text-secondary/70" />
+        <p className="text-caption text-secondary">Up to five, placed before the sport&apos;s own, so they survive a platform&apos;s limit.</p>
       </div>
 
       <fieldset className="grid gap-3">
