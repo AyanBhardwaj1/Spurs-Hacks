@@ -4,6 +4,10 @@ mock.module("server-only", () => ({}));
 const { POST } = await import("./route");
 const originalKey = process.env.SCOREPLAY_API_KEY;
 
+
+/** Calls this test cares about: ScorePlay's. Other tests' leftover work may still use fetch for other hosts. */
+const scoreplayCalls = (mock: { mock: { calls: unknown[][] } }) =>
+  mock.mock.calls.filter(([input]) => String(input instanceof Request ? input.url : input).includes("scoreplay.io"));
 afterEach(() => {
   mock.restore();
   if (originalKey === undefined) delete process.env.SCOREPLAY_API_KEY;
@@ -19,5 +23,5 @@ test("without a ScorePlay key, a decision is refused as offline so the page can 
   );
   expect(response.status).toBe(503);
   expect(await response.json()).toMatchObject({ offline: true });
-  expect(fetchMock).not.toHaveBeenCalled();
+  expect(scoreplayCalls(fetchMock)).toEqual([]);
 });

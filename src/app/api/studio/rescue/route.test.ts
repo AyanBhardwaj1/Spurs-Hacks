@@ -6,6 +6,10 @@ const { loadStudioAnalysis } = await import("@/lib/studio/load");
 const { rescueKey } = await import("@/lib/studio/rescue-log");
 const originalKey = process.env.SCOREPLAY_API_KEY;
 
+
+/** Calls this test cares about: ScorePlay's. Other tests' leftover work may still use fetch for other hosts. */
+const scoreplayCalls = (mock: { mock: { calls: unknown[][] } }) =>
+  mock.mock.calls.filter(([input]) => String(input instanceof Request ? input.url : input).includes("scoreplay.io"));
 afterEach(() => {
   mock.restore();
   if (originalKey === undefined) delete process.env.SCOREPLAY_API_KEY;
@@ -46,7 +50,7 @@ test("without a ScorePlay key, a real candidate comes back offline with the rang
   const response = await rescue({ at: item.at, title: item.title });
   expect(response.status).toBe(503);
   expect(await response.json()).toMatchObject({ offline: true, start: moment.start, end: moment.end });
-  expect(fetchMock).not.toHaveBeenCalled();
+  expect(scoreplayCalls(fetchMock)).toEqual([]);
 });
 
 test("without a ScorePlay key, a candidate outside the run is still a 404", async () => {
@@ -58,7 +62,7 @@ test("returns 404 for a candidate outside the committed run, without calling Sco
   process.env.SCOREPLAY_API_KEY = "test-key";
   const fetchMock = spyOn(globalThis, "fetch");
   expect((await rescue({ at: 1, title: "nope" })).status).toBe(404);
-  expect(fetchMock).not.toHaveBeenCalled();
+  expect(scoreplayCalls(fetchMock)).toEqual([]);
 });
 
 test("writes a real candidate once and reads it back, then reports it as already logged", async () => {
