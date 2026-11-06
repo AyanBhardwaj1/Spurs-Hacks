@@ -307,7 +307,7 @@ async function renderClips(id: string, clipIds: string[], source: string, words:
   for (const clipId of clipIds) {
     await updateJob(id, (j) => ({ ...j, clips: j.clips.map((c) => (c.id === clipId ? { ...c, render: { state: "rendering" } } : c)) }));
     const result = await renderOne(id, clipId, source, words, hasAudio, font).then(
-      ({ file, cover }) => ({ state: "ready" as const, file, ...(cover && { cover }) }),
+      ({ file, cover, probe }) => ({ state: "ready" as const, file, ...(cover && { cover }), ...(probe && { probe }) }),
       (err: Error) => ({ state: "failed" as const, error: err.message }),
     );
     if (result.state === "ready") ready += 1;
@@ -357,7 +357,13 @@ async function renderOne(id: string, clipId: string, source: string, words: Word
   );
   if (coverRun.code !== 0) console.warn(`[jobs] ${id} cover for ${clip.id} failed: ${lastLine(coverRun.stderr)}`);
   await rm(dir, { recursive: true, force: true });
-  return { file: path.basename(output), cover: coverRun.code === 0 ? path.basename(coverFile) : undefined };
+  // Measured, not assumed: the pre-post checks read what ffmpeg actually wrote.
+  const measured = await probe(output).catch(() => undefined);
+  return {
+    file: path.basename(output),
+    cover: coverRun.code === 0 ? path.basename(coverFile) : undefined,
+    probe: measured && { width: measured.width, height: measured.height, durationSec: measured.durationSec, hasAudio: measured.hasAudio },
+  };
 }
 
 /** Vision marks one frame a second; the camera's pan is measured five times a second between them. */

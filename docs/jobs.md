@@ -52,6 +52,8 @@ Above the clips, a timeline draws the crowd's loudness across the whole match wi
 
 A "Post first" list above the clips names each platform's clip to post first, skipping rejected ones. On any rendered clip, "App zones" shades what the app draws over it (the top bar, the caption and account at the bottom, and on a vertical feed the button rail), so you can check the play is not hidden under them.
 
+After rendering, each clip's file is measured, and the card checks it and its post against the platform: the frame size, the length against the platform's limit, that it has sound, the post's length (counted X's way on X) and the number of hashtags. "Ready for TikTok" means all five pass; anything that would fail on the platform is listed.
+
 Review from the keyboard: J and K move between clips in the order the page shows them, A approves and moves on, R rejects and moves on, U undoes. Each finished stage shows how long it took.
 
 Each platform's clips are shown in posting order, and the card says why: a clip's strength is half its moment's score, plus points for evidence the job has about the clip (the crowd and the commentary agreed, the commentary called it, the cut ends as the crowd settles, the crop follows the play or nothing is cropped, the clip is short enough to watch twice). It is a rule you can check, not a prediction of views. The rule is in `src/lib/jobs/rank.ts`, and the manifest in the zip carries each clip's place in the order.

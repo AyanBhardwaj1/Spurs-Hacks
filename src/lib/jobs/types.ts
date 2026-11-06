@@ -79,7 +79,14 @@ export type JobClip = {
   /** Why this cut suits this platform, in one sentence a producer can argue with. */
   why: string;
   /** cover is the clip's cover image, made after the clip; a clip can be ready without one. */
-  render: { state: "waiting" | "rendering" | "ready" | "failed"; file?: string; cover?: string; error?: string };
+  render: {
+    state: "waiting" | "rendering" | "ready" | "failed";
+    file?: string;
+    cover?: string;
+    /** The rendered file as measured, for the pre-post checks. */
+    probe?: { width: number; height: number; durationSec: number; hasAudio: boolean };
+    error?: string;
+  };
   /** Other hooks a producer can swap in, the first being the one the rules chose. */
   hooks?: string[];
   /** Source seconds replayed at half speed after the segments, when the job asked for replays. */

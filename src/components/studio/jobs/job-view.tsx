@@ -7,6 +7,7 @@ import { PLACEMENTS } from "@/lib/rundown/platforms";
 import { matchClock } from "@/lib/jobs/moments";
 import { clipSeconds, isMontage } from "@/lib/jobs/planner";
 import { postText } from "@/lib/jobs/post";
+import { preflight } from "@/lib/jobs/preflight";
 import { postOrder, type Strength } from "@/lib/jobs/rank";
 import { SPORT } from "@/lib/jobs/sports";
 import type { JobSummary } from "@/lib/jobs/summary";
@@ -260,6 +261,28 @@ function PickBar({ jobId, at, onCancel, onQueued }: { jobId: string; at: number;
   );
 }
 
+// The rendered file and its post, checked against the platform: one line when all is well, the list on demand.
+function Preflight({ clip }: { clip: JobClip }) {
+  const checks = preflight(clip);
+  if (checks.length === 0) return null;
+  const failed = checks.filter((c) => !c.ok);
+  return (
+    <details className="mt-2 text-caption">
+      <summary className={`cursor-pointer font-semibold ${failed.length ? "text-tally" : "text-go"}`}>
+        {failed.length ? `${failed.length} ${failed.length === 1 ? "problem" : "problems"} for ${PLACEMENTS[clip.placement].platform}` : `Ready for ${PLACEMENTS[clip.placement].platform}`}
+      </summary>
+      <ul className="mt-1 space-y-0.5 pl-1">
+        {checks.map((c) => (
+          <li key={c.label} className={c.ok ? "text-secondary" : "text-tally"}>
+            <span aria-hidden>{c.ok ? "✓ " : "✗ "}</span>
+            {c.label}
+          </li>
+        ))}
+      </ul>
+    </details>
+  );
+}
+
 const Kbd = ({ children }: { children: string }) => <kbd className="num rounded border border-separator bg-fill px-1.5 py-px text-caption font-semibold text-label">{children}</kbd>;
 
 /** How long a finished stage took, as "4 s" or "2 min 5 s"; nothing for a stage that has not finished. */
@@ -364,6 +387,7 @@ function ClipCard({ jobId, clip, strength, editable, hasCaptions, durationSec, o
       </p>
       <p className="mt-2 whitespace-pre-line text-caption text-label/85 text-pretty">{post}</p>
       <p className="mt-2 text-caption text-secondary text-pretty">{clip.why}</p>
+      <Preflight clip={clip} />
       <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-2 pt-3">
         <button
           type="button"

@@ -57,6 +57,7 @@ test.skipIf(!haveFfmpeg)(
       expect(out.hasAudio).toBe(true);
       // ffmpeg reads a JPEG's size the same way it reads a video's.
       expect(clip.render.cover).toBe(`${clip.id}.jpg`);
+      expect(clip.render.probe).toMatchObject({ width: expected[0], height: expected[1], hasAudio: true });
       const cover = await probe(jobFile.cover(job.id, clip.id));
       expect([cover.width, cover.height]).toEqual(expected);
     }
