@@ -90,3 +90,9 @@ test("a hook is 1 to 60 characters of text, trimmed", () => {
   expect(parseHook({ hook: "x".repeat(61) })).toMatchObject({ ok: false });
   expect(parseHook({})).toMatchObject({ ok: false });
 });
+
+test("a post language is one Rundown lists, and English is the same as none", () => {
+  expect(parseNewJob({ ...valid, language: "Spanish" })).toEqual({ ok: true, value: { ...valid, language: "Spanish" } });
+  expect(parseNewJob({ ...valid, language: "English" })).toEqual({ ok: true, value: valid });
+  expect(parseNewJob({ ...valid, language: "Klingon" })).toMatchObject({ ok: false });
+});

@@ -24,6 +24,10 @@ export const PLACEMENT_LABEL: Record<JobPlacement, string> = {
 /** What a new job is cut for unless someone picks otherwise: the four short-form feeds. */
 export const DEFAULT_PLACEMENTS: JobPlacement[] = ["tiktok", "instagram-reel", "youtube-short", "x-video"];
 
+/** Languages the model can write a job's post copy in. English needs no key; the rest need the model. */
+export const LANGUAGES = ["English", "Spanish", "Portuguese", "French", "German", "Italian", "Arabic", "Japanese", "Korean", "Hindi", "Indonesian", "Turkish"] as const;
+export type Language = (typeof LANGUAGES)[number];
+
 export const SPORTS = [
   "soccer", "basketball", "american-football", "ice-hockey", "baseball", "tennis", "cricket", "rugby", "volleyball", "combat", "motorsport", "esports", "other",
 ] as const;
@@ -97,6 +101,8 @@ export type Job = {
   status: "uploading" | "queued" | "running" | "done" | "failed";
   /** The club's colour for the caption word being said, and whether a logo was uploaded to lay over every clip. */
   brand?: { colour?: string; logo?: "png" | "jpg" };
+  /** The language the model writes the hooks, captions and titles in; English when absent. */
+  language?: Language;
   /** Whether short clips end with a slow-motion replay of their play. */
   replay?: boolean;
   /** Runs started for this job; a restart mid-run starts another, up to a limit. */

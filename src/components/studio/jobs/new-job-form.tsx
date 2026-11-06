@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { PLACEMENTS } from "@/lib/rundown/platforms";
 import { SPORT } from "@/lib/jobs/sports";
-import { DEFAULT_PLACEMENTS, JOB_PLACEMENTS, PLACEMENT_LABEL, SPORTS, type JobPlacement, type JobSport } from "@/lib/jobs/types";
+import { DEFAULT_PLACEMENTS, JOB_PLACEMENTS, LANGUAGES, PLACEMENT_LABEL, type Language, SPORTS, type JobPlacement, type JobSport } from "@/lib/jobs/types";
 import { uploadFile } from "./upload";
 
 
@@ -16,11 +16,12 @@ const mb = (bytes: number) => `${(bytes / 1024 ** 2).toFixed(bytes < 1024 ** 3 ?
 // the page moves to the job as soon as the last chunk lands.
 export function NewJobForm() {
   const router = useRouter();
-  const ids = { title: useId(), sport: useId(), file: useId(), replay: useId(), colour: useId(), logo: useId() };
+  const ids = { title: useId(), sport: useId(), file: useId(), replay: useId(), colour: useId(), logo: useId(), language: useId() };
   const [title, setTitle] = useState("");
   const [sport, setSport] = useState<JobSport>("soccer");
   const [placements, setPlacements] = useState<JobPlacement[]>(DEFAULT_PLACEMENTS);
   const [replay, setReplay] = useState(false);
+  const [language, setLanguage] = useState<Language>("English");
   const [colour, setColour] = useState(DEFAULT_HIGHLIGHT);
   const [logo, setLogo] = useState<File | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -40,7 +41,7 @@ export function NewJobForm() {
       const res = await fetch("/api/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title.trim(), sport, placements, replay, colour, fileName: file.name, size: file.size }),
+        body: JSON.stringify({ title: title.trim(), sport, placements, replay, colour, language, fileName: file.name, size: file.size }),
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? `The server answered ${res.status}.`);
@@ -113,6 +114,20 @@ export function NewJobForm() {
           })}
         </div>
       </fieldset>
+
+      <div className="grid gap-2">
+        <label htmlFor={ids.language} className="text-footnote font-semibold">
+          Post language
+        </label>
+        <select id={ids.language} value={language} onChange={(e) => setLanguage(e.target.value as Language)} className="h-11 w-fit rounded-lg bg-fill px-3 text-body text-label">
+          {LANGUAGES.map((l) => (
+            <option key={l} value={l}>
+              {l}
+            </option>
+          ))}
+        </select>
+        <p className="text-caption text-secondary">The hooks, captions and titles are written in it. Any language but English needs an OpenAI key on the server.</p>
+      </div>
 
       <fieldset className="grid gap-3">
         <legend className="text-footnote font-semibold">Your brand</legend>

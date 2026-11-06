@@ -38,6 +38,8 @@ The play comes before the crowd, so every short cut opens on the build-up and la
 | Vertical recap | 9:16 | the top 6 moments in match order, 6 to 8 s each, for any vertical feed | 1 |
 | YouTube | 16:9 | one highlights cut of the top 8 moments in match order | 1 |
 
+Pick a post language and the model writes every hook, caption and title in it, whatever language the commentary is in: English, Spanish, Portuguese, French, German, Italian, Arabic, Japanese, Korean, Hindi, Indonesian or Turkish. It needs `OPENAI_API_KEY`; without one the copy is in English and the plan stage says so.
+
 Under "Your brand", pick the colour the caption word being said turns, and add a logo (PNG or JPEG, up to 2 MB). The logo sits in the top corner of every clip and cover, under the band each app covers, at 14% of the short side and slightly see-through. `PUT /api/jobs/{id}/logo` with the image as the body does the same; clips rendered afterwards carry it.
 
 Tick "End each short clip with a slow-motion replay" on upload and every short clip ends with the three seconds around its play again at half speed, sound slowed with it and labelled Replay, which adds 6 s to the lengths above. The replay sits inside the cut, so trimming a clip moves its replay with it; the YouTube highlights cut never has one.

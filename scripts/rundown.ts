@@ -51,7 +51,7 @@ if (opts.logo) {
   logo = { bytes, type: checked.value };
 }
 
-const job = await createJob({ title: opts.title, sport: opts.sport, placements: opts.placements, fileName: path.basename(opts.video), size, replay: opts.replay, colour: opts.colour });
+const job = await createJob({ title: opts.title, sport: opts.sport, placements: opts.placements, fileName: path.basename(opts.video), size, replay: opts.replay, colour: opts.colour, language: opts.language });
 const source = jobFile.source(job.id, job.upload.fileName);
 // A hard link costs no space; across volumes the video is copied instead.
 await link(path.resolve(opts.video), source).catch(() => copyFile(opts.video, source));

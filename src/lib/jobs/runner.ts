@@ -201,9 +201,10 @@ async function runStages(id: string) {
     const { skipped } = plan;
     let { clips } = plan;
     let detail = `${clips.length} clips across ${job.placements.length} platforms`;
+    if (job.language && !openaiConfigured()) detail += `; the copy is in English, since writing it in ${job.language} needs an OpenAI key`;
     if (openaiConfigured() && clips.length > 0) {
       try {
-        const { system, user } = copyPrompt(clips, moments, job.sport, job.title);
+        const { system, user } = copyPrompt(clips, moments, job.sport, job.title, job.language);
         clips = applyCopy(clips, await structured({ name: "clip_copy", system, user, schema: COPY_SCHEMA, check: isCopyAnswer }));
         await updateJob(id, (j) => ({ ...j, services: { ...j.services, model: true } }));
         detail += ", copy written by the model";
@@ -244,7 +245,7 @@ async function runRender(id: string, clipIds: string[], writeCopy = false) {
       // Clips for a platform added later get the model's copy, like the ones planned in the first run.
       const fresh = job.clips.filter((c) => clipIds.includes(c.id));
       try {
-        const { system, user } = copyPrompt(fresh, job.moments, job.sport, job.title);
+        const { system, user } = copyPrompt(fresh, job.moments, job.sport, job.title, job.language);
         const answer = await structured({ name: "clip_copy", system, user, schema: COPY_SCHEMA, check: isCopyAnswer });
         const written = new Map(applyCopy(fresh, answer).map((c) => [c.id, c]));
         job = await updateJob(id, (j) => ({ ...j, clips: j.clips.map((c) => written.get(c.id) ?? c) }));

@@ -58,7 +58,7 @@ export function applyCopy(clips: JobClip[], answer: CopyAnswer): JobClip[] {
 }
 
 /** The system and user messages for one copy call. */
-export function copyPrompt(clips: JobClip[], moments: JobMoment[], sport: JobSport, jobTitle: string) {
+export function copyPrompt(clips: JobClip[], moments: JobMoment[], sport: JobSport, jobTitle: string, language?: string) {
   const byId = new Map(moments.map((m) => [m.id, m]));
   const system = [
     "You write social video copy for a sports club's content team. For each clip, write a hook (the text burned",
@@ -66,10 +66,12 @@ export function copyPrompt(clips: JobClip[], moments: JobMoment[], sport: JobSpo
     "Write like the platform: TikTok and Reels casual and punchy, X short and newsy, YouTube descriptive.",
     "Use only what the moment and its quote say happened. Never invent a score, a player's name or a result.",
     "Leave hashtags out; they are added separately. Answer for every clip id you are given and no others.",
+    ...(language ? [`Write the hook, caption and title in ${language}, whatever language the commentary is in.`] : []),
   ].join(" ");
   const user = JSON.stringify({
     match: jobTitle,
     sport: SPORT[sport].label,
+    ...(language && { language }),
     clips: clips.map((c) => {
       const m = byId.get(c.momentId);
       return { id: c.id, platform: spec(c.placement).platform, placement: spec(c.placement).placement, captionLimit: spec(c.placement).captionLimit, moment: m?.title, said: m?.quote?.slice(0, 600) };

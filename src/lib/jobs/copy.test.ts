@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { applyCopy, isCopyAnswer } from "./copy";
+import { applyCopy, copyPrompt, isCopyAnswer } from "./copy";
 import type { JobClip } from "./types";
 
 const clip = (id: string, placement: JobClip["placement"]): JobClip => ({
@@ -33,4 +33,11 @@ test("model copy replaces rule copy within each platform's limits, and never tou
   expect(tiktok.title).toBe("Crowd erupts at 0:20");
   expect(out).toHaveLength(2);
   expect(clips[0].hook).toBe("Listen to this crowd");
+});
+
+test("with a post language, the model is told to write in it whatever the commentary's language", () => {
+  const { system, user } = copyPrompt([], [], "soccer", "Final", "Spanish");
+  expect(system).toContain("Write the hook, caption and title in Spanish");
+  expect(JSON.parse(user).language).toBe("Spanish");
+  expect(copyPrompt([], [], "soccer", "Final").system).not.toContain("Write the hook, caption and title in");
 });
