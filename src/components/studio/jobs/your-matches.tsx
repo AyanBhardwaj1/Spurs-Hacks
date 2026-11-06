@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Job } from "@/lib/jobs/types";
 import { JobLink } from "./job-view";
+import { TrySample } from "./try-sample";
 
 type Summary = Pick<Job, "id" | "title" | "status"> & { clips: number };
 
@@ -24,9 +25,12 @@ export function YourMatches() {
           </h2>
           <p className="mt-1 text-footnote text-secondary">Upload a full game and get clips cut for TikTok, Reels, Shorts, X and YouTube.</p>
         </div>
-        <Link href="/studio/new" className="press inline-flex h-10 items-center rounded-full bg-button px-5 text-footnote font-semibold text-white hover:bg-button-hover">
-          Upload a match
-        </Link>
+        <div className="flex flex-wrap items-start gap-3">
+          <TrySample />
+          <Link href="/studio/new" className="press inline-flex h-10 items-center rounded-full bg-button px-5 text-footnote font-semibold text-white hover:bg-button-hover">
+            Upload a match
+          </Link>
+        </div>
       </div>
       {jobs && jobs.length > 0 && (
         <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">

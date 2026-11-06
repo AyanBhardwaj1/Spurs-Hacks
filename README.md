@@ -6,7 +6,7 @@ It started at the Spurs² Hackathon (UT Austin, October 22 to 23, 2026) as a too
 
 ## Make clips from any match
 
-Open `/studio`, press **Upload a match**, and pick the platforms. Each gets its own cut:
+Open `/studio`, press **Upload a match**, and pick the platforms. No video to hand? **Try a sample match** makes a synthetic three-minute game on the server and runs the whole pipeline on it. Each platform gets its own cut:
 
 | Platform | Shape | Cut | Moments |
 | --- | --- | --- | --- |

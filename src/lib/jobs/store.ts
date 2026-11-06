@@ -176,3 +176,13 @@ export function updateJob(id: string, change: (job: Job) => Job | Promise<Job>):
     return next;
   });
 }
+
+/** Marks a job whose source was written on the server, not uploaded, as ready to run. */
+export function adoptSource(id: string, size: number, detail: string): Promise<Job> {
+  return updateJob(id, (j) => ({
+    ...j,
+    status: "queued",
+    upload: { ...j.upload, size, received: size },
+    stages: setStage(j.stages, "upload", { state: "done", detail, endedAt: new Date().toISOString() }),
+  }));
+}
