@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { mkdir, open, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { NewJob } from "./requests";
-import type { Job, JobStage, StageId } from "./types";
+import type { Job, JobStage, StageId, Word } from "./types";
 
 // Jobs live in RUNDOWN_DATA_DIR/jobs/<id>/: job.json, the uploaded video, the transcript and the rendered
 // clips. The video is the uploader's own and stays until the job is deleted. Every path is built here from
@@ -185,4 +185,14 @@ export function adoptSource(id: string, size: number, detail: string): Promise<J
     upload: { ...j.upload, size, received: size },
     stages: setStage(j.stages, "upload", { state: "done", detail, endedAt: new Date().toISOString() }),
   }));
+}
+
+/** The job's saved transcript, or none when it had no transcript or the file cannot be read. */
+export async function jobWords(id: string): Promise<Word[]> {
+  try {
+    return JSON.parse(await readFile(/*turbopackIgnore: true*/ jobFile.transcript(id), "utf8")) as Word[];
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== "ENOENT") console.warn(`[jobs] ${id} transcript unreadable:`, err);
+    return [];
+  }
 }

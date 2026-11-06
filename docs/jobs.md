@@ -42,6 +42,8 @@ Captions keep to each platform's caption and hashtag limits from `src/lib/rundow
 
 Both run as render-only tasks in the same one-at-a-time queue.
 
+- **Download.** "Download approved" gives one zip of every approved clip with its SRT captions (when there is a transcript), `posts.txt` with each post ready to paste, and `manifest.json` listing each clip's file, platform, length, copy and source range for a scheduling tool. "Download every clip" takes all rendered clips. Each clip also has its own SRT link. `GET /api/jobs/{id}/export[?all=1]` and `GET /api/jobs/{id}/clips/{clipId}/srt`.
+
 ## What the model may do
 
 Write copy, and mark where the play is on sampled frames. It sees each clip's moment, what was said and the platform's limits. It cannot move a cut, add a clip or change hashtags. Its answer is checked against a schema in code, every field is cut to its platform's limit, and a blank or missing field keeps the rule-written copy. If the call fails, the job uses the rule copy and says why on the Plan stage. Its frame marks are checked the same way: a frame it skips, repeats or numbers out of range gets no mark, the camera's pan fills the gap, and a moment whose call fails keeps a centred crop.

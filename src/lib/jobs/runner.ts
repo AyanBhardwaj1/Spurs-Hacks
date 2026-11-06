@@ -1,6 +1,6 @@
 import "server-only";
 
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { PLACEMENTS } from "@/lib/rundown/platforms";
 import { defaultFont } from "@/lib/rundown/render";
@@ -14,7 +14,7 @@ import { audioPieces, crowdFloor, motionFrames, probe, sampledJpegs, sceneCuts }
 import { fuseMoments, matchClock } from "./moments";
 import { openaiConfigured, structured, transcribePiece } from "./openai";
 import { planClips } from "./planner";
-import { dataDir, jobFile, listJobs, setStage, updateJob } from "./store";
+import { dataDir, jobFile, jobWords, listJobs, setStage, updateJob } from "./store";
 import type { Job, JobMoment, SourceInfo, StageId, Word } from "./types";
 
 // Runs a job's stages in order, saving after each so the page can follow along. Jobs run one at a time:
@@ -254,21 +254,12 @@ async function runRender(id: string, clipIds: string[], writeCopy = false) {
       const windows = cropWindows(job, info, (c) => clipIds.includes(c.id) && !job.moments.find((m) => m.id === c.momentId)?.focus);
       await followMoments(id, source, windows);
     }
-    const words = job.services.transcript ? await readWords(id) : [];
+    const words = job.services.transcript ? await jobWords(id) : [];
     await renderClips(id, clipIds, source, words, info.hasAudio);
   } finally {
     await rm(jobFile.work(id), { recursive: true, force: true });
   }
   await updateJob(id, (j) => ({ ...j, status: "done" }));
-}
-
-async function readWords(id: string): Promise<Word[]> {
-  try {
-    return JSON.parse(await readFile(/*turbopackIgnore: true*/ jobFile.transcript(id), "utf8")) as Word[];
-  } catch (err) {
-    console.warn(`[jobs] ${id} transcript unreadable, rendering without captions:`, err);
-    return [];
-  }
 }
 
 /** Follows the play for each window and saves the keys on its moment. A failed call leaves that moment centred. */

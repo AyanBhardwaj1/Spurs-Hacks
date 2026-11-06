@@ -90,6 +90,7 @@ export function JobView() {
         </div>
         {!live(job) && <DeleteJob id={job.id} onDeleted={() => router.push("/studio")} />}
       </header>
+      {job.status === "done" && job.clips.some((c) => c.render.state === "ready") && <ExportLinks job={job} />}
       {job.status === "done" && (
         <AddPlatforms
           job={job}
@@ -137,6 +138,7 @@ export function JobView() {
                 jobId={job.id}
                 clip={c}
                 editable={job.status === "done" && Boolean(job.source)}
+                hasCaptions={job.services.transcript}
                 durationSec={job.source?.durationSec ?? 0}
                 onChange={(next) => setJob((j) => j && { ...j, clips: j.clips.map((x) => (x.id === next.id ? next : x)) })}
                 onQueued={() => setPollKey((k) => k + 1)}
@@ -153,9 +155,9 @@ export function JobView() {
 
 const ASPECT_CLASS: Record<string, string> = { "9:16": "aspect-[9/16]", "1:1": "aspect-square", "16:9": "aspect-video" };
 
-type ClipCardProps = { jobId: string; clip: JobClip; editable: boolean; durationSec: number; onChange: (clip: JobClip) => void; onQueued: () => void };
+type ClipCardProps = { jobId: string; clip: JobClip; editable: boolean; hasCaptions: boolean; durationSec: number; onChange: (clip: JobClip) => void; onQueued: () => void };
 
-function ClipCard({ jobId, clip, editable, durationSec, onChange, onQueued }: ClipCardProps) {
+function ClipCard({ jobId, clip, editable, hasCaptions, durationSec, onChange, onQueued }: ClipCardProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -209,6 +211,11 @@ function ClipCard({ jobId, clip, editable, durationSec, onChange, onQueued }: Cl
             Download
           </a>
         )}
+        {hasCaptions && (
+          <a href={`${src}/srt`} className="press rounded-md text-caption font-semibold text-tint hover:underline">
+            Captions (.srt)
+          </a>
+        )}
       </div>
       {editable && clip.segments.length === 1 && <TrimControl jobId={jobId} clip={clip} durationSec={durationSec} onChange={onChange} onQueued={onQueued} />}
       <div className="mt-3 flex items-center gap-2 border-t border-separator/60 pt-3">
@@ -242,7 +249,7 @@ function ClipCard({ jobId, clip, editable, durationSec, onChange, onQueued }: Cl
 const STEP_SEC = 1;
 
 // Nudge a clip's edges a second at a time and render it again. The server checks the new edges.
-function TrimControl({ jobId, clip, durationSec, onChange, onQueued }: Omit<ClipCardProps, "editable">) {
+function TrimControl({ jobId, clip, durationSec, onChange, onQueued }: Omit<ClipCardProps, "editable" | "hasCaptions">) {
   const [open, setOpen] = useState(false);
   const [edges, setEdges] = useState(clip.segments[0]);
   const [error, setError] = useState<string | null>(null);
@@ -306,6 +313,25 @@ function TrimControl({ jobId, clip, durationSec, onChange, onQueued }: Omit<Clip
           {error}
         </p>
       )}
+    </div>
+  );
+}
+
+// Approved clips, or every rendered clip, as one zip with captions, posts and a manifest.
+function ExportLinks({ job }: { job: Job }) {
+  const approved = job.clips.filter((c) => c.render.state === "ready" && c.decision?.value === "approved").length;
+  return (
+    <div className="mt-5 flex flex-wrap items-center gap-3">
+      {approved > 0 ? (
+        <a href={`/api/jobs/${job.id}/export`} className="press inline-flex h-9 items-center rounded-full bg-button px-4 text-caption font-semibold text-white hover:bg-button-hover">
+          Download approved ({approved})
+        </a>
+      ) : (
+        <span className="text-caption text-secondary">Approve clips to download them together.</span>
+      )}
+      <a href={`/api/jobs/${job.id}/export?all=1`} className="press rounded-md text-caption font-semibold text-tint hover:underline">
+        Download every clip
+      </a>
     </div>
   );
 }
