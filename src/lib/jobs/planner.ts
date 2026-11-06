@@ -16,7 +16,10 @@ const spec = (p: keyof typeof PLACEMENTS): Placement => PLACEMENTS[p];
 /** tail is used when the roar's length is unknown; otherwise the cut runs one second past the crowd settling, held to minTail..maxTail. */
 type Style = { name: string; count: number; lead: number; tail: number; minTail: number; maxTail: number; why: (sec: number, lead: number) => string };
 
-const STYLE: Record<Exclude<JobPlacement, "youtube-video">, Style> = {
+/** The cuts that string several moments together instead of cutting one: they keep their own picks. */
+export const isMontage = (p: JobPlacement) => p === "youtube-video" || p === "vertical-recap";
+
+const STYLE: Record<Exclude<JobPlacement, "youtube-video" | "vertical-recap">, Style> = {
   tiktok: {
     name: "TikTok",
     count: 5,
@@ -66,7 +69,7 @@ const STYLE: Record<Exclude<JobPlacement, "youtube-video">, Style> = {
 
 /** How long a platform's cuts run and how many it takes. The highlights cut has neither, so it has none. */
 export function cutRange(placement: JobPlacement): { min: number; max: number; count: number } | undefined {
-  if (placement === "youtube-video") return undefined;
+  if (placement === "youtube-video" || placement === "vertical-recap") return undefined;
   const s = STYLE[placement];
   return { min: s.lead + s.minTail, max: s.lead + s.maxTail, count: s.count };
 }
@@ -111,6 +114,12 @@ export function clipSeconds(clip: Pick<JobClip, "segments" | "replay">): number 
   const cut = clip.segments.reduce((n, s) => n + s.end - s.start, 0);
   return cut + (clip.replay ? (clip.replay.end - clip.replay.start) * REPLAY_SLOWDOWN : 0);
 }
+
+/** The vertical recap: this many top moments, each from a few seconds before its play to its reaction. */
+const RECAP_MOMENTS = 6;
+const RECAP_LEAD = 3;
+const RECAP_MIN_TAIL = 3;
+const RECAP_TAIL = 5;
 
 /** Moments under this score are noise for every platform. */
 const MIN_SCORE = 0.3;
@@ -157,6 +166,35 @@ export function planClips({ moments, placements, durationSec, sport, title, repl
   for (const placement of placements) {
     for (const m of ranked) {
       if (m.score < MIN_SCORE) skipped.push({ momentId: m.id, placement, reason: `Scored ${m.score.toFixed(2)}, under the ${MIN_SCORE.toFixed(2)} floor for a clip.` });
+    }
+    if (placement === "vertical-recap") {
+      const top = strong.slice(0, RECAP_MOMENTS).sort((a, b) => a.peak - b.peak);
+      if (top.length === 0) continue;
+      const segments: { start: number; end: number }[] = [];
+      for (const m of top) {
+        const tail = m.settle === undefined ? RECAP_TAIL : Math.min(RECAP_TAIL, Math.max(RECAP_MIN_TAIL, m.settle + 1));
+        const seg = { start: round(clamp(m.peak - RECAP_LEAD, durationSec)), end: round(clamp(m.peak + tail, durationSec)) };
+        const last = segments.at(-1);
+        if (last && seg.start <= last.end) last.end = Math.max(last.end, seg.end);
+        else if (seg.end > seg.start) segments.push(seg);
+      }
+      const sec = Math.round(segments.reduce((n, s) => n + s.end - s.start, 0));
+      const hook = fit(`${title} in ${sec} seconds`, HOOK_MAX);
+      clips.push({
+        id: `${placement}-recap`,
+        momentId: top[0].id,
+        placement,
+        segments,
+        title: fit(`${title}: the match in ${sec} seconds`, 100),
+        hook,
+        ...copy(placement, hook, title, sport, top[0].peak),
+        why: `The top ${top.length} moments in match order, ${sec} s in all: the whole game for someone scrolling a vertical feed.`,
+        render: { state: "waiting" },
+      });
+      strong.slice(RECAP_MOMENTS).forEach((m, i) =>
+        skipped.push({ momentId: m.id, placement, reason: `Ranked ${ordinal(RECAP_MOMENTS + i + 1)}; the recap takes the top ${RECAP_MOMENTS}.` }),
+      );
+      continue;
     }
     if (placement === "youtube-video") {
       const top = strong.slice(0, HIGHLIGHTS_MOMENTS).sort((a, b) => a.peak - b.peak);

@@ -205,3 +205,15 @@ export function focusExpr(keys: FocusKey[], segmentStart: number): string {
   }
   return clampX(`if(lt(t,${local[0].t}),${local[0].x},${expr})`);
 }
+
+/**
+ * The crop path for a clip. A single cut follows its own moment; a montage follows, in each segment, the
+ * moment whose play it shows, so one moment's path never steers another's footage.
+ */
+export function clipFocus(clip: { momentId: string; segments: { start: number; end: number }[] }, moments: { id: string; peak: number; focus?: FocusKey[] }[]): FocusKey[] {
+  if (clip.segments.length === 1) return moments.find((m) => m.id === clip.momentId)?.focus ?? [];
+  return clip.segments.flatMap((seg) => {
+    const m = moments.find((x) => x.peak >= seg.start && x.peak <= seg.end);
+    return (m?.focus ?? []).filter((k) => k.t >= seg.start - 2 && k.t <= seg.end + 2);
+  });
+}

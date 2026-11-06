@@ -31,6 +31,9 @@ export const PLACEMENTS = {
   "x-square": { platform: "X", placement: "Post", aspect: "1:1", width: 1080, height: 1080, maxSeconds: 140, captionLimit: 280, hashtagLimit: 2, safeTop: 0.05, safeBottom: 0.1 },
   "club-app": { platform: "Club app", placement: "Video", aspect: "16:9", width: 1920, height: 1080, maxSeconds: 600, captionLimit: 1000, hashtagLimit: 0, safeTop: 0.05, safeBottom: 0.1 },
   "club-app-vertical": { platform: "Club app", placement: "Story", aspect: "9:16", width: 1080, height: 1920, maxSeconds: 60, captionLimit: 500, hashtagLimit: 0, safeTop: 0.1, safeBottom: 0.2 },
+  // Rundown's own: a match's best moments in one vertical cut, for any 9:16 feed. Its safe zones are the
+  // strictest of TikTok's and Reels'.
+  "vertical-recap": { platform: "TikTok", placement: "Recap", aspect: "9:16", width: 1080, height: 1920, maxSeconds: 90, captionLimit: 2200, hashtagLimit: 5, safeTop: 0.12, safeBottom: 0.3 },
   partner: { platform: "Partner", placement: "Delivery", aspect: "16:9", width: 1920, height: 1080, maxSeconds: 600, captionLimit: 1000, hashtagLimit: 0, safeTop: 0.05, safeBottom: 0.1 },
 } as const satisfies Record<string, Placement>;
 

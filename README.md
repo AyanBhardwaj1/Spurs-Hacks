@@ -14,6 +14,7 @@ Open `/studio`, press **Upload a match**, and pick the platforms. No video to ha
 | Instagram Reels | 9:16 | 15 to 21 s, short enough to loop | top 4 |
 | YouTube Shorts | 9:16 | 22 to 44 s, with the build-up and the reaction | top 4 |
 | X | 16:9 and 1:1 | 14 to 20 s, newsy | top 3 |
+| Vertical recap | 9:16 | the top 6 moments, a few seconds each, under a minute | 1 |
 | YouTube | 16:9 | one highlights cut of the top 8 moments | 1 |
 
 It runs with no keys: moments come from the crowd's noise, and the copy follows rules. Add `OPENAI_API_KEY` and it also transcribes the commentary, which finds moments the crowd missed and captions every clip, the vertical and square crops follow the play instead of staying centred, and the model writes each platform's hook and caption. Once a job is done you can move any clip's start and end and render it again, or cut the same match for platforms you skipped, without uploading it again. Every clip gets a cover image cut from its play, with the hook on it. Captions light up word by word as they are said, and short clips can end with a slow-motion replay of the play. Add your club's logo and colour and every clip and cover carries them. "Download approved" puts every approved clip, its cover, its captions and its post copy in one zip with a manifest. [docs/jobs.md](docs/jobs.md) covers how each stage works, the rules, and the settings.

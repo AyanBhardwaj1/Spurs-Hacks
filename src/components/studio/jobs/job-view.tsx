@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useId, useState } from "react";
 import { PLACEMENTS } from "@/lib/rundown/platforms";
 import { matchClock } from "@/lib/jobs/moments";
-import { clipSeconds } from "@/lib/jobs/planner";
+import { clipSeconds, isMontage } from "@/lib/jobs/planner";
 import { postText } from "@/lib/jobs/post";
 import { postOrder, type Strength } from "@/lib/jobs/rank";
 import { JOB_PLACEMENTS, PLACEMENT_LABEL, type Job, type JobClip, type JobPlacement, type JobStage } from "@/lib/jobs/types";
@@ -134,7 +134,7 @@ export function JobView() {
         ))}
       </ol>
 
-      <EnergyTimeline job={job} onPick={job.status === "done" && job.placements.some((p) => p !== "youtube-video") ? setPicked : undefined} />
+      <EnergyTimeline job={job} onPick={job.status === "done" && job.placements.some((p) => !isMontage(p)) ? setPicked : undefined} />
       {picked !== null && job.status === "done" && (
         <PickBar
           jobId={job.id}

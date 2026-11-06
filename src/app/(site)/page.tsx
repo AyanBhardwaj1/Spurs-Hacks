@@ -101,7 +101,7 @@ export default function Home() {
                   <tr key={p} className="border-b border-separator">
                     <th scope="row" className="py-3 pr-4 font-semibold">{PLACEMENT_LABEL[p]}</th>
                     <td className="num py-3 pr-4">{PLACEMENTS[p].aspect}</td>
-                    <td className="num py-3 pr-4">{range ? `${range.min} to ${range.max} s` : "the top 8 moments in one cut"}</td>
+                    <td className="num py-3 pr-4">{range ? `${range.min} to ${range.max} s` : p === "vertical-recap" ? "the top 6 moments, a few seconds each" : "the top 8 moments in one cut"}</td>
                     <td className="num py-3 pr-4">{range ? `top ${range.count}` : "1"}</td>
                     <td className="num py-3">{PLACEMENTS[p].hashtagLimit}</td>
                   </tr>

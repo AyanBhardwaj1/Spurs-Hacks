@@ -9,7 +9,7 @@ import { anchorsFrom, ANCHOR_SCHEMA, ANCHOR_SYSTEM, isAnchorAnswer } from "./anc
 import { coverArgs, coverAss, coverTime } from "./cover";
 import { applyCopy, copyPrompt, COPY_SCHEMA, isCopyAnswer } from "./copy";
 import { energyCurve, findPeaks, settleAfter } from "./energy";
-import { cropShare, focusKeys, MOTION, motionSteps, type Anchor } from "./focus";
+import { clipFocus, cropShare, focusKeys, MOTION, motionSteps, type Anchor } from "./focus";
 import { lastLine, runFfmpeg } from "./ffmpeg";
 import { audioPieces, crowdFloor, motionFrames, probe, sampledJpegs, sceneCuts } from "./media";
 import { fuseMoments, matchClock } from "./moments";
@@ -321,7 +321,7 @@ async function renderOne(id: string, clipId: string, source: string, words: Word
     ...(clip.replay && { replayAt: { start: clipSeconds({ segments: clip.segments }), end: clipSeconds(clip) } }),
   });
   await writeFile(path.join(dir, "captions.ass"), captions);
-  const focus = job.moments.find((m) => m.id === clip.momentId)?.focus;
+  const focus = clipFocus(clip, job.moments);
   const logo = job.brand?.logo ? { file: jobFile.logo(id, job.brand.logo), ...logoPlacement(p.width, p.height, p.safeTop) } : undefined;
   const args = renderArgs({ source, segments: clip.segments, replay: clip.replay, logo, width: p.width, height: p.height, captions: "captions.ass", fontsDir: font ? path.dirname(font) : undefined, output, hasAudio, focus });
   const run = await runFfmpeg(args, { cwd: dir, timeoutMs: 900_000 });
@@ -352,10 +352,14 @@ function cropWindows(job: Job, info: SourceInfo, include: (clip: Job["clips"][nu
   for (const clip of job.clips) {
     if (!include(clip)) continue;
     const share = cropShare(info, PLACEMENTS[clip.placement]);
-    if (share >= 0.99 || clip.segments.length !== 1) continue;
-    const [seg] = clip.segments;
-    const w = windows.get(clip.momentId);
-    windows.set(clip.momentId, w ? { start: Math.min(w.start, seg.start), end: Math.max(w.end, seg.end), share: Math.min(w.share, share) } : { ...seg, share });
+    if (share >= 0.99) continue;
+    // A montage's segments each show one moment's play, so each widens that moment's window.
+    for (const seg of clip.segments) {
+      const momentId = clip.segments.length === 1 ? clip.momentId : job.moments.find((m) => m.peak >= seg.start && m.peak <= seg.end)?.id;
+      if (!momentId) continue;
+      const w = windows.get(momentId);
+      windows.set(momentId, w ? { start: Math.min(w.start, seg.start), end: Math.max(w.end, seg.end), share: Math.min(w.share, share) } : { ...seg, share });
+    }
   }
   return windows;
 }

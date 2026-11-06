@@ -121,3 +121,22 @@ test("a clip plays its segments and then its replay at half speed", () => {
   expect(clipSeconds({ segments: [{ start: 10, end: 28 }] })).toBe(18);
   expect(clipSeconds({ segments: [{ start: 10, end: 28 }], replay: { start: 20, end: 23 } })).toBe(24);
 });
+
+test("the vertical recap strings the top six moments in match order, a few seconds each, under a minute", () => {
+  const moments = [1, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7].map((s, i) => moment(300 * (i + 1), s, i === 0 ? { settle: 2 } : {}));
+  const { clips, skipped } = planClips({ ...base, moments, placements: ["vertical-recap"] });
+  expect(clips).toHaveLength(1);
+  const [recap] = clips;
+  expect(recap.id).toBe("vertical-recap-recap");
+  expect(recap.segments).toEqual([
+    { start: 297, end: 303 },
+    { start: 597, end: 605 },
+    { start: 897, end: 905 },
+    { start: 1197, end: 1205 },
+    { start: 1497, end: 1505 },
+    { start: 1797, end: 1805 },
+  ]);
+  expect(length(recap)).toBeLessThanOrEqual(60);
+  expect(recap.hook).toBe("City v United in 46 seconds");
+  expect(skipped).toContainEqual({ momentId: "m-2100", placement: "vertical-recap", reason: "Ranked 7th; the recap takes the top 6." });
+});

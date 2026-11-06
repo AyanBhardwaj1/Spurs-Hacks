@@ -35,6 +35,7 @@ The play comes before the crowd, so every short cut opens on the build-up and la
 | Instagram Reels | 9:16 | opens 9 s before, 15 to 21 s, short enough to loop | top 4 |
 | YouTube Shorts | 9:16 | 22 to 44 s, with the build-up and the reaction | top 4 |
 | X | 16:9 and 1:1 | opens 10 s before, 14 to 20 s | top 3 |
+| Vertical recap | 9:16 | the top 6 moments in match order, 6 to 8 s each, for any vertical feed | 1 |
 | YouTube | 16:9 | one highlights cut of the top 8 moments in match order | 1 |
 
 Under "Your brand", pick the colour the caption word being said turns, and add a logo (PNG or JPEG, up to 2 MB). The logo sits in the top corner of every clip and cover, under the band each app covers, at 14% of the short side and slightly see-through. `PUT /api/jobs/{id}/logo` with the image as the body does the same; clips rendered afterwards carry it.
