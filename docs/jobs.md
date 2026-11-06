@@ -50,7 +50,7 @@ Captions keep to each platform's caption and hashtag limits from `src/lib/rundow
 
 Above the clips, a timeline draws the crowd's loudness across the whole match with every moment marked; filled marks became clips. Click a second the rules missed (or move along it with the arrow keys and press Enter) and Rundown makes it a moment, with a clip for every short platform, rendered with the copy and the crop like the rest. `POST /api/jobs/{id}/moments` with `{ "at": seconds }` does the same.
 
-A "Post first" list above the clips names each platform's clip to post first, skipping rejected ones. On any rendered clip, "App zones" shades what the app draws over it (the top bar, the caption and account at the bottom, and on a vertical feed the button rail), so you can check the play is not hidden under them.
+A "Post first" list above the clips names each platform's clip to post first, skipping rejected ones; "Approve these" approves the ones not yet decided, each through the same route as its card. On any rendered clip, "App zones" shades what the app draws over it (the top bar, the caption and account at the bottom, and on a vertical feed the button rail), so you can check the play is not hidden under them.
 
 After rendering, each clip's file is measured, and the card checks it and its post against the platform: the frame size, the length against the platform's limit, that it has sound, the post's length (counted X's way on X) and the number of hashtags. "Ready for TikTok" means all five pass; anything that would fail on the platform is listed.
 

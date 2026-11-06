@@ -159,7 +159,9 @@ export function JobView() {
         />
       )}
 
-      {job.status === "done" && <PostFirst groups={byPlacement} order={order} />}
+      {job.status === "done" && (
+        <PostFirst jobId={job.id} groups={byPlacement} order={order} onChange={(next) => setJob((j) => j && { ...j, clips: j.clips.map((x) => (x.id === next.id ? next : x)) })} />
+      )}
 
       {byPlacement.length > 0 && (
         <p className="mt-10 text-caption text-secondary">
@@ -199,17 +201,47 @@ export function JobView() {
 }
 
 // The answer to "what do I post now": each platform's clip to post first, one line each, linked to its card.
-function PostFirst({ groups, order }: { groups: { placement: JobPlacement; clips: JobClip[] }[]; order: Map<string, Strength & { rank: number }> }) {
+function PostFirst({ jobId, groups, order, onChange }: { jobId: string; groups: { placement: JobPlacement; clips: JobClip[] }[]; order: Map<string, Strength & { rank: number }>; onChange: (clip: JobClip) => void }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const firsts = groups.flatMap((g) => {
     const clip = g.clips.find((c) => c.render.state === "ready" && c.decision?.value !== "rejected");
     return clip ? [{ placement: g.placement, clip, score: order.get(clip.id)?.score }] : [];
   });
   if (firsts.length === 0) return null;
+  const waiting = firsts.filter((f) => !f.clip.decision);
+  // One decision per clip, through the same route the cards use, so each is recorded on its own.
+  const approveAll = async () => {
+    setBusy(true);
+    setError(null);
+    for (const { clip } of waiting) {
+      const res = await fetch(`/api/jobs/${jobId}/clips/${clip.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ decision: "approved" }) });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(body.error ?? `The server answered ${res.status}.`);
+        break;
+      }
+      onChange(body);
+    }
+    setBusy(false);
+  };
   return (
     <section aria-labelledby="post-first" className="mt-10 rounded-[14px] bg-grouped p-4">
-      <h2 id="post-first" className="text-footnote font-semibold">
-        Post first
-      </h2>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 id="post-first" className="text-footnote font-semibold">
+          Post first
+        </h2>
+        {waiting.length > 0 && (
+          <button type="button" disabled={busy} onClick={approveAll} className="press inline-flex h-8 items-center rounded-full bg-button px-3 text-caption font-semibold text-white hover:bg-button-hover disabled:opacity-40">
+            {busy ? "Approving…" : `Approve ${waiting.length === 1 ? "this one" : `these ${waiting.length}`}`}
+          </button>
+        )}
+      </div>
+      {error && (
+        <p role="alert" className="mt-1 text-caption text-tally">
+          {error}
+        </p>
+      )}
       <ul className="mt-2 grid gap-1">
         {firsts.map(({ placement, clip, score }) => (
           <li key={placement}>
