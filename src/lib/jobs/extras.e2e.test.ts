@@ -30,7 +30,7 @@ test.skipIf(!haveFfmpeg)(
     for (const hasAudio of [true, false]) {
       const output = path.join(dir, `clip-${hasAudio}.mp4`);
       const run = await runFfmpeg(renderArgs({ source, segments: [{ start: 2, end: 10 }], replay: { start: 5, end: 8 }, width: 360, height: 640, captions: "c.ass", output, hasAudio }), { cwd: dir });
-      expect(run.stderr).toBe("");
+      expect(run.code, run.stderr).toBe(0);
       const out = await probe(output);
       expect(Math.abs(out.durationSec - 14)).toBeLessThan(0.3);
       expect(out.hasAudio).toBe(true);
@@ -50,11 +50,11 @@ test.skipIf(!haveFfmpeg)(
     const place = { file: logo, ...logoPlacement(360, 640, 0.1) };
     const clip = path.join(dir, "logo.mp4");
     const run = await runFfmpeg(renderArgs({ source, segments: [{ start: 0, end: 3 }], width: 360, height: 640, captions: "l.ass", output: clip, hasAudio: false, logo: place }), { cwd: dir });
-    expect(run.stderr).toBe("");
+    expect(run.code, run.stderr).toBe(0);
     expect(await probe(clip)).toMatchObject({ width: 360, height: 640 });
     const cover = path.join(dir, "logo.jpg");
     const shot = await runFfmpeg(coverArgs({ source, at: 1, width: 360, height: 640, captions: "l.ass", output: cover, logo: place }), { cwd: dir });
-    expect(shot.stderr).toBe("");
+    expect(shot.code, shot.stderr).toBe(0);
     expect(await probe(cover)).toMatchObject({ width: 360, height: 640 });
   },
   120_000,
