@@ -19,6 +19,20 @@ Open `/studio`, press **Upload a match**, and pick the platforms. No video to ha
 
 It runs with no keys: moments come from the crowd's noise, and the copy follows rules. Add `OPENAI_API_KEY` and it also transcribes the commentary (which finds moments the crowd missed and captions every clip), follows the play with the vertical and square crops, and writes each platform's hook and caption, in any of twelve languages.
 
+```mermaid
+flowchart LR
+  V[Full match video] --> P[Read the video]
+  P --> A[Measure the crowd<br/>per-second loudness]
+  P --> T[Transcribe the commentary<br/>with a key]
+  A --> M[Find the moments<br/>roars + the sport's calls]
+  T --> M
+  M --> PL[Plan a cut per platform<br/>length, count, copy]
+  PL --> F[Follow the play<br/>vision marks + camera pan]
+  F --> R[Render<br/>crop, captions, cover, replay, logo]
+  R --> Y[You review<br/>rank, pre-flight, trim, hooks]
+  Y --> Z[Zip, webhook, posts]
+```
+
 What a job gives you:
 
 - **Thirteen sports.** Each has its own commentary calls, in English and five other languages, and its own pace, so back-to-back tennis points stay separate clips.
