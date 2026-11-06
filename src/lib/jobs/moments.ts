@@ -115,3 +115,15 @@ export function fuseMoments({ durationSec, peaks, words, cuts, sport = "other" }
     })
     .sort((a, b) => b.score - a.score || a.peak - b.peak);
 }
+
+/** A moment a producer picks on the timeline: their second is the play, and their pick outranks the rules. */
+export function pickedMoment(at: number, words: Word[], durationSec: number, taken: Set<string>): JobMoment {
+  const start = Math.max(0, at - LEAD_SEC);
+  const end = Math.min(durationSec, at + TAIL_SEC);
+  let id = `m-${Math.round(at)}`;
+  for (let n = 2; taken.has(id); n++) id = `m-${Math.round(at)}-${n}`;
+  const quote = spoken(words, start, end);
+  // Titled like a found moment, so the hook quotes the commentary when there is some.
+  const said = spoken(words, at - AGREE_BEFORE_SEC + 4, at + 3, TITLE_WORDS);
+  return { id, peak: at, start, end, score: 1, signals: ["producer"], title: said ? `“${said}” at ${matchClock(at)}` : `Picked at ${matchClock(at)}`, ...(quote && { quote }) };
+}

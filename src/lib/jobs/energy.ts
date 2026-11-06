@@ -125,3 +125,14 @@ export function settleAfter(floor: number[], peak: number): number | undefined {
   }
   return undefined;
 }
+
+/**
+ * The crowd floor to draw on the job page: whole seconds up to `maxPoints`, and past that the loudest
+ * second of each bucket, so a roar never drops out of the picture. dB to one decimal.
+ */
+export function energyCurve(floor: number[], maxPoints = 900): { stepSec: number; db: number[] } {
+  const stepSec = Math.max(1, Math.ceil(floor.length / maxPoints));
+  const db: number[] = [];
+  for (let s = 0; s < floor.length; s += stepSec) db.push(Math.round(Math.max(...floor.slice(s, s + stepSec)) * 10) / 10);
+  return { stepSec, db };
+}

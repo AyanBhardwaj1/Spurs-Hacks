@@ -45,9 +45,11 @@ Captions keep to each platform's caption and hashtag limits from `src/lib/rundow
 
 ## After a job finishes
 
+Above the clips, a timeline draws the crowd's loudness across the whole match with every moment marked; filled marks became clips. Click a second the rules missed (or move along it with the arrow keys and press Enter) and Rundown makes it a moment, with a clip for every short platform, rendered with the copy and the crop like the rest. `POST /api/jobs/{id}/moments` with `{ "at": seconds }` does the same.
+
 Review from the keyboard: J and K move between clips in the order the page shows them, A approves and moves on, R rejects and moves on, U undoes. Each finished stage shows how long it took.
 
-Each platform's clips are shown in posting order, and the card says why: a clip's strength is half its moment's score, plus points for evidence the job has about the clip (the crowd and the commentary agreed, the hook quotes the commentary, the cut ends as the crowd settles, the crop follows the play or nothing is cropped, the clip is short enough to watch twice). It is a rule you can check, not a prediction of views. The rule is in `src/lib/jobs/rank.ts`, and the manifest in the zip carries each clip's place in the order.
+Each platform's clips are shown in posting order, and the card says why: a clip's strength is half its moment's score, plus points for evidence the job has about the clip (the crowd and the commentary agreed, the commentary called it, the cut ends as the crowd settles, the crop follows the play or nothing is cropped, the clip is short enough to watch twice). It is a rule you can check, not a prediction of views. The rule is in `src/lib/jobs/rank.ts`, and the manifest in the zip carries each clip's place in the order.
 
 - **Adjust a cut.** On any single-moment clip, move the start and end a second at a time and render it again. The new edges must stay inside the video, run at least 3 s and keep to the platform's length limit. The clip's approval is cleared, since it was given for the old cut. `POST /api/jobs/{id}/clips/{clipId}/trim` with `{ start, end }`.
 - **Add platforms.** "Also cut it for" plans the missing platforms from the moments the job already found and renders only those clips, with the model's copy and play-following when a key is set. `POST /api/jobs/{id}/placements` with `{ placements }`.

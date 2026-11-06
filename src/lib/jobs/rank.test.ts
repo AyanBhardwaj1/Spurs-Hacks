@@ -22,12 +22,12 @@ test("strength adds up what the evidence shows, and says why", () => {
   expect(plain.score).toBe(40 + 5);
   const strong = clipStrength(
     clip("b", "m", { hook: "What a goal", segments: [{ start: 92, end: 110 }] }),
-    moment("m", { score: 1, signals: ["crowd", "commentary"], settle: 9, focus: [{ t: 100, x: 0.4 }] }),
+    moment("m", { score: 1, signals: ["crowd", "commentary"], settle: 9, focus: [{ t: 100, x: 0.4 }], title: "“What a goal” at 1:40" }),
   );
   expect(strong.score).toBe(100);
   expect(strong.reasons).toEqual([
     "The crowd and the commentary both picked it.",
-    "The hook quotes the commentary.",
+    "The commentary called it.",
     "It ends as the crowd settles.",
     "The crop follows the play.",
     "Short enough to watch twice.",

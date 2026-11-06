@@ -133,7 +133,7 @@ export function fit(text: string, max: number) {
 }
 
 /** The words a moment's title quotes, or a plain line when nothing was said. */
-const hookOf = (m: JobMoment) => fit(/“(.+)”/.exec(m.title)?.[1] ?? "Listen to this crowd", HOOK_MAX);
+const hookOf = (m: JobMoment) => fit(/“(.+)”/.exec(m.title)?.[1] ?? (m.signals.includes("crowd") ? "Listen to this crowd" : "Watch this"), HOOK_MAX);
 
 function copy(placement: JobPlacement, hook: string, jobTitle: string, sport: JobSport, when: number) {
   const p = spec(placement);

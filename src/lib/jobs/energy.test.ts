@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { findPeaks, floorPerSecond, parseRmsPrint, settleAfter } from "./energy";
+import { energyCurve, findPeaks, floorPerSecond, parseRmsPrint, settleAfter } from "./energy";
 
 /** A flat -30 dB crowd with a rise to `db` for `width` seconds starting at each burst's second. */
 function crowd(seconds: number, bursts: { at: number; db: number; width?: number }[]) {
@@ -74,4 +74,15 @@ test("a roar that never settles before the end, or a flat crowd, has no answer",
   for (let s = 300; s < 330; s++) floor[s] = -15;
   expect(settleAfter(floor, 300)).toBeUndefined();
   expect(settleAfter(new Array(600).fill(-30), 300)).toBeUndefined();
+});
+
+test("the energy curve keeps every second of a short match and the loudest of each bucket of a long one", () => {
+  expect(energyCurve([-30, -20.04, -25])).toEqual({ stepSec: 1, db: [-30, -20, -25] });
+  const long = Array.from({ length: 1200 }, (_, s) => (s === 601 ? -10 : -30));
+  const curve = energyCurve(long, 600);
+  expect(curve.stepSec).toBe(2);
+  expect(curve.db).toHaveLength(600);
+  expect(curve.db[300]).toBe(-10);
+  expect(curve.db[299]).toBe(-30);
+  expect(energyCurve([])).toEqual({ stepSec: 1, db: [] });
 });

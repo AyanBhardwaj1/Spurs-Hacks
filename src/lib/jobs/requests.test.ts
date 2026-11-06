@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { CHUNK_BYTES, checkChunk, checkLogo, parseAddPlacements, parseNewJob, parseRange, parseTrim, type NewJob } from "./requests";
+import { CHUNK_BYTES, checkChunk, checkLogo, parsePick, parseAddPlacements, parseNewJob, parseRange, parseTrim, type NewJob } from "./requests";
 
 const valid: NewJob = { title: "City v United", sport: "soccer", placements: ["tiktok", "x-video"], fileName: "match.mp4", size: 2_000_000_000 };
 
@@ -75,4 +75,11 @@ test("a logo is a PNG or JPEG of at most 2 MB", () => {
   expect(checkLogo(jpeg)).toEqual({ ok: true, value: "jpg" });
   expect(checkLogo(new TextEncoder().encode("<svg></svg>"))).toMatchObject({ ok: false });
   expect(checkLogo(new Uint8Array(2 * 1024 ** 2 + 1).fill(0x89))).toMatchObject({ ok: false });
+});
+
+test("a picked second is a number inside the video", () => {
+  expect(parsePick({ at: 12.4 }, 600)).toEqual({ ok: true, value: 12 });
+  expect(parsePick({ at: 700 }, 600)).toMatchObject({ ok: false });
+  expect(parsePick({ at: "12" }, 600)).toMatchObject({ ok: false });
+  expect(parsePick(null, 600)).toMatchObject({ ok: false });
 });

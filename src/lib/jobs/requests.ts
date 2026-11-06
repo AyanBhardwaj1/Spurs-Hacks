@@ -99,3 +99,10 @@ export function parseAddPlacements(body: unknown, current: JobPlacement[]): Pars
   if (fresh.length === 0) return { ok: false, error: "The job already has those platforms." };
   return { ok: true, value: fresh };
 }
+
+/** POST /moments: { at } in source seconds, inside the video, rounded to the second. */
+export function parsePick(body: unknown, durationSec: number): Parsed<number> {
+  const at = (body as { at?: unknown } | null)?.at;
+  if (typeof at !== "number" || !Number.isFinite(at) || at < 0 || at > durationSec) return { ok: false, error: `at must be a second between 0 and ${Math.floor(durationSec)}.` };
+  return { ok: true, value: Math.round(at) };
+}

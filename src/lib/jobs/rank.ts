@@ -7,8 +7,6 @@ import type { JobClip, JobMoment } from "./types";
 
 export type Strength = { score: number; reasons: string[] };
 
-const HOOK_FALLBACK = "Listen to this crowd";
-
 export function clipStrength(clip: JobClip, moment: JobMoment | undefined): Strength {
   const reasons: string[] = [];
   let score = Math.round((moment?.score ?? 0) * 50);
@@ -17,7 +15,7 @@ export function clipStrength(clip: JobClip, moment: JobMoment | undefined): Stre
     reasons.push(reason);
   };
   if (moment?.signals.includes("crowd") && moment.signals.includes("commentary")) add(15, "The crowd and the commentary both picked it.");
-  if (clip.hook !== HOOK_FALLBACK) add(10, "The hook quotes the commentary.");
+  if (moment?.title.includes("“")) add(10, "The commentary called it.");
   if (moment?.settle !== undefined) add(10, "It ends as the crowd settles.");
   if (PLACEMENTS[clip.placement].aspect === "16:9") add(10, "Wide, so nothing is cropped out.");
   else if (moment?.focus?.length) add(10, "The crop follows the play.");

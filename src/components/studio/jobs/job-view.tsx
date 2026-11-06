@@ -9,6 +9,7 @@ import { clipSeconds } from "@/lib/jobs/planner";
 import { postText } from "@/lib/jobs/post";
 import { postOrder, type Strength } from "@/lib/jobs/rank";
 import { JOB_PLACEMENTS, PLACEMENT_LABEL, type Job, type JobClip, type JobPlacement, type JobStage } from "@/lib/jobs/types";
+import { EnergyTimeline } from "./energy-timeline";
 import { useReviewKeys } from "./review-keys";
 import { uploadFile } from "./upload";
 
@@ -31,6 +32,7 @@ export function JobView() {
   const [missing, setMissing] = useState(false);
   // Bumped when something outside the poll, such as a resumed upload, makes the job live again.
   const [pollKey, setPollKey] = useState(0);
+  const [picked, setPicked] = useState<number | null>(null);
   useReviewKeys();
 
   const load = useCallback(async () => {
@@ -132,6 +134,20 @@ export function JobView() {
         ))}
       </ol>
 
+      <EnergyTimeline job={job} onPick={job.status === "done" && job.placements.some((p) => p !== "youtube-video") ? setPicked : undefined} />
+      {picked !== null && job.status === "done" && (
+        <PickBar
+          jobId={job.id}
+          at={picked}
+          onCancel={() => setPicked(null)}
+          onQueued={(next) => {
+            setPicked(null);
+            setJob(next);
+            setPollKey((k) => k + 1);
+          }}
+        />
+      )}
+
       {byPlacement.length > 0 && (
         <p className="mt-10 text-caption text-secondary">
           Review from the keyboard: <Kbd>J</Kbd> and <Kbd>K</Kbd> move between clips, <Kbd>A</Kbd> approves, <Kbd>R</Kbd> rejects, <Kbd>U</Kbd> undoes.
@@ -166,6 +182,47 @@ export function JobView() {
 
       {job.moments.length > 0 && <MomentsAndSkips job={job} />}
     </>
+  );
+}
+
+// Confirms a second picked on the timeline before it becomes clips.
+function PickBar({ jobId, at, onCancel, onQueued }: { jobId: string; at: number; onCancel: () => void; onQueued: (job: Job) => void }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  return (
+    <div role="group" aria-label="New moment" className="mt-3 flex flex-wrap items-center gap-3 rounded-xl bg-tint/10 px-4 py-3">
+      <p className="text-footnote">
+        Make a clip for every short platform from <span className="num font-semibold">{matchClock(at)}</span>? The cut opens on the build-up before it.
+      </p>
+      <button
+        type="button"
+        disabled={busy}
+        onClick={async () => {
+          setBusy(true);
+          setError(null);
+          try {
+            const res = await fetch(`/api/jobs/${jobId}/moments`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ at }) });
+            const body = await res.json();
+            if (!res.ok) throw new Error(body.error ?? `The server answered ${res.status}.`);
+            onQueued(body);
+          } catch (err) {
+            setError((err as Error).message);
+            setBusy(false);
+          }
+        }}
+        className="press inline-flex h-8 items-center rounded-full bg-button px-3 text-caption font-semibold text-white hover:bg-button-hover disabled:opacity-40"
+      >
+        {busy ? "Planning…" : "Make clips"}
+      </button>
+      <button type="button" onClick={onCancel} className="press rounded-md text-caption font-semibold text-tint hover:underline">
+        Cancel
+      </button>
+      {error && (
+        <p role="alert" className="w-full text-caption text-tally">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }
 

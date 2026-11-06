@@ -38,7 +38,7 @@ export type SourceInfo = { durationSec: number; width: number; height: number; f
 export type Word = { text: string; start: number; end: number };
 
 /** Where a moment's evidence came from. */
-export type Signal = "crowd" | "commentary" | "model";
+export type Signal = "crowd" | "commentary" | "model" | "producer";
 
 export type JobMoment = {
   id: string;
@@ -104,6 +104,8 @@ export type Job = {
   stages: JobStage[];
   /** Which optional services ran, so the page can say what the picks were based on. */
   services: { transcript: boolean; model: boolean };
+  /** The crowd's loudness across the match, for the page to draw: one dB value per stepSec seconds. */
+  energy?: { stepSec: number; db: number[] };
   moments: JobMoment[];
   clips: JobClip[];
   skipped: JobSkip[];

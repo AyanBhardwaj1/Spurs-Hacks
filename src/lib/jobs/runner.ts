@@ -8,7 +8,7 @@ import { clipAss, captionEvents, fontFamily, logoPlacement, renderArgs } from ".
 import { anchorsFrom, ANCHOR_SCHEMA, ANCHOR_SYSTEM, isAnchorAnswer } from "./anchors";
 import { coverArgs, coverAss, coverTime } from "./cover";
 import { applyCopy, copyPrompt, COPY_SCHEMA, isCopyAnswer } from "./copy";
-import { findPeaks, settleAfter } from "./energy";
+import { energyCurve, findPeaks, settleAfter } from "./energy";
 import { cropShare, focusKeys, MOTION, motionSteps, type Anchor } from "./focus";
 import { lastLine, runFfmpeg } from "./ffmpeg";
 import { audioPieces, crowdFloor, motionFrames, probe, sampledJpegs, sceneCuts } from "./media";
@@ -158,6 +158,7 @@ async function runStages(id: string) {
   const floor = await stage(id, "audio", async () => {
     if (!info.hasAudio) return { value: [] as number[], skipped: true, detail: "The video has no audio track." };
     const value = await crowdFloor(source, info.durationSec, work);
+    await updateJob(id, (j) => ({ ...j, energy: energyCurve(value) }));
     return { value, detail: `${value.length} seconds measured` };
   });
 

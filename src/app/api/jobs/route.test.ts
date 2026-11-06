@@ -105,3 +105,20 @@ test("platforms added to a finished job are planned from its moments and queued,
   expect(next.status).toBe("queued");
   expect((await add({ placements: ["tiktok"] })).status).toBe(409);
 });
+
+test("a second the producer picks becomes a moment with a clip for each short platform, queued to render", async () => {
+  const moments = await import("./[id]/moments/route");
+  const { job } = await (await jobs.POST(new Request("http://localhost/api/jobs", { method: "POST", body: JSON.stringify({ title: "F", sport: "tennis", placements: ["tiktok", "youtube-video"], fileName: "m.mp4", size: 1 }) }))).json();
+  const pick = (body: unknown) => moments.POST(new Request("http://localhost", { method: "POST", body: JSON.stringify(body) }), ctx({ id: job.id }) as never);
+  expect((await pick({ at: 100 })).status).toBe(404);
+  await updateJob(job.id, (j) => ({ ...j, status: "done", source: { durationSec: 600, width: 1280, height: 720, fps: 25, hasAudio: true } }));
+  expect((await pick({ at: 900 })).status).toBe(400);
+  const res = await pick({ at: 100.4 });
+  expect(res.status).toBe(201);
+  const next = await res.json();
+  expect(next.moments.map((m: { id: string; signals: string[] }) => [m.id, m.signals])).toEqual([["m-100", ["producer"]]]);
+  expect(next.clips.map((c: { id: string }) => c.id)).toEqual(["tiktok-m-100"]);
+  expect(next.status).toBe("queued");
+  expect(queuedJobs()).toContain(job.id);
+  expect((await pick({ at: 200 })).status).toBe(409);
+});

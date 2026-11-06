@@ -107,6 +107,11 @@ test("with a replay, each short clip replays the three seconds around its play, 
   expect(planClips({ ...base, moments: [moment(1000, 1)], placements: ["tiktok"] }).clips[0].replay).toBeUndefined();
 });
 
+test("a picked moment with nothing said opens on Watch this, not on a crowd that may be quiet", () => {
+  const { clips } = planClips({ ...base, moments: [moment(1000, 1, { signals: ["producer"], title: "Picked at 16:40" })], placements: ["tiktok"] });
+  expect(clips[0].hook).toBe("Watch this");
+});
+
 test("a replay window stays inside its segment", () => {
   expect(replayWindow(1000, { start: 999, end: 1010 })).toEqual({ start: 999, end: 1002 });
   expect(replayWindow(1000, { start: 990, end: 1000.5 })).toEqual({ start: 997.5, end: 1000.5 });
