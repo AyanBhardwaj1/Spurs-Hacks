@@ -11,6 +11,8 @@ export type PlacementId = keyof typeof PLACEMENTS;
 /** The placements a job can target. Club-app and partner deliveries are hackathon extras, left out. */
 export const JOB_PLACEMENTS = ["tiktok", "instagram-reel", "youtube-short", "x-video", "x-square", "youtube-video"] as const satisfies readonly PlacementId[];
 export type JobPlacement = (typeof JOB_PLACEMENTS)[number];
+/** What a new job is cut for unless someone picks otherwise: the four short-form feeds. */
+export const DEFAULT_PLACEMENTS: JobPlacement[] = ["tiktok", "instagram-reel", "youtube-short", "x-video"];
 
 export const SPORTS = ["soccer", "basketball", "american-football", "other"] as const;
 export type JobSport = (typeof SPORTS)[number];

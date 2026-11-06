@@ -1,4 +1,5 @@
-import { JOB_PLACEMENTS, SPORTS, type JobPlacement, type JobSport } from "./types";
+import { PLACEMENTS } from "@/lib/rundown/platforms";
+import { JOB_PLACEMENTS, SPORTS, type JobClip, type JobPlacement, type JobSport } from "./types";
 
 // What the job routes accept, checked at the boundary. Pure, so every rule has a test.
 
@@ -54,4 +55,29 @@ export function parseRange(header: string | null, size: number): { start: number
   if (start >= size) return "unsatisfiable";
   const end = m[2] === "" ? size - 1 : Math.min(size - 1, Number(m[2]));
   return end < start ? "unsatisfiable" : { start, end };
+}
+
+/** The shortest a trimmed clip may be; anything shorter is not a clip anyone posts. */
+const MIN_CLIP_SEC = 3;
+
+/** New edges for a single-segment clip: inside the video, at least 3 s, at most the platform's limit. */
+export function parseTrim(body: unknown, clip: Pick<JobClip, "placement" | "segments">, durationSec: number): Parsed<{ start: number; end: number }[]> {
+  if (clip.segments.length !== 1) return { ok: false, error: "Only a single-moment clip can be trimmed; a highlights cut is made of several." };
+  const { start, end } = (body ?? {}) as Record<string, unknown>;
+  if (typeof start !== "number" || typeof end !== "number" || !Number.isFinite(start) || !Number.isFinite(end)) return { ok: false, error: "start and end must be source seconds." };
+  if (start < 0 || end > durationSec) return { ok: false, error: `Keep the clip inside the video, 0 to ${Math.floor(durationSec)} s.` };
+  const max = PLACEMENTS[clip.placement].maxSeconds;
+  if (end - start < MIN_CLIP_SEC || end - start > max) return { ok: false, error: `A clip here runs ${MIN_CLIP_SEC} to ${max} s.` };
+  return { ok: true, value: [{ start: Math.round(start * 1000) / 1000, end: Math.round(end * 1000) / 1000 }] };
+}
+
+/** Platforms to add to a finished job: known ones it does not have yet. */
+export function parseAddPlacements(body: unknown, current: JobPlacement[]): Parsed<JobPlacement[]> {
+  const placements = (body as { placements?: unknown } | null)?.placements;
+  if (!Array.isArray(placements) || placements.length === 0 || !placements.every((p) => JOB_PLACEMENTS.includes(p as JobPlacement))) {
+    return { ok: false, error: `Pick at least one platform from ${JOB_PLACEMENTS.join(", ")}.` };
+  }
+  const fresh = [...new Set(placements as JobPlacement[])].filter((p) => !current.includes(p));
+  if (fresh.length === 0) return { ok: false, error: "The job already has those platforms." };
+  return { ok: true, value: fresh };
 }

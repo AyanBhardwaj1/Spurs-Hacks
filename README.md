@@ -16,7 +16,7 @@ Open `/studio`, press **Upload a match**, and pick the platforms. No video to ha
 | X | 16:9 and 1:1 | 14 to 20 s, newsy | top 3 |
 | YouTube | 16:9 | one highlights cut of the top 8 moments | 1 |
 
-It runs with no keys: moments come from the crowd's noise, and the copy follows rules. Add `OPENAI_API_KEY` and it also transcribes the commentary, which finds moments the crowd missed and captions every clip, the vertical and square crops follow the play instead of staying centred, and the model writes each platform's hook and caption. [docs/jobs.md](docs/jobs.md) covers how each stage works, the rules, and the settings.
+It runs with no keys: moments come from the crowd's noise, and the copy follows rules. Add `OPENAI_API_KEY` and it also transcribes the commentary, which finds moments the crowd missed and captions every clip, the vertical and square crops follow the play instead of staying centred, and the model writes each platform's hook and caption. Once a job is done you can move any clip's start and end and render it again, or cut the same match for platforms you skipped, without uploading it again. [docs/jobs.md](docs/jobs.md) covers how each stage works, the rules, and the settings.
 
 ## Team and this repo
 

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { mkdir, rm, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { PLACEMENTS } from "@/lib/rundown/platforms";
 import { defaultFont } from "@/lib/rundown/render";
@@ -28,33 +28,46 @@ const FALLBACK_SAMPLES = 6;
 /** A job that a restart interrupts this many times is failed rather than run again: it may be what crashes. */
 const MAX_ATTEMPTS = 2;
 
-type QueueState = { ids: string[]; busy: boolean; running?: string; recovered: Map<string, Promise<void>> };
+/** A full run of a job, or a render of some of its clips after a trim or an added platform. */
+type Task = { id: string; clipIds?: string[]; writeCopy?: boolean };
+type QueueState = { tasks: Task[]; busy: boolean; running?: string; recovered: Map<string, Promise<void>> };
 const queue = globalThis as unknown as { rundownJobQueue?: QueueState };
-const state: QueueState = (queue.rundownJobQueue ??= { ids: [], busy: false, recovered: new Map() });
+const state: QueueState = (queue.rundownJobQueue ??= { tasks: [], busy: false, recovered: new Map() });
 
 /** Whether this server process has the job in line or running. The saved status can outlive the process. */
-export const isActive = (id: string) => state.running === id || state.ids.includes(id);
+export const isActive = (id: string) => state.running === id || state.tasks.some((t) => t.id === id);
 
 /**
  * Puts a fully uploaded job in line. Safe to call twice: a job in line or running is not added again.
  * RUNDOWN_RUNNER=off takes uploads without running them, for tests or a server that only receives.
  */
 export function enqueue(id: string) {
-  if (!state.ids.includes(id)) state.ids.push(id);
+  if (!state.tasks.some((t) => t.id === id && !t.clipIds)) state.tasks.push({ id });
   if (process.env.RUNDOWN_RUNNER !== "off") void drain();
 }
 
-/** The ids waiting to run, oldest first. */
-export const queuedJobs = () => [...state.ids];
+/** Puts a render of some clips in line, joining one already waiting for the same job. */
+export function enqueueRender(id: string, clipIds: string[], { writeCopy = false } = {}) {
+  const waiting = state.tasks.find((t) => t.id === id && t.clipIds);
+  if (waiting) {
+    waiting.clipIds = [...new Set([...waiting.clipIds!, ...clipIds])];
+    waiting.writeCopy ||= writeCopy;
+  } else state.tasks.push({ id, clipIds, writeCopy });
+  if (process.env.RUNDOWN_RUNNER !== "off") void drain();
+}
+
+/** The job ids waiting to run, oldest first. */
+export const queuedJobs = () => state.tasks.map((t) => t.id);
 
 async function drain() {
   if (state.busy) return;
   state.busy = true;
   try {
-    for (let id = state.ids.shift(); id; id = state.ids.shift()) {
+    for (let task = state.tasks.shift(); task; task = state.tasks.shift()) {
+      const { id } = task;
       state.running = id;
       try {
-        await runJob(id);
+        await (task.clipIds ? runRender(id, task.clipIds, task.writeCopy) : runJob(id));
       } catch (err) {
         console.error(`[jobs] ${id} failed:`, err);
         await updateJob(id, (j) => ({ ...j, status: "failed", error: (err as Error).message })).catch((e) => console.error(`[jobs] ${id} could not be marked failed:`, e));
@@ -201,43 +214,94 @@ async function runStages(id: string) {
   });
 
   await stage(id, "focus", async (job) => {
-    // The narrowest crop any clip of a moment needs decides whether the moment needs following at all.
     const windows = cropWindows(job, info);
     if (windows.size === 0) return { value: undefined, skipped: true, detail: "No clip crops the picture, so there is nothing to follow." };
     if (!openaiConfigured()) return { value: undefined, skipped: true, detail: "No OpenAI key on the server; vertical and square cuts are centred." };
-    let followed = 0;
-    const failures: string[] = [];
-    for (const [momentId, w] of windows) {
-      try {
-        const keys = await followPlay(source, w.start, w.end, w.share);
-        await updateJob(id, (j) => ({ ...j, moments: j.moments.map((m) => (m.id === momentId ? { ...m, focus: keys } : m)) }));
-        followed += 1;
-      } catch (err) {
-        // A moment the model could not follow keeps a centred crop; the rest still follow.
-        console.warn(`[jobs] ${id} focus for ${momentId} failed:`, err);
-        failures.push(momentId);
-      }
-    }
-    const missed = failures.length ? `; ${failures.length} kept a centred crop after the vision call failed` : "";
+    const { followed, failed } = await followMoments(id, source, windows);
+    const missed = failed ? `; ${failed} kept a centred crop after the vision call failed` : "";
     return { value: undefined, detail: `Followed the play in ${followed} of ${windows.size} moments${missed}` };
   });
 
   await stage(id, "render", async (job) => {
-    const font = defaultFont();
-    let ready = 0;
-    for (const clip of job.clips) {
-      await updateJob(id, (j) => ({ ...j, clips: j.clips.map((c) => (c.id === clip.id ? { ...c, render: { state: "rendering" } } : c)) }));
-      const result = await renderOne(id, clip.id, source, words, info.hasAudio, font).then(
-        (file) => ({ state: "ready" as const, file }),
-        (err: Error) => ({ state: "failed" as const, error: err.message }),
-      );
-      if (result.state === "ready") ready += 1;
-      await updateJob(id, (j) => ({ ...j, clips: j.clips.map((c) => (c.id === clip.id ? { ...c, render: result } : c)) }));
-    }
+    const ready = await renderClips(id, job.clips.map((c) => c.id), source, words, info.hasAudio);
     return { value: undefined, detail: `${ready} of ${job.clips.length} rendered` };
   });
 
   await updateJob(id, (j) => ({ ...j, status: "done" }));
+}
+
+/** Renders some clips of a finished job again: after a trim, or for platforms added later. */
+async function runRender(id: string, clipIds: string[], writeCopy = false) {
+  let job = await updateJob(id, (j) => ({ ...j, status: "running" }));
+  const info = job.source;
+  if (!info) throw new Error("The job has not been read yet, so its clips cannot be rendered.");
+  const source = jobFile.source(id, job.upload.fileName);
+  try {
+    if (writeCopy && openaiConfigured()) {
+      // Clips for a platform added later get the model's copy, like the ones planned in the first run.
+      const fresh = job.clips.filter((c) => clipIds.includes(c.id));
+      try {
+        const { system, user } = copyPrompt(fresh, job.moments, job.sport, job.title);
+        const answer = await structured({ name: "clip_copy", system, user, schema: COPY_SCHEMA, check: isCopyAnswer });
+        const written = new Map(applyCopy(fresh, answer).map((c) => [c.id, c]));
+        job = await updateJob(id, (j) => ({ ...j, clips: j.clips.map((c) => written.get(c.id) ?? c) }));
+      } catch (err) {
+        console.warn(`[jobs] ${id} copy for added clips failed, keeping rule copy:`, err);
+      }
+    }
+    if (openaiConfigured()) {
+      // Clips of a moment nobody has followed yet, such as one only a new platform uses, get followed now.
+      const windows = cropWindows(job, info, (c) => clipIds.includes(c.id) && !job.moments.find((m) => m.id === c.momentId)?.focus);
+      await followMoments(id, source, windows);
+    }
+    const words = job.services.transcript ? await readWords(id) : [];
+    await renderClips(id, clipIds, source, words, info.hasAudio);
+  } finally {
+    await rm(jobFile.work(id), { recursive: true, force: true });
+  }
+  await updateJob(id, (j) => ({ ...j, status: "done" }));
+}
+
+async function readWords(id: string): Promise<Word[]> {
+  try {
+    return JSON.parse(await readFile(/*turbopackIgnore: true*/ jobFile.transcript(id), "utf8")) as Word[];
+  } catch (err) {
+    console.warn(`[jobs] ${id} transcript unreadable, rendering without captions:`, err);
+    return [];
+  }
+}
+
+/** Follows the play for each window and saves the keys on its moment. A failed call leaves that moment centred. */
+async function followMoments(id: string, source: string, windows: Map<string, { start: number; end: number; share: number }>) {
+  let followed = 0;
+  let failed = 0;
+  for (const [momentId, w] of windows) {
+    try {
+      const keys = await followPlay(source, w.start, w.end, w.share);
+      await updateJob(id, (j) => ({ ...j, moments: j.moments.map((m) => (m.id === momentId ? { ...m, focus: keys } : m)) }));
+      followed += 1;
+    } catch (err) {
+      console.warn(`[jobs] ${id} focus for ${momentId} failed:`, err);
+      failed += 1;
+    }
+  }
+  return { followed, failed };
+}
+
+/** Renders the given clips one by one, recording each one's result. Returns how many are ready. */
+async function renderClips(id: string, clipIds: string[], source: string, words: Word[], hasAudio: boolean) {
+  const font = defaultFont();
+  let ready = 0;
+  for (const clipId of clipIds) {
+    await updateJob(id, (j) => ({ ...j, clips: j.clips.map((c) => (c.id === clipId ? { ...c, render: { state: "rendering" } } : c)) }));
+    const result = await renderOne(id, clipId, source, words, hasAudio, font).then(
+      (file) => ({ state: "ready" as const, file }),
+      (err: Error) => ({ state: "failed" as const, error: err.message }),
+    );
+    if (result.state === "ready") ready += 1;
+    await updateJob(id, (j) => ({ ...j, clips: j.clips.map((c) => (c.id === clipId ? { ...c, render: result } : c)) }));
+  }
+  return ready;
 }
 
 async function renderOne(id: string, clipId: string, source: string, words: Word[], hasAudio: boolean, font: string | undefined) {
@@ -272,9 +336,10 @@ const ANCHOR_FPS = 1;
 const ANCHORS_PER_CALL = 20;
 
 /** For each moment that a cropped clip uses: the stretch of source its cropped clips cover, and the narrowest crop. */
-function cropWindows(job: Job, info: SourceInfo) {
+function cropWindows(job: Job, info: SourceInfo, include: (clip: Job["clips"][number]) => boolean = () => true) {
   const windows = new Map<string, { start: number; end: number; share: number }>();
   for (const clip of job.clips) {
+    if (!include(clip)) continue;
     const share = cropShare(info, PLACEMENTS[clip.placement]);
     if (share >= 0.99 || clip.segments.length !== 1) continue;
     const [seg] = clip.segments;

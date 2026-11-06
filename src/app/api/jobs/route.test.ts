@@ -59,3 +59,49 @@ test("a producer approves, rejects with a reason, and clears a clip; an unrender
   expect((await clip.GET(new Request("http://localhost"), ctx({ id: job.id, clipId: "tiktok-m-30" }) as never)).status).toBe(409);
   expect((await clip.GET(new Request("http://localhost"), ctx({ id: job.id, clipId: "nope" }) as never)).status).toBe(404);
 });
+
+test("a finished clip is trimmed and queued to render again, its old approval cleared; new platforms are planned from the job's moments", async () => {
+  const trim = await import("./[id]/clips/[clipId]/trim/route");
+  const placements = await import("./[id]/placements/route");
+  const { job } = await (await jobs.POST(new Request("http://localhost/api/jobs", { method: "POST", body: JSON.stringify({ title: "F", sport: "soccer", placements: ["tiktok"], fileName: "m.mp4", size: 1 }) }))).json();
+  await updateJob(job.id, (j) => ({
+    ...j,
+    status: "done",
+    source: { durationSec: 600, width: 1280, height: 720, fps: 25, hasAudio: true },
+    moments: [{ id: "m-30", peak: 30, start: 15, end: 40, score: 0.9, signals: ["crowd"], title: "Crowd erupts at 0:30" }],
+    clips: [{ id: "tiktok-m-30", momentId: "m-30", placement: "tiktok", segments: [{ start: 22, end: 40 }], title: "t", hook: "h", caption: "c", hashtags: [], why: "w", render: { state: "ready", file: "x.mp4" }, decision: { value: "approved", at: "now" } }],
+  }));
+  const post = (mod: { POST: (r: Request, c: never) => Promise<Response> }, params: Record<string, string>, body: unknown) =>
+    mod.POST(new Request("http://localhost", { method: "POST", body: JSON.stringify(body) }), ctx(params) as never);
+
+  const trimmed = await (await post(trim, { id: job.id, clipId: "tiktok-m-30" }, { start: 20, end: 44 })).json();
+  expect(trimmed).toMatchObject({ segments: [{ start: 20, end: 44 }], render: { state: "waiting" } });
+  expect(trimmed.decision).toBeUndefined();
+  expect((await post(trim, { id: job.id, clipId: "tiktok-m-30" }, { start: 20, end: 21 })).status).toBe(409);
+
+  await updateJob(job.id, (j) => ({ ...j, status: "done" }));
+  const { queuedJobs } = await import("@/lib/jobs/runner");
+  if (queuedJobs().includes(job.id)) {
+    // The trim's render is still in line in this runner-off test; adding platforms waits for it.
+    expect((await post(placements, { id: job.id }, { placements: ["x-video"] })).status).toBe(409);
+  }
+});
+
+test("platforms added to a finished job are planned from its moments and queued, and repeats are refused", async () => {
+  const placements = await import("./[id]/placements/route");
+  const { job } = await (await jobs.POST(new Request("http://localhost/api/jobs", { method: "POST", body: JSON.stringify({ title: "F", sport: "soccer", placements: ["tiktok"], fileName: "m.mp4", size: 1 }) }))).json();
+  await updateJob(job.id, (j) => ({
+    ...j,
+    status: "done",
+    source: { durationSec: 600, width: 1280, height: 720, fps: 25, hasAudio: true },
+    moments: [{ id: "m-30", peak: 30, start: 15, end: 40, score: 0.9, signals: ["crowd"], title: "Crowd erupts at 0:30" }],
+  }));
+  const add = (body: unknown) => placements.POST(new Request("http://localhost", { method: "POST", body: JSON.stringify(body) }), ctx({ id: job.id }) as never);
+  const res = await add({ placements: ["x-video", "tiktok"] });
+  expect(res.status).toBe(200);
+  const next = await res.json();
+  expect(next.placements).toEqual(["tiktok", "x-video"]);
+  expect(next.clips.map((c: { id: string }) => c.id)).toEqual(["x-video-m-30"]);
+  expect(next.status).toBe("queued");
+  expect((await add({ placements: ["tiktok"] })).status).toBe(409);
+});

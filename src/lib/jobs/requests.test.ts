@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { CHUNK_BYTES, checkChunk, parseNewJob, parseRange, type NewJob } from "./requests";
+import { CHUNK_BYTES, checkChunk, parseAddPlacements, parseNewJob, parseRange, parseTrim, type NewJob } from "./requests";
 
 const valid: NewJob = { title: "City v United", sport: "soccer", placements: ["tiktok", "x-video"], fileName: "match.mp4", size: 2_000_000_000 };
 
@@ -39,4 +39,23 @@ test("byte ranges for seeking a video", () => {
   expect(parseRange("items=0-1", 1000)).toBeNull();
   expect(parseRange("bytes=-0", 1000)).toBe("unsatisfiable");
   expect(parseRange("bytes=0-", 0)).toBe("unsatisfiable");
+});
+
+const clip = { placement: "tiktok" as const, segments: [{ start: 100, end: 118 }] };
+
+test("a trim moves a single-segment clip's edges inside the video and the platform's length limits", () => {
+  expect(parseTrim({ start: 98.5, end: 121 }, clip, 600)).toEqual({ ok: true, value: [{ start: 98.5, end: 121 }] });
+  expect(parseTrim({ start: -1, end: 20 }, clip, 600)).toMatchObject({ ok: false });
+  expect(parseTrim({ start: 590, end: 601 }, clip, 600)).toMatchObject({ ok: false });
+  expect(parseTrim({ start: 100, end: 101 }, clip, 600)).toMatchObject({ ok: false });
+  expect(parseTrim({ start: 0, end: 700 }, clip, 900)).toMatchObject({ ok: false });
+  expect(parseTrim({ start: "1", end: 20 }, clip, 600)).toMatchObject({ ok: false });
+  expect(parseTrim({ start: 10, end: 30 }, { placement: "youtube-video", segments: [{ start: 1, end: 9 }, { start: 20, end: 30 }] }, 600)).toMatchObject({ ok: false });
+});
+
+test("added platforms must be known and new to the job", () => {
+  expect(parseAddPlacements({ placements: ["x-square", "youtube-video"] }, ["tiktok"])).toEqual({ ok: true, value: ["x-square", "youtube-video"] });
+  expect(parseAddPlacements({ placements: ["tiktok"] }, ["tiktok"])).toMatchObject({ ok: false });
+  expect(parseAddPlacements({ placements: ["myspace"] }, ["tiktok"])).toMatchObject({ ok: false });
+  expect(parseAddPlacements({ placements: [] }, ["tiktok"])).toMatchObject({ ok: false });
 });

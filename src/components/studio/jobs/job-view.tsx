@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useId, useState } from "react";
 import { PLACEMENTS } from "@/lib/rundown/platforms";
 import { matchClock } from "@/lib/jobs/moments";
-import type { Job, JobClip, JobPlacement, JobStage } from "@/lib/jobs/types";
+import { JOB_PLACEMENTS, type Job, type JobClip, type JobPlacement, type JobStage } from "@/lib/jobs/types";
 import { PLACEMENT_LABEL } from "./new-job-form";
 import { uploadFile } from "./upload";
 
@@ -90,6 +90,15 @@ export function JobView() {
         </div>
         {!live(job) && <DeleteJob id={job.id} onDeleted={() => router.push("/studio")} />}
       </header>
+      {job.status === "done" && (
+        <AddPlatforms
+          job={job}
+          onQueued={(next) => {
+            setJob(next);
+            setPollKey((k) => k + 1);
+          }}
+        />
+      )}
 
       {job.status === "uploading" && <ResumeUpload job={job} onDone={() => setPollKey((k) => k + 1)} />}
       {job.status === "failed" && (
@@ -123,7 +132,15 @@ export function JobView() {
           </h2>
           <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {g.clips.map((c) => (
-              <ClipCard key={c.id} jobId={job.id} clip={c} onChange={(next) => setJob((j) => j && { ...j, clips: j.clips.map((x) => (x.id === next.id ? next : x)) })} />
+              <ClipCard
+                key={c.id}
+                jobId={job.id}
+                clip={c}
+                editable={job.status === "done" && Boolean(job.source)}
+                durationSec={job.source?.durationSec ?? 0}
+                onChange={(next) => setJob((j) => j && { ...j, clips: j.clips.map((x) => (x.id === next.id ? next : x)) })}
+                onQueued={() => setPollKey((k) => k + 1)}
+              />
             ))}
           </div>
         </section>
@@ -136,7 +153,9 @@ export function JobView() {
 
 const ASPECT_CLASS: Record<string, string> = { "9:16": "aspect-[9/16]", "1:1": "aspect-square", "16:9": "aspect-video" };
 
-function ClipCard({ jobId, clip, onChange }: { jobId: string; clip: JobClip; onChange: (clip: JobClip) => void }) {
+type ClipCardProps = { jobId: string; clip: JobClip; editable: boolean; durationSec: number; onChange: (clip: JobClip) => void; onQueued: () => void };
+
+function ClipCard({ jobId, clip, editable, durationSec, onChange, onQueued }: ClipCardProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -191,6 +210,7 @@ function ClipCard({ jobId, clip, onChange }: { jobId: string; clip: JobClip; onC
           </a>
         )}
       </div>
+      {editable && clip.segments.length === 1 && <TrimControl jobId={jobId} clip={clip} durationSec={durationSec} onChange={onChange} onQueued={onQueued} />}
       <div className="mt-3 flex items-center gap-2 border-t border-separator/60 pt-3">
         {clip.decision ? (
           <>
@@ -216,6 +236,119 @@ function ClipCard({ jobId, clip, onChange }: { jobId: string; clip: JobClip; onC
         </p>
       )}
     </article>
+  );
+}
+
+const STEP_SEC = 1;
+
+// Nudge a clip's edges a second at a time and render it again. The server checks the new edges.
+function TrimControl({ jobId, clip, durationSec, onChange, onQueued }: Omit<ClipCardProps, "editable">) {
+  const [open, setOpen] = useState(false);
+  const [edges, setEdges] = useState(clip.segments[0]);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  if (!open) {
+    return (
+      <button type="button" onClick={() => setOpen(true)} className="press mt-2 self-start rounded-md text-caption font-semibold text-tint hover:underline">
+        Adjust the cut
+      </button>
+    );
+  }
+  const nudge = (edge: "start" | "end", by: number) =>
+    setEdges((e) => ({ ...e, [edge]: Math.min(durationSec, Math.max(0, Math.round((e[edge] + by) * 10) / 10)) }));
+  const row = (edge: "start" | "end", label: string) => (
+    <div className="flex items-center gap-2">
+      <span className="w-10 text-caption text-secondary">{label}</span>
+      <button type="button" aria-label={`${label} one second earlier`} onClick={() => nudge(edge, -STEP_SEC)} className="press h-7 w-8 rounded-md bg-fill text-caption font-semibold">
+        −1
+      </button>
+      <span className="num w-14 text-center text-caption">{matchClock(edges[edge])}</span>
+      <button type="button" aria-label={`${label} one second later`} onClick={() => nudge(edge, STEP_SEC)} className="press h-7 w-8 rounded-md bg-fill text-caption font-semibold">
+        +1
+      </button>
+    </div>
+  );
+  return (
+    <div className="mt-3 grid gap-2 rounded-lg bg-fill/50 p-2">
+      {row("start", "Start")}
+      {row("end", "End")}
+      <p className="num text-caption text-secondary">{Math.round(edges.end - edges.start)} s</p>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          disabled={saving}
+          onClick={async () => {
+            setSaving(true);
+            setError(null);
+            try {
+              const res = await fetch(`/api/jobs/${jobId}/clips/${clip.id}/trim`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(edges) });
+              const body = await res.json();
+              if (!res.ok) throw new Error(body.error ?? `The server answered ${res.status}.`);
+              onChange(body);
+              onQueued();
+              setOpen(false);
+            } catch (err) {
+              setError((err as Error).message);
+            } finally {
+              setSaving(false);
+            }
+          }}
+          className="press inline-flex h-8 items-center rounded-full bg-button px-3 text-caption font-semibold text-white hover:bg-button-hover disabled:opacity-40"
+        >
+          Render this cut
+        </button>
+        <button type="button" onClick={() => setOpen(false)} className="press rounded-md px-2 text-caption font-semibold text-secondary hover:text-label">
+          Cancel
+        </button>
+      </div>
+      {error && (
+        <p role="alert" className="text-caption text-tally">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// Cut a finished job for more platforms, from the moments it already found.
+function AddPlatforms({ job, onQueued }: { job: Job; onQueued: (job: Job) => void }) {
+  const missing = JOB_PLACEMENTS.filter((p) => !job.placements.includes(p));
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState<JobPlacement | null>(null);
+  if (missing.length === 0 || job.moments.length === 0) return null;
+  return (
+    <div className="mt-5 flex flex-wrap items-center gap-2">
+      <span className="text-caption text-secondary">Also cut it for</span>
+      {missing.map((p) => (
+        <button
+          key={p}
+          type="button"
+          disabled={busy !== null}
+          onClick={async () => {
+            setBusy(p);
+            setError(null);
+            try {
+              const res = await fetch(`/api/jobs/${job.id}/placements`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ placements: [p] }) });
+              const body = await res.json();
+              if (!res.ok) throw new Error(body.error ?? `The server answered ${res.status}.`);
+              onQueued(body);
+            } catch (err) {
+              setError((err as Error).message);
+            } finally {
+              setBusy(null);
+            }
+          }}
+          className="press h-8 rounded-full border border-separator px-3 text-caption font-semibold text-label hover:bg-fill disabled:opacity-40"
+        >
+          {busy === p ? "Adding…" : `+ ${PLACEMENT_LABEL[p]}`}
+        </button>
+      ))}
+      {error && (
+        <span role="alert" className="text-caption text-tally">
+          {error}
+        </span>
+      )}
+    </div>
   );
 }
 

@@ -35,6 +35,13 @@ The play comes before the crowd, so every short cut opens on the build-up and la
 
 Captions keep to each platform's caption and hashtag limits from `src/lib/rundown/platforms.ts`, and burned-in text stays out of the bands each app covers with its own buttons. Moments scoring under 0.30 are left out everywhere. The rules are in `src/lib/jobs/planner.ts`; the tests next to it pin them.
 
+## After a job finishes
+
+- **Adjust a cut.** On any single-moment clip, move the start and end a second at a time and render it again. The new edges must stay inside the video, run at least 3 s and keep to the platform's length limit. The clip's approval is cleared, since it was given for the old cut. `POST /api/jobs/{id}/clips/{clipId}/trim` with `{ start, end }`.
+- **Add platforms.** "Also cut it for" plans the missing platforms from the moments the job already found and renders only those clips, with the model's copy and play-following when a key is set. `POST /api/jobs/{id}/placements` with `{ placements }`.
+
+Both run as render-only tasks in the same one-at-a-time queue.
+
 ## What the model may do
 
 Write copy, and mark where the play is on sampled frames. It sees each clip's moment, what was said and the platform's limits. It cannot move a cut, add a clip or change hashtags. Its answer is checked against a schema in code, every field is cut to its platform's limit, and a blank or missing field keeps the rule-written copy. If the call fails, the job uses the rule copy and says why on the Plan stage. Its frame marks are checked the same way: a frame it skips, repeats or numbers out of range gets no mark, the camera's pan fills the gap, and a moment whose call fails keeps a centred crop.
