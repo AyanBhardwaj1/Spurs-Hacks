@@ -18,6 +18,16 @@ Open `/studio`, press **Upload a match**, and pick the platforms. No video to ha
 
 It runs with no keys: moments come from the crowd's noise, and the copy follows rules. Add `OPENAI_API_KEY` and it also transcribes the commentary, which finds moments the crowd missed and captions every clip, the vertical and square crops follow the play instead of staying centred, and the model writes each platform's hook and caption. Once a job is done you can move any clip's start and end and render it again, or cut the same match for platforms you skipped, without uploading it again. Every clip gets a cover image cut from its play, with the hook on it. Captions light up word by word as they are said, and short clips can end with a slow-motion replay of the play. Add your club's logo and colour and every clip and cover carries them. "Download approved" puts every approved clip, its cover, its captions and its post copy in one zip with a manifest. [docs/jobs.md](docs/jobs.md) covers how each stage works, the rules, and the settings.
 
+### From the command line
+
+The same pipeline runs with no server and no browser:
+
+```bash
+bun run rundown match.mp4 --sport tennis --platforms tiktok,x-video --replay --logo logo.png
+```
+
+It prints each stage as it finishes, then copies every clip, its cover and captions, `posts.txt` and `manifest.json` to `rundown-match/` (or `--out`), and names the clip to post first on each platform. The job stays in the studio, where you can review, trim or add platforms. `bun run rundown` with no arguments lists the options.
+
 ## Team and this repo
 
 Team 7 built Rundown: Feria, Hamid, Sam, Ayan and Bryan. Feria and Hamid built the MatchWatch prompts the studio uses. The team's repository, with each person's commits, is `SamGu-NRX/spurs-hackathon`.
