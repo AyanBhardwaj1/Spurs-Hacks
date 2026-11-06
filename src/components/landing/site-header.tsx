@@ -8,14 +8,12 @@ import { container } from "./page-parts";
 const pill = "press inline-flex items-center rounded-full bg-button text-white hover:bg-button-hover";
 
 const pages = [
-  { href: "/how-it-works", label: "How it works" },
-  { href: "/proposals", label: "Proposals" },
-  { href: "/built-on", label: "Built on" },
-  { href: "/demo", label: "Sample run" },
+  { href: "/studio", label: "Your matches" },
+  { href: "/case-study", label: "Case study" },
 ];
 
 // One bar on wider screens. On a phone the page links drop to a second row that scrolls sideways, so every
-// page stays one tap away. The links come before "Try the demo" in the markup, so Tab follows the bar from
+// page stays one tap away. The links come before "Cut a match" in the markup, so Tab follows the bar from
 // left to right; on a phone the row of links moves below with order-last. The row's padding leaves room for
 // the focus ring, which its sideways scrolling would otherwise clip.
 export function SiteHeader() {
@@ -63,14 +61,13 @@ export function SiteHeader() {
             </Link>
           ))}
         </div>
-        {/* The demo is the studio on the real match; /demo is the sample walkthrough, listed with the pages.
-            The studio has its own layout, so this link leaves the header behind and keeps Next's own scroll to
+        {/* The studio has its own layout, so this link leaves the header behind and keeps Next's own scroll to
             the top instead of link()'s. */}
         <Link
-          href="/studio"
+          href="/studio/new"
           className={`${pill} h-8 px-3.5 text-caption md:ml-3 pointer-coarse:h-11 pointer-coarse:px-4`}
         >
-          Try the demo
+          Cut a match
         </Link>
       </nav>
     </header>

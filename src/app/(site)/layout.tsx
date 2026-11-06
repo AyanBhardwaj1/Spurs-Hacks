@@ -1,11 +1,10 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { container } from "@/components/landing/page-parts";
 import { SiteHeader } from "@/components/landing/site-header";
 import "@/components/landing/landing.css";
 
-const BRIEF_URL =
-  "https://scoreplay.notion.site/Spurs-Hackathon-Builder-Brief-3fb9d8f0d4ce815096d4dc8294142346";
-const REPO_URL = "https://github.com/SamGu-NRX/spurs-hackathon";
+const REPO_URL = "https://github.com/AyanBhardwaj1/Spurs-Hacks";
 
 // The pages that explain Rundown share one header and footer. The footer sits at the bottom of the window
 // even when a page is shorter than it.
@@ -24,22 +23,22 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       </main>
       <footer className="bg-grouped">
         <div className={`${container} py-8 text-caption text-secondary`}>
-          <ol className="space-y-2">
-            <li>
-              The demo rows, the Pegasus description and the video log values are written by hand to show the format.
-              None of them come from match data.
-            </li>
-            <li>
-              Match footage, photos and logos belong to the clubs and leagues and stay on ScorePlay and Twelve Labs.
-              None of it is hosted here.
-            </li>
-          </ol>
+          <p className="max-w-[48em]">
+            A video you upload stays in its job&apos;s folder on the server running Rundown until you delete the
+            job. Nothing is posted anywhere. With an OpenAI key set, the audio and a few sampled frames go to
+            OpenAI to transcribe the commentary, follow the play and write the copy; nothing else leaves.
+          </p>
+          <p className="mt-2 max-w-[48em]">
+            On the case study pages, the demo rows, the Pegasus description and the video log values are written by
+            hand to show the format. Match footage, photos and logos belong to the clubs and leagues and are not
+            hosted here.
+          </p>
           <div className="mt-8 flex flex-col gap-3 md:flex-row md:justify-between">
-            <p>Spurs² Hackathon, UT Austin, October 22 to 23, 2026.</p>
+            <p>Started at the Spurs² Hackathon, UT Austin, October 2026. Built by Ayan Bhardwaj.</p>
             <p className="flex gap-6">
-              <a href={BRIEF_URL} className="hover:text-label hover:underline">
-                Builder brief
-              </a>
+              <Link href="/case-study" className="hover:text-label hover:underline">
+                Case study
+              </Link>
               <a href={REPO_URL} className="hover:text-label hover:underline">
                 GitHub
               </a>

@@ -5,8 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useId, useState } from "react";
 import { PLACEMENTS } from "@/lib/rundown/platforms";
 import { matchClock } from "@/lib/jobs/moments";
-import { JOB_PLACEMENTS, type Job, type JobClip, type JobPlacement, type JobStage } from "@/lib/jobs/types";
-import { PLACEMENT_LABEL } from "./new-job-form";
+import { JOB_PLACEMENTS, PLACEMENT_LABEL, type Job, type JobClip, type JobPlacement, type JobStage } from "@/lib/jobs/types";
 import { uploadFile } from "./upload";
 
 const POLL_MS = 2000;

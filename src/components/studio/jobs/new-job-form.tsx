@@ -4,17 +4,9 @@ import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { PLACEMENTS } from "@/lib/rundown/platforms";
 import { SPORT } from "@/lib/jobs/sports";
-import { DEFAULT_PLACEMENTS, JOB_PLACEMENTS, SPORTS, type JobPlacement, type JobSport } from "@/lib/jobs/types";
+import { DEFAULT_PLACEMENTS, JOB_PLACEMENTS, PLACEMENT_LABEL, SPORTS, type JobPlacement, type JobSport } from "@/lib/jobs/types";
 import { uploadFile } from "./upload";
 
-export const PLACEMENT_LABEL: Record<JobPlacement, string> = {
-  tiktok: "TikTok",
-  "instagram-reel": "Instagram Reels",
-  "youtube-short": "YouTube Shorts",
-  "x-video": "X",
-  "x-square": "X, square",
-  "youtube-video": "YouTube highlights",
-};
 
 const mb = (bytes: number) => `${(bytes / 1024 ** 2).toFixed(bytes < 1024 ** 3 ? 0 : 1)} MB`;
 

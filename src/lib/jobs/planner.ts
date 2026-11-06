@@ -63,6 +63,13 @@ const STYLE: Record<Exclude<JobPlacement, "youtube-video">, Style> = {
   },
 };
 
+/** How long a platform's cuts run and how many it takes. The highlights cut has neither, so it has none. */
+export function cutRange(placement: JobPlacement): { min: number; max: number; count: number } | undefined {
+  if (placement === "youtube-video") return undefined;
+  const s = STYLE[placement];
+  return { min: s.lead + s.minTail, max: s.lead + s.maxTail, count: s.count };
+}
+
 /** Moments under this score are noise for every platform. */
 const MIN_SCORE = 0.3;
 /** The highlights cut takes this many of the top moments, at most. */

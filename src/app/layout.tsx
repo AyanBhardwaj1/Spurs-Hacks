@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Rundown · Assisted auto-production for match day",
+  title: "Rundown · Turn a full match into clips for every feed",
   description:
-    "Rundown watches every asset from a game, drafts the pieces worth making for each audience, and shows the producer what it dropped and why. Built at the Spurs² Hackathon on ScorePlay and Twelve Labs.",
+    "Upload a full match from any sport. Rundown finds the moments from the crowd and the commentary, cuts each one for TikTok, Reels, Shorts, X and YouTube, captions it, follows the play, and puts every clip in front of you to approve.",
 };
 
 export const viewport: Viewport = {

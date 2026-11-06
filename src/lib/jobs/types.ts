@@ -11,6 +11,15 @@ export type PlacementId = keyof typeof PLACEMENTS;
 /** The placements a job can target. Club-app and partner deliveries are hackathon extras, left out. */
 export const JOB_PLACEMENTS = ["tiktok", "instagram-reel", "youtube-short", "x-video", "x-square", "youtube-video"] as const satisfies readonly PlacementId[];
 export type JobPlacement = (typeof JOB_PLACEMENTS)[number];
+/** What each placement is called on the page. */
+export const PLACEMENT_LABEL: Record<JobPlacement, string> = {
+  tiktok: "TikTok",
+  "instagram-reel": "Instagram Reels",
+  "youtube-short": "YouTube Shorts",
+  "x-video": "X",
+  "x-square": "X, square",
+  "youtube-video": "YouTube highlights",
+};
 /** What a new job is cut for unless someone picks otherwise: the four short-form feeds. */
 export const DEFAULT_PLACEMENTS: JobPlacement[] = ["tiktok", "instagram-reel", "youtube-short", "x-video"];
 

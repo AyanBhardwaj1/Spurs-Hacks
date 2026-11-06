@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { PLACEMENTS } from "@/lib/rundown/platforms";
-import { planClips } from "./planner";
+import { cutRange, planClips } from "./planner";
 import type { JobMoment } from "./types";
 
 const moment = (peak: number, score: number, extra: Partial<JobMoment> = {}): JobMoment => ({
@@ -80,4 +80,10 @@ test("a long roar keeps its cut going until the crowd settles, within each platf
 test("a short roar ends the cut early, but never under the platform's shortest tail", () => {
   const { clips } = planClips({ ...base, moments: [moment(1000, 1, { settle: 2 })], placements: ["tiktok", "x-video"] });
   expect(clips.map((c) => c.segments[0].end)).toEqual([1006, 1004]);
+});
+
+test("each short-form platform's cut length runs from its shortest tail to its longest", () => {
+  expect(cutRange("tiktok")).toEqual({ min: 14, max: 26, count: 5 });
+  expect(cutRange("youtube-short")).toEqual({ min: 22, max: 44, count: 4 });
+  expect(cutRange("youtube-video")).toBeUndefined();
 });
