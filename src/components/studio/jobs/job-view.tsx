@@ -8,6 +8,8 @@ import { matchClock } from "@/lib/jobs/moments";
 import { clipSeconds, isMontage } from "@/lib/jobs/planner";
 import { postText } from "@/lib/jobs/post";
 import { postOrder, type Strength } from "@/lib/jobs/rank";
+import { SPORT } from "@/lib/jobs/sports";
+import type { JobSummary } from "@/lib/jobs/summary";
 import { JOB_PLACEMENTS, PLACEMENT_LABEL, type Job, type JobClip, type JobPlacement, type JobStage } from "@/lib/jobs/types";
 import { EnergyTimeline } from "./energy-timeline";
 import { useReviewKeys } from "./review-keys";
@@ -673,11 +675,32 @@ function DeleteJob({ id, onDeleted }: { id: string; onDeleted: () => void }) {
   );
 }
 
-export function JobLink({ id, title, status, clips }: { id: string; title: string; status: Job["status"]; clips: number }) {
+const STATUS_LABEL: Record<Job["status"], string> = { uploading: "Uploading", queued: "Queued", running: "Working", done: "Done", failed: "Stopped" };
+
+// One match in the list: the cover of its clip to post first, then what it is and how far review has got.
+export function JobLink({ id, title, sport, status, durationSec, clips, ready, approved, cover }: JobSummary) {
   return (
-    <Link href={`/studio/jobs/${id}`} className="press flex items-baseline justify-between gap-4 rounded-xl bg-grouped px-4 py-3 hover:bg-fill/60">
-      <span className="truncate text-footnote font-semibold">{title}</span>
-      <span className="num shrink-0 text-caption text-secondary">{status === "done" ? `${clips} clips` : status}</span>
+    <Link href={`/studio/jobs/${id}`} className="press group flex flex-col overflow-hidden rounded-xl bg-page ring-1 ring-separator/60 hover:ring-tint">
+      <div className="relative aspect-video bg-black">
+        {cover ? (
+          // eslint-disable-next-line @next/next/no-img-element -- a job's own file, served by the API, not a static asset
+          <img src={`/api/jobs/${id}/clips/${cover}/cover`} alt="" loading="lazy" className="size-full object-cover opacity-90 group-hover:opacity-100" />
+        ) : (
+          <span className="grid size-full place-items-center text-caption text-secondary">{status === "done" ? "No cover" : `${STATUS_LABEL[status]}…`}</span>
+        )}
+        <span className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[11px] font-semibold ${status === "done" ? "bg-black/60 text-white" : status === "failed" ? "bg-tally text-white" : "bg-tint text-white"}`}>
+          {STATUS_LABEL[status]}
+        </span>
+      </div>
+      <div className="px-3 py-2.5">
+        <p className="truncate text-footnote font-semibold">{title}</p>
+        <p className="num mt-0.5 truncate text-caption text-secondary">
+          {SPORT[sport].label}
+          {durationSec ? ` · ${matchClock(durationSec)}` : ""}
+          {clips ? ` · ${ready} of ${clips} clips` : ""}
+          {approved ? ` · ${approved} approved` : ""}
+        </p>
+      </div>
     </Link>
   );
 }

@@ -2,15 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { Job } from "@/lib/jobs/types";
+import type { JobSummary } from "@/lib/jobs/summary";
 import { JobLink } from "./job-view";
 import { TrySample } from "./try-sample";
 
-type Summary = Pick<Job, "id" | "title" | "status"> & { clips: number };
-
 // The library's way into the product as it is now: upload a match of your own, or open one already made.
 export function YourMatches() {
-  const [jobs, setJobs] = useState<Summary[] | null>(null);
+  const [jobs, setJobs] = useState<JobSummary[] | null>(null);
   useEffect(() => {
     fetch("/api/jobs", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : []))
@@ -33,8 +31,8 @@ export function YourMatches() {
         </div>
       </div>
       {jobs && jobs.length > 0 && (
-        <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {jobs.slice(0, 9).map((j) => (
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {jobs.slice(0, 12).map((j) => (
             <JobLink key={j.id} {...j} />
           ))}
         </div>

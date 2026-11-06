@@ -2,6 +2,7 @@ import { connection } from "next/server";
 import { CHUNK_BYTES, parseNewJob } from "@/lib/jobs/requests";
 import { recoverJobs } from "@/lib/jobs/runner";
 import { createJob, listJobs } from "@/lib/jobs/store";
+import { jobSummary } from "@/lib/jobs/summary";
 
 // GET lists the jobs on this server, newest first. POST starts one: the browser then sends the video in
 // CHUNK_BYTES pieces to /api/jobs/{id}/upload.
@@ -12,9 +13,7 @@ export async function GET() {
   await connection();
   await recoverJobs();
   const jobs = await listJobs();
-  return Response.json(
-    jobs.map((j) => ({ id: j.id, title: j.title, sport: j.sport, status: j.status, createdAt: j.createdAt, clips: j.clips.length, placements: j.placements })),
-  );
+  return Response.json(jobs.map(jobSummary));
 }
 
 export async function POST(request: Request) {
