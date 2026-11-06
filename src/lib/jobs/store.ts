@@ -33,6 +33,10 @@ export const jobFile = {
     if (!isClipId(clipId)) throw new Error(`Not a clip id: ${clipId}`);
     return path.join(jobDir(id), "clips", `${clipId}.mp4`);
   },
+  cover: (id: string, clipId: string) => {
+    if (!isClipId(clipId)) throw new Error(`Not a clip id: ${clipId}`);
+    return path.join(jobDir(id), "clips", `${clipId}.jpg`);
+  },
 };
 
 const STAGES: { id: StageId; label: string }[] = [

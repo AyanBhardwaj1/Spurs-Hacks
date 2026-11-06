@@ -17,7 +17,7 @@ Each stage saves `job.json`, so the page can follow along and a restart keeps fi
 | Find the moments | A rise of 6 dB or more over the minute before is a roar, placed at its onset. A commentary call is another signal: shared calls ("what a", "unbelievable") plus the sport's own ("wicket", "ace", "knockout", ...). Both together score highest. Roars closer than the sport's gap between plays are one moment. Edges snap to a camera cut within 3 s. | Audio or a transcript |
 | Plan | Each platform gets its own cut and its own number of moments. Every moment a platform passes on is kept with the reason. With a key, the model rewrites the hook, caption and title. | Nothing, or a key for copy |
 | Follow the play | For each moment that a vertical or square clip uses, the vision model marks where the play is once a second, and the measured camera pan carries the crop between marks. A cut lets the crop jump, and a pan-speed limit stops it jittering. The pan and cut rules are the hackathon's, shared in `focus.ts`. | `OPENAI_API_KEY`; otherwise the crop is centred |
-| Render | ffmpeg crops to the platform's shape, joins the segments, burns in the hook and the commentary as captions, and levels loudness to -14 LUFS at 48 kHz. | ffmpeg |
+| Render | ffmpeg crops to the platform's shape, joins the segments, burns in the hook and the commentary as captions, and levels loudness to -14 LUFS at 48 kHz. Then it makes the clip's cover: the frame where the play happens, cropped the same way, with the hook across the middle in large type. | ffmpeg |
 
 With no audio and no transcript, the job samples six evenly spaced moments and says so on each one.
 

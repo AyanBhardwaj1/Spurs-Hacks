@@ -2,7 +2,7 @@ import { readFile, stat } from "node:fs/promises";
 import { clipSrt, exportManifest, zipStored } from "@/lib/jobs/export";
 import { getJob, jobFile, jobWords } from "@/lib/jobs/store";
 
-// Every approved, rendered clip in one zip: the videos, their SRT captions, posts.txt with each post
+// Every approved, rendered clip in one zip: the videos, their covers, their SRT captions, posts.txt with each post
 // ready to paste, and manifest.json for a scheduling tool. ?all=1 takes every rendered clip instead.
 
 /** The zip is built in memory, so a job's export is capped. */
@@ -25,6 +25,7 @@ export async function GET(request: Request, ctx: RouteContext<"/api/jobs/[id]/ex
   const files: { name: string; data: Uint8Array }[] = [];
   for (const c of clips) {
     files.push({ name: `clips/${c.id}.mp4`, data: new Uint8Array(await readFile(/*turbopackIgnore: true*/ jobFile.clip(id, c.id))) });
+    if (c.render.cover) files.push({ name: `covers/${c.id}.jpg`, data: new Uint8Array(await readFile(/*turbopackIgnore: true*/ jobFile.cover(id, c.id))) });
     const srt = clipSrt(words, c.segments);
     if (srt) files.push({ name: `captions/${c.id}.srt`, data: enc.encode(srt) });
   }

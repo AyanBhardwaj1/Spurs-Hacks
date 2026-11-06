@@ -96,6 +96,7 @@ export function exportManifest(match: string, clips: JobClip[], moments: JobMome
       return {
         file: `${c.id}.mp4`,
         captions: `${c.id}.srt`,
+        ...(c.render.cover && { cover: `${c.id}.jpg` }),
         platform: p.platform,
         placement: p.placement,
         aspect: p.aspect,

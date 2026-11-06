@@ -206,7 +206,7 @@ function ClipCard({ jobId, clip, strength, editable, hasCaptions, durationSec, o
     <article className="flex flex-col rounded-[14px] bg-grouped p-3" data-decision={clip.decision?.value ?? "none"}>
       <div className={`${ASPECT_CLASS[PLACEMENTS[clip.placement].aspect]} max-h-[440px] overflow-hidden rounded-lg bg-black`}>
         {clip.render.state === "ready" ? (
-          <video src={src} controls playsInline preload="metadata" className="size-full object-contain" aria-label={clip.title} />
+          <video src={src} poster={clip.render.cover ? `${src}/cover` : undefined} controls playsInline preload="metadata" className="size-full object-contain" aria-label={clip.title} />
         ) : (
           <p className="grid size-full place-items-center p-4 text-center text-caption text-secondary">
             {clip.render.state === "failed" ? `Render failed: ${clip.render.error}` : clip.render.state === "rendering" ? "Rendering…" : "Waiting to render"}
@@ -233,6 +233,11 @@ function ClipCard({ jobId, clip, strength, editable, hasCaptions, durationSec, o
         {clip.render.state === "ready" && (
           <a href={`${src}?download=1`} className="press rounded-md text-caption font-semibold text-tint hover:underline">
             Download
+          </a>
+        )}
+        {clip.render.cover && (
+          <a href={`${src}/cover?download=1`} className="press rounded-md text-caption font-semibold text-tint hover:underline">
+            Cover
           </a>
         )}
         {hasCaptions && (

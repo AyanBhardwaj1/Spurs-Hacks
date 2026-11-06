@@ -6,6 +6,7 @@ import { PLACEMENTS } from "@/lib/rundown/platforms";
 import { defaultFont } from "@/lib/rundown/render";
 import { clipAss, captionEvents, fontFamily, renderArgs } from "./captions";
 import { anchorsFrom, ANCHOR_SCHEMA, ANCHOR_SYSTEM, isAnchorAnswer } from "./anchors";
+import { coverArgs, coverAss, coverTime } from "./cover";
 import { applyCopy, copyPrompt, COPY_SCHEMA, isCopyAnswer } from "./copy";
 import { findPeaks, settleAfter } from "./energy";
 import { cropShare, focusKeys, MOTION, motionSteps, type Anchor } from "./focus";
@@ -287,7 +288,7 @@ async function renderClips(id: string, clipIds: string[], source: string, words:
   for (const clipId of clipIds) {
     await updateJob(id, (j) => ({ ...j, clips: j.clips.map((c) => (c.id === clipId ? { ...c, render: { state: "rendering" } } : c)) }));
     const result = await renderOne(id, clipId, source, words, hasAudio, font).then(
-      (file) => ({ state: "ready" as const, file }),
+      ({ file, cover }) => ({ state: "ready" as const, file, ...(cover && { cover }) }),
       (err: Error) => ({ state: "failed" as const, error: err.message }),
     );
     if (result.state === "ready") ready += 1;
@@ -318,9 +319,21 @@ async function renderOne(id: string, clipId: string, source: string, words: Word
   const focus = job.moments.find((m) => m.id === clip.momentId)?.focus;
   const args = renderArgs({ source, segments: clip.segments, width: p.width, height: p.height, captions: "captions.ass", fontsDir: font ? path.dirname(font) : undefined, output, hasAudio, focus });
   const run = await runFfmpeg(args, { cwd: dir, timeoutMs: 900_000 });
+  if (run.code !== 0) {
+    await rm(dir, { recursive: true, force: true });
+    throw new Error(`ffmpeg failed: ${lastLine(run.stderr)}`);
+  }
+  // A cover is a bonus: without one the clip still ships, and the page shows its first frame instead.
+  const moment = job.moments.find((m) => m.id === clip.momentId);
+  const coverFile = jobFile.cover(id, clip.id);
+  await writeFile(path.join(dir, "cover.ass"), coverAss({ width: p.width, height: p.height, hook: clip.hook, font: font ? fontFamily(font) : "Arial" }));
+  const coverRun = await runFfmpeg(
+    coverArgs({ source, at: coverTime(moment, clip.segments), width: p.width, height: p.height, captions: "cover.ass", fontsDir: font ? path.dirname(font) : undefined, output: coverFile, focus }),
+    { cwd: dir, timeoutMs: 120_000 },
+  );
+  if (coverRun.code !== 0) console.warn(`[jobs] ${id} cover for ${clip.id} failed: ${lastLine(coverRun.stderr)}`);
   await rm(dir, { recursive: true, force: true });
-  if (run.code !== 0) throw new Error(`ffmpeg failed: ${lastLine(run.stderr)}`);
-  return path.basename(output);
+  return { file: path.basename(output), cover: coverRun.code === 0 ? path.basename(coverFile) : undefined };
 }
 
 /** Vision marks one frame a second; the camera's pan is measured five times a second between them. */

@@ -55,6 +55,10 @@ test.skipIf(!haveFfmpeg)(
       const expected = clip.placement === "tiktok" ? [1080, 1920] : [1280, 720];
       expect([out.width, out.height]).toEqual(expected);
       expect(out.hasAudio).toBe(true);
+      // ffmpeg reads a JPEG's size the same way it reads a video's.
+      expect(clip.render.cover).toBe(`${clip.id}.jpg`);
+      const cover = await probe(jobFile.cover(job.id, clip.id));
+      expect([cover.width, cover.height]).toEqual(expected);
     }
     expect(existsSync(jobFile.work(job.id))).toBe(false);
   },
