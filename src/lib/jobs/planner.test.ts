@@ -66,3 +66,18 @@ test("the highlights cut never plays the same footage twice", () => {
   const { clips } = planClips({ ...base, moments: [moment(1000, 1), moment(1020, 0.9)], placements: ["youtube-video"] });
   expect(clips[0].segments).toEqual([{ start: 985, end: 1030 }]);
 });
+
+test("a long roar keeps its cut going until the crowd settles, within each platform's limits", () => {
+  const long = moment(1000, 1, { settle: 25 });
+  const { clips } = planClips({ ...base, moments: [long], placements: ["tiktok", "x-video", "youtube-short"] });
+  const end = (p: string) => clips.find((c) => c.placement === p)!.segments[0].end;
+  expect(end("tiktok")).toBe(1018);
+  expect(end("x-video")).toBe(1010);
+  expect(end("youtube-short")).toBe(1026);
+  expect(clips.find((c) => c.placement === "tiktok")!.why).toContain("a second after the crowd settles");
+});
+
+test("a short roar ends the cut early, but never under the platform's shortest tail", () => {
+  const { clips } = planClips({ ...base, moments: [moment(1000, 1, { settle: 2 })], placements: ["tiktok", "x-video"] });
+  expect(clips.map((c) => c.segments[0].end)).toEqual([1006, 1004]);
+});

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { findPeaks, floorPerSecond, parseRmsPrint } from "./energy";
+import { findPeaks, floorPerSecond, parseRmsPrint, settleAfter } from "./energy";
 
 /** A flat -30 dB crowd with a rise to `db` for `width` seconds starting at each burst's second. */
 function crowd(seconds: number, bursts: { at: number; db: number; width?: number }[]) {
@@ -56,4 +56,22 @@ test("a moment is placed where the roar starts, not where it tops out", () => {
   const [p] = findPeaks(floor);
   expect(p.peak).toBe(301);
   expect(p.start).toBe(286);
+});
+
+test("a roar settles when the crowd falls most of the way back for two seconds", () => {
+  const floor = new Array<number>(600).fill(-30);
+  for (let s = 300; s < 320; s++) floor[s] = -15;
+  // A one-second swell at 321 s is still the same roar, so it settles at the quiet pair from 322 s.
+  floor[321] = -18;
+  expect(settleAfter(floor, 300)).toBe(22);
+  const short = new Array<number>(600).fill(-30);
+  for (let s = 300; s < 304; s++) short[s] = -15;
+  expect(settleAfter(short, 300)).toBe(4);
+});
+
+test("a roar that never settles before the end, or a flat crowd, has no answer", () => {
+  const floor = new Array<number>(330).fill(-30);
+  for (let s = 300; s < 330; s++) floor[s] = -15;
+  expect(settleAfter(floor, 300)).toBeUndefined();
+  expect(settleAfter(new Array(600).fill(-30), 300)).toBeUndefined();
 });

@@ -39,6 +39,8 @@ export type JobMoment = {
   title: string;
   /** The words spoken across the moment, if there is a transcript. */
   quote?: string;
+  /** Seconds after the peak until the crowd settled, when the audio showed it. Sets how long a cut runs on. */
+  settle?: number;
   /** Where a narrow crop centres over time, in source seconds; absent means centred. */
   focus?: FocusKey[];
 };

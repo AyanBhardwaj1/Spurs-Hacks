@@ -104,3 +104,24 @@ export function findPeaks(floor: number[]): Peak[] {
     };
   });
 }
+
+/** A roar has settled once the floor is back below this share of the way from baseline to its peak. */
+const SETTLE_SHARE = 0.4;
+const SETTLE_MAX_SEC = 60;
+
+/**
+ * Seconds after `peak` until the crowd settles: the first of two seconds in a row back under 40% of the
+ * way from the minute-before baseline to the roar's loudest. Undefined for no real roar, or one still
+ * going at the end of the video or a minute later.
+ */
+export function settleAfter(floor: number[], peak: number): number | undefined {
+  const before = floor.slice(Math.max(0, peak - BASELINE_FROM_SEC), Math.max(0, peak - BASELINE_TO_SEC));
+  const baseline = median(before.length ? before : floor);
+  const loudest = Math.max(...floor.slice(peak, peak + 11));
+  if (!Number.isFinite(loudest) || loudest - baseline < MIN_RISE_DB) return undefined;
+  const threshold = baseline + SETTLE_SHARE * (loudest - baseline);
+  for (let s = peak + 1; s + 1 < floor.length && s - peak <= SETTLE_MAX_SEC; s++) {
+    if (floor[s] < threshold && floor[s + 1] < threshold) return s - peak;
+  }
+  return undefined;
+}

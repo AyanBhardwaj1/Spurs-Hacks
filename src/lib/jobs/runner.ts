@@ -7,7 +7,7 @@ import { defaultFont } from "@/lib/rundown/render";
 import { clipAss, captionEvents, fontFamily, renderArgs } from "./captions";
 import { anchorsFrom, ANCHOR_SCHEMA, ANCHOR_SYSTEM, isAnchorAnswer } from "./anchors";
 import { applyCopy, copyPrompt, COPY_SCHEMA, isCopyAnswer } from "./copy";
-import { findPeaks } from "./energy";
+import { findPeaks, settleAfter } from "./energy";
 import { cropShare, focusKeys, MOTION, motionSteps, type Anchor } from "./focus";
 import { lastLine, runFfmpeg } from "./ffmpeg";
 import { audioPieces, crowdFloor, motionFrames, probe, sampledJpegs, sceneCuts } from "./media";
@@ -170,6 +170,11 @@ async function runStages(id: string) {
     const cuts = await sceneCuts(source, work);
     let value = fuseMoments({ durationSec: info.durationSec, peaks: findPeaks(floor), words, cuts });
     if (value.length === 0) value = samples(info.durationSec);
+    // How long each roar lasted decides how long its cuts run on.
+    value = value.map((m) => {
+      const settle = m.signals.includes("crowd") ? settleAfter(floor, Math.round(m.peak)) : undefined;
+      return settle === undefined ? m : { ...m, settle };
+    });
     await updateJob(id, (j) => ({ ...j, moments: value }));
     const signal = value.some((m) => m.signals.length) ? "" : ", sampled evenly because nothing stood out";
     return { value, detail: `${value.length} moments${signal}` };

@@ -23,14 +23,14 @@ With no audio and no transcript, the job samples six evenly spaced moments and s
 
 ## How each platform is cut
 
-The play comes before the crowd, so every short cut opens on the build-up and lands the roar in the first seconds people watch.
+The play comes before the crowd, so every short cut opens on the build-up and lands the roar in the first seconds people watch. Each runs on until a second after the crowd settles, so a long celebration is not cut off and a short roar does not drag; the length stays inside the range below.
 
 | Platform | Shape | Cut | Moments |
 | --- | --- | --- | --- |
-| TikTok | 9:16 | 18 s, opening 8 s before the roar | top 5 |
-| Instagram Reels | 9:16 | 18 s, opening 9 s before, short enough to loop | top 4 |
-| YouTube Shorts | 9:16 | 28 s, with the build-up and the reaction | top 4 |
-| X | 16:9 and 1:1 | 15 s, opening 10 s before | top 3 |
+| TikTok | 9:16 | opens 8 s before the roar, 14 to 26 s | top 5 |
+| Instagram Reels | 9:16 | opens 9 s before, 15 to 21 s, short enough to loop | top 4 |
+| YouTube Shorts | 9:16 | 22 to 44 s, with the build-up and the reaction | top 4 |
+| X | 16:9 and 1:1 | opens 10 s before, 14 to 20 s | top 3 |
 | YouTube | 16:9 | one highlights cut of the top 8 moments in match order | 1 |
 
 Captions keep to each platform's caption and hashtag limits from `src/lib/rundown/platforms.ts`, and burned-in text stays out of the bands each app covers with its own buttons. Moments scoring under 0.30 are left out everywhere. The rules are in `src/lib/jobs/planner.ts`; the tests next to it pin them.

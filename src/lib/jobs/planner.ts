@@ -11,7 +11,8 @@ const spec = (p: keyof typeof PLACEMENTS): Placement => PLACEMENTS[p];
 // lead: seconds before the roar the cut opens. The play comes before the crowd, so every short cut opens
 // on the build-up and lands the roar inside the first few seconds people watch.
 
-type Style = { name: string; count: number; lead: number; tail: number; why: (sec: number, lead: number) => string };
+/** tail is used when the roar's length is unknown; otherwise the cut runs one second past the crowd settling, held to minTail..maxTail. */
+type Style = { name: string; count: number; lead: number; tail: number; minTail: number; maxTail: number; why: (sec: number, lead: number) => string };
 
 const STYLE: Record<Exclude<JobPlacement, "youtube-video">, Style> = {
   tiktok: {
@@ -19,6 +20,8 @@ const STYLE: Record<Exclude<JobPlacement, "youtube-video">, Style> = {
     count: 5,
     lead: 8,
     tail: 10,
+    minTail: 6,
+    maxTail: 18,
     why: (sec, lead) => `TikTok decides in the first seconds, so this ${sec} s cut opens ${lead} s before the roar and ends while it is still loud.`,
   },
   "instagram-reel": {
@@ -26,6 +29,8 @@ const STYLE: Record<Exclude<JobPlacement, "youtube-video">, Style> = {
     count: 4,
     lead: 9,
     tail: 9,
+    minTail: 6,
+    maxTail: 12,
     why: (sec, lead) => `Reels loop, so this ${sec} s cut is short enough to watch twice and opens ${lead} s before the roar.`,
   },
   "youtube-short": {
@@ -33,6 +38,8 @@ const STYLE: Record<Exclude<JobPlacement, "youtube-video">, Style> = {
     count: 4,
     lead: 14,
     tail: 14,
+    minTail: 8,
+    maxTail: 30,
     why: (sec) => `Shorts give a moment more room: ${sec} s with the build-up, the roar and the reaction after it.`,
   },
   "x-video": {
@@ -40,6 +47,8 @@ const STYLE: Record<Exclude<JobPlacement, "youtube-video">, Style> = {
     count: 3,
     lead: 10,
     tail: 5,
+    minTail: 4,
+    maxTail: 10,
     why: (sec) => `X moves fast: ${sec} s of the play and the roar, posted while people are still talking about it.`,
   },
   "x-square": {
@@ -47,6 +56,8 @@ const STYLE: Record<Exclude<JobPlacement, "youtube-video">, Style> = {
     count: 3,
     lead: 10,
     tail: 5,
+    minTail: 4,
+    maxTail: 10,
     why: (sec) => `The same ${sec} s X cut in square, which fills more of a phone's timeline than widescreen.`,
   },
 };
@@ -140,8 +151,9 @@ export function planClips({ moments, placements, durationSec, sport, title }: Pl
         skipped.push({ momentId: m.id, placement, reason: `Ranked ${ordinal(i + 1)}; ${style.name} takes the top ${style.count}.` });
         return;
       }
+      const tail = m.settle === undefined ? style.tail : Math.min(style.maxTail, Math.max(style.minTail, m.settle + 1));
       const start = clamp(m.peak - style.lead, durationSec);
-      const end = Math.min(clamp(m.peak + style.tail, durationSec), start + max);
+      const end = Math.min(clamp(m.peak + tail, durationSec), start + max);
       const hook = hookOf(m);
       clips.push({
         id: `${placement}-${m.id}`,
@@ -151,7 +163,7 @@ export function planClips({ moments, placements, durationSec, sport, title }: Pl
         title: fit(m.title, spec(placement).titleLimit ?? 100),
         hook,
         ...copy(placement, hook, title, sport, m.peak),
-        why: style.why(Math.round(end - start), Math.round(m.peak - start)),
+        why: m.settle === undefined ? style.why(Math.round(end - start), Math.round(m.peak - start)) : `${style.why(Math.round(end - start), Math.round(m.peak - start)).replace(/ and ends while it is still loud/, "")} It ends a second after the crowd settles.`,
         render: { state: "waiting" },
       });
     });
