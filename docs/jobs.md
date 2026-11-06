@@ -23,7 +23,7 @@ With no audio and no transcript, the job samples six evenly spaced moments and s
 
 ### Sports
 
-A job names its sport, and `sports.ts` holds what changes with it: the commentary calls, the gap between two separate plays, and the hashtags. Thirteen are listed: soccer, basketball, American football, ice hockey, baseball, tennis, cricket, rugby, volleyball, boxing or MMA, motorsport, esports, and "another sport", which listens for every sport's calls. Fast sports get a short gap (8 s for tennis and volleyball, 10 s for basketball and esports), so back-to-back points stay separate clips; slow ones keep 20 to 25 s, so a long celebration stays one moment.
+A job names its sport, and `sports.ts` holds what changes with it: the commentary calls, the gap between two separate plays, and the hashtags. Thirteen are listed: soccer, basketball, American football, ice hockey, baseball, tennis, cricket, rugby, volleyball, boxing or MMA, motorsport, esports, and "another sport", which listens for every sport's calls. Fast sports get a short gap (8 s for tennis and volleyball, 10 s for basketball and esports), so back-to-back points stay separate clips; slow ones keep 20 to 25 s, so a long celebration stays one moment. Calls are matched in Spanish, Portuguese, French, German and Italian too ("golazo", "increíble", "incroyable", "was für ein Tor", "che gol"), since the transcript keeps the commentary's own language.
 
 ## How each platform is cut
 

@@ -21,7 +21,8 @@ const AGREE_BONUS = 0.3;
 const CALL_ONLY_SCORE = 0.45;
 const TITLE_WORDS = 6;
 
-const norm = (text: string) => text.toLowerCase().replace(/[^a-z0-9' ]/g, "");
+/** Lower case, letters in any alphabet kept, punctuation but the apostrophe dropped: "INCREÍBLE!" is "increíble". */
+const norm = (text: string) => text.toLowerCase().normalize("NFC").replace(/[^\p{L}\p{N}' ]/gu, "");
 
 /** Source seconds where a commentator makes one of the sport's calls, one per burst. */
 export function excitedCalls(words: Word[], sport: JobSport = "other"): { at: number }[] {

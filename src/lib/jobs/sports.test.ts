@@ -40,3 +40,10 @@ test("moments merge at the sport's gap, so back-to-back points stay separate in 
   expect(fuseMoments({ durationSec: 600, peaks, words: [], cuts: [] }).length).toBe(1);
   expect(fuseMoments({ durationSec: 600, peaks, words: [], cuts: [], sport: "tennis" }).length).toBe(2);
 });
+
+test("calls in Spanish, Portuguese, French, German and Italian count, accents and all", () => {
+  for (const line of ["qué golazo", "INCREÍBLE", "que golaço", "c'est incroyable", "was für ein Tor", "che gol"]) {
+    expect(excitedCalls(words(5, line), "soccer").length).toBe(1);
+  }
+  expect(excitedCalls(words(5, "el partido sigue tranquilo"), "soccer")).toEqual([]);
+});

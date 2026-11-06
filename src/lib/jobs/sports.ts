@@ -17,13 +17,19 @@ export type SportProfile = {
 export const SHARED_CALLS = [
   "what a", "oh my", "unbelievable", "incredible", "sensational", "stunning", "brilliant", "amazing", "wow",
   "he's done it", "she's done it", "they've done it", "look at that", "are you kidding", "you have to see",
+  // Spanish, Portuguese, French, German and Italian commentary, for the same moments.
+  "increíble", "impresionante", "espectacular", "qué jugada", "inacreditável", "que jogada", "incroyable", "magnifique",
+  "quelle action", "unglaublich", "wahnsinn", "was für ein", "incredibile", "fantastico", "che giocata",
 ];
 
 export const SPORT: Record<JobSport, SportProfile> = {
   soccer: {
     label: "Soccer",
     gapSec: 20,
-    calls: ["goal", "goals", "scores", "scored", "red card", "penalty", "save", "saves", "free kick", "header", "volley", "top corner", "off the bar"],
+    calls: [
+      "goal", "goals", "scores", "scored", "red card", "penalty", "save", "saves", "free kick", "header", "volley", "top corner", "off the bar",
+      "gol", "golazo", "golaço", "golo", "penalti", "pênalti", "tor", "elfmeter", "rigore", "parada", "arrêt",
+    ],
     tags: ["football", "soccer", "goal", "matchday", "highlights"],
   },
   basketball: {
