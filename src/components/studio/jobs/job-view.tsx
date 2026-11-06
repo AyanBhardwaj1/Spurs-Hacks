@@ -95,7 +95,12 @@ export function JobView() {
     <>
       <header className="mt-10 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-caption font-semibold uppercase tracking-[0.06em] text-secondary">Your match</p>
+          <p className="text-caption font-semibold uppercase tracking-[0.06em] text-secondary">
+            {SPORT[job.sport].label}
+            {job.language ? ` · posts in ${job.language}` : ""}
+            {job.replay ? " · with replays" : ""}
+            {job.brand?.logo ? " · with your logo" : ""}
+          </p>
           <h1 className="mt-1 text-[34px] font-semibold leading-tight tracking-tight">{job.title}</h1>
           {job.source && (
             <p className="num mt-1 text-footnote text-secondary">
@@ -637,7 +642,11 @@ function HookControl({ jobId, clip, onChange, onQueued }: Omit<ClipCardProps, "e
 
 // Approved clips, or every rendered clip, as one zip with captions, posts and a manifest.
 function ExportLinks({ job }: { job: Job }) {
-  const approved = job.clips.filter((c) => c.render.state === "ready" && c.decision?.value === "approved").length;
+  const [copied, setCopied] = useState(false);
+  const approvedClips = job.clips.filter((c) => c.render.state === "ready" && c.decision?.value === "approved");
+  const approved = approvedClips.length;
+  // Every approved post, headed by its platform, the way posts.txt in the zip has them.
+  const allPosts = () => approvedClips.map((c) => `${PLACEMENT_LABEL[c.placement]} · ${c.id}.mp4\n${postText(c)}`).join("\n\n");
   return (
     <div className="mt-5 flex flex-wrap items-center gap-3">
       {approved > 0 ? (
@@ -646,6 +655,11 @@ function ExportLinks({ job }: { job: Job }) {
         </a>
       ) : (
         <span className="text-caption text-secondary">Approve clips to download them together.</span>
+      )}
+      {approved > 0 && (
+        <button type="button" onClick={() => void navigator.clipboard?.writeText(allPosts()).then(() => setCopied(true))} className="press rounded-md text-caption font-semibold text-tint hover:underline">
+          {copied ? "Posts copied" : "Copy every approved post"}
+        </button>
       )}
       <a href={`/api/jobs/${job.id}/export?all=1`} className="press rounded-md text-caption font-semibold text-tint hover:underline">
         Download every clip
