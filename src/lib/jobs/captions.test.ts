@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { captionEvents, escapeFilterValue, renderArgs } from "./captions";
+import { captionEvents, escapeFilterValue, logoPlacement, renderArgs } from "./captions";
 
 const w = (text: string, start: number, end = start + 0.3) => ({ text, start, end });
 
@@ -76,6 +76,20 @@ test("a silent source still gets a replay, with silence long enough for it", () 
   expect(args).toContain("anullsrc=r=48000:cl=stereo");
   expect(args[args.indexOf("anullsrc=r=48000:cl=stereo") - 2]).toBe("24.000");
   expect(args[args.indexOf("-filter_complex") + 1]).toContain("concat=n=2:v=1:a=0");
+});
+
+test("a logo sits in the top corner, under the platform's top band, a set share of the width", () => {
+  expect(logoPlacement(1080, 1920, 0.1)).toEqual({ width: 151, x: 886, y: 235 });
+  expect(logoPlacement(1280, 720, 0.05)).toEqual({ width: 101, x: 1150, y: 65 });
+});
+
+test("the logo goes in as the last input and is laid over the picture before the captions", () => {
+  const args = renderArgs({ source: "s.mp4", segments: [{ start: 10, end: 20 }], replay: { start: 12, end: 15 }, width: 1080, height: 1920, captions: "c.ass", output: "o.mp4", hasAudio: false, logo: { file: "logo.png", width: 151, x: 886, y: 235 } });
+  expect(args.filter((a) => a === "-i").at(-1)).toBe("-i");
+  expect(args[args.lastIndexOf("-i") + 1]).toBe("logo.png");
+  const graph = args[args.indexOf("-filter_complex") + 1];
+  // Inputs: two cuts, the silent track, then the logo.
+  expect(graph).toContain("[3:v]scale=151:-1,format=rgba,colorchannelmixer=aa=0.9[logo];[vc][logo]overlay=886:235[vl];[vl]ass=c.ass");
 });
 
 test("each segment's crop follows its own stretch of the focus path, in that segment's time", () => {

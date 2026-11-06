@@ -92,6 +92,8 @@ export type Job = {
   placements: JobPlacement[];
   createdAt: string;
   status: "uploading" | "queued" | "running" | "done" | "failed";
+  /** The club's colour for the caption word being said, and whether a logo was uploaded to lay over every clip. */
+  brand?: { colour?: string; logo?: "png" | "jpg" };
   /** Whether short clips end with a slow-motion replay of their play. */
   replay?: boolean;
   /** Runs started for this job; a restart mid-run starts another, up to a limit. */

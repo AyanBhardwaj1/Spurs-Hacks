@@ -1,6 +1,6 @@
 import type { FocusKey } from "@/lib/studio/types";
 import { assDocument, assText, type AssStyle } from "./ass";
-import { escapeFilterValue } from "./captions";
+import { escapeFilterValue, logoFilter, type Logo } from "./captions";
 import { focusExpr } from "./focus";
 
 // A cover image for each clip, the frame a feed shows before anyone presses play: the moment's play,
@@ -25,15 +25,19 @@ export function coverAss({ width, height, hook, font }: { width: number; height:
   return assDocument(width, height, styles, hook.trim() ? [{ start: 0, end: 10, style: "Cover", text: assText(hook).toUpperCase(), layer: 1 }] : []);
 }
 
-type Cover = { source: string; at: number; width: number; height: number; captions: string; fontsDir?: string; output: string; focus?: FocusKey[] };
+type Cover = { source: string; at: number; width: number; height: number; captions: string; fontsDir?: string; output: string; focus?: FocusKey[]; logo?: Logo };
 
 /** ffmpeg arguments for one cover: seek to the play, crop and scale like the clip, burn in the hook. */
-export function coverArgs({ source, at, width: W, height: H, captions, fontsDir, output, focus = [] }: Cover): string[] {
+export function coverArgs({ source, at, width: W, height: H, captions, fontsDir, output, focus = [], logo }: Cover): string[] {
   const aspect = (W / H).toFixed(5);
   const near = focus.filter((k) => k.t >= at - 2 && k.t <= at + 2);
   const fonts = fontsDir ? `:fontsdir=${escapeFilterValue(fontsDir)}` : "";
-  const graph =
+  const picture =
     `crop=w='if(gt(a,${aspect}),ih*${aspect},iw)':h='if(gt(a,${aspect}),ih,iw/${aspect})':x='${focusExpr(near, at)}':y='(ih-oh)/2',` +
-    `scale=${W}:${H},setsar=1,ass=${captions}${fonts}`;
-  return ["-v", "error", "-ss", at.toFixed(3), "-i", source, "-frames:v", "1", "-vf", graph, "-q:v", "3", "-y", output];
+    `scale=${W}:${H},setsar=1`;
+  const head = ["-v", "error", "-ss", at.toFixed(3), "-i", source];
+  const tail = ["-frames:v", "1", "-q:v", "3", "-y", output];
+  if (!logo) return [...head, "-vf", `${picture},ass=${captions}${fonts}`, ...tail];
+  const graph = `[0:v]${picture}[base];${logoFilter(1, logo, "base", "vl")};[vl]ass=${captions}${fonts}[v]`;
+  return [...head, "-i", logo.file, "-filter_complex", graph, "-map", "[v]", ...tail];
 }

@@ -94,6 +94,20 @@ export const fontFamily = (file: string) =>
 /** Escapes a value inside a filtergraph option: ffmpeg reads `:` as the next option and `'` and `\` as quoting. */
 export const escapeFilterValue = (value: string) => value.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/:/g, "\\:");
 
+/** A logo's size and corner, in output pixels: top right, under the band the app covers, 14% of the short side. */
+export function logoPlacement(width: number, height: number, safeTop: number): { width: number; x: number; y: number } {
+  const base = Math.min(width, height);
+  const w = Math.round(base * 0.14);
+  const margin = Math.round(base * 0.04);
+  return { width: w, x: width - w - margin, y: Math.round(height * safeTop) + margin };
+}
+
+export type Logo = { file: string; width: number; x: number; y: number };
+
+/** The filter that lays a logo input over [in], slightly see-through, as [out]. */
+export const logoFilter = (input: number, logo: Logo, from: string, to: string) =>
+  `[${input}:v]scale=${logo.width}:-1,format=rgba,colorchannelmixer=aa=0.9[logo];[${from}][logo]overlay=${logo.x}:${logo.y}[${to}]`;
+
 type Render = {
   source: string;
   segments: Segment[];
@@ -109,10 +123,12 @@ type Render = {
   hasAudio?: boolean;
   /** Where a narrow crop centres, in source seconds. Without it the crop is centred. */
   focus?: FocusKey[];
+  /** A club logo laid over every frame. */
+  logo?: Logo;
 };
 
 /** ffmpeg arguments that cut, crop, join, caption and loudness-level one clip. Pure, so it can be tested. */
-export function renderArgs({ source, segments, replay, width: W, height: H, captions, fontsDir, output, hasAudio = true, focus = [] }: Render): string[] {
+export function renderArgs({ source, segments, replay, width: W, height: H, captions, fontsDir, output, hasAudio = true, focus = [], logo }: Render): string[] {
   const aspect = (W / H).toFixed(5);
   // The replay is one more input, played at half speed after the segments.
   const parts = replay ? [...segments, replay] : segments;
@@ -134,9 +150,11 @@ export function renderArgs({ source, segments, replay, width: W, height: H, capt
   } else {
     graph = `${video.join("")}${parts.map((_, i) => `[v${i}]`).join("")}concat=n=${parts.length}:v=1:a=0[vc];[${parts.length}:a]anull[aout];`;
   }
-  graph += `[vc]ass=${captions}${fonts}[vout]`;
+  // The logo is the last input: after the cuts and, for a silent source, the silent track.
+  const logoInput = parts.length + (hasAudio ? 0 : 1);
+  graph += logo ? `${logoFilter(logoInput, logo, "vc", "vl")};[vl]ass=${captions}${fonts}[vout]` : `[vc]ass=${captions}${fonts}[vout]`;
   return [
-    "-v", "error", ...inputs, ...silent,
+    "-v", "error", ...inputs, ...silent, ...(logo ? ["-i", logo.file] : []),
     "-filter_complex", graph, "-map", "[vout]", "-map", "[aout]",
     "-c:v", "libx264", "-preset", "veryfast", "-crf", "21", "-profile:v", "high",
     "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", "-shortest", "-y", output,

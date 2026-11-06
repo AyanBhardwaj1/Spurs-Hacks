@@ -8,17 +8,21 @@ import { DEFAULT_PLACEMENTS, JOB_PLACEMENTS, PLACEMENT_LABEL, SPORTS, type JobPl
 import { uploadFile } from "./upload";
 
 
+const DEFAULT_HIGHLIGHT = "#FFD60A";
+
 const mb = (bytes: number) => `${(bytes / 1024 ** 2).toFixed(bytes < 1024 ** 3 ? 0 : 1)} MB`;
 
 // Upload a match and choose where its clips go. The video goes up in chunks the server can resume, and
 // the page moves to the job as soon as the last chunk lands.
 export function NewJobForm() {
   const router = useRouter();
-  const ids = { title: useId(), sport: useId(), file: useId(), replay: useId() };
+  const ids = { title: useId(), sport: useId(), file: useId(), replay: useId(), colour: useId(), logo: useId() };
   const [title, setTitle] = useState("");
   const [sport, setSport] = useState<JobSport>("soccer");
   const [placements, setPlacements] = useState<JobPlacement[]>(DEFAULT_PLACEMENTS);
   const [replay, setReplay] = useState(false);
+  const [colour, setColour] = useState(DEFAULT_HIGHLIGHT);
+  const [logo, setLogo] = useState<File | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [dragging, setDragging] = useState(false);
   const [sent, setSent] = useState<number | null>(null);
@@ -36,10 +40,14 @@ export function NewJobForm() {
       const res = await fetch("/api/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title.trim(), sport, placements, replay, fileName: file.name, size: file.size }),
+        body: JSON.stringify({ title: title.trim(), sport, placements, replay, colour, fileName: file.name, size: file.size }),
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? `The server answered ${res.status}.`);
+      if (logo) {
+        const sent = await fetch(`/api/jobs/${body.job.id}/logo`, { method: "PUT", body: logo });
+        if (!sent.ok) throw new Error((await sent.json()).error ?? `The logo upload failed (${sent.status}).`);
+      }
       await uploadFile({ jobId: body.job.id, file, from: 0, chunkBytes: body.chunkBytes, onProgress: setSent });
       router.push(`/studio/jobs/${body.job.id}`);
     } catch (err) {
@@ -103,6 +111,31 @@ export function NewJobForm() {
               </button>
             );
           })}
+        </div>
+      </fieldset>
+
+      <fieldset className="grid gap-3">
+        <legend className="text-footnote font-semibold">Your brand</legend>
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+          <label htmlFor={ids.colour} className="flex items-center gap-2 text-footnote">
+            <input id={ids.colour} type="color" value={colour} onChange={(e) => setColour(e.target.value.toUpperCase())} className="size-9 cursor-pointer rounded-md bg-transparent" />
+            Caption highlight
+          </label>
+          <label htmlFor={ids.logo} className="flex items-center gap-2 text-footnote">
+            <span className="press inline-flex h-9 cursor-pointer items-center rounded-full border border-separator px-4 font-semibold hover:bg-fill">{logo ? "Change logo" : "Add a logo"}</span>
+            <span className="text-caption text-secondary">{logo ? logo.name : "PNG or JPEG, up to 2 MB. It sits in the top corner of every clip and cover."}</span>
+          </label>
+          <input
+            id={ids.logo}
+            type="file"
+            accept="image/png,image/jpeg"
+            className="sr-only"
+            onChange={(e) => {
+              const picked = e.target.files?.[0] ?? null;
+              setError(picked && picked.size > 2 * 1024 ** 2 ? "The logo is over 2 MB." : null);
+              setLogo(picked && picked.size <= 2 * 1024 ** 2 ? picked : null);
+            }}
+          />
         </div>
       </fieldset>
 

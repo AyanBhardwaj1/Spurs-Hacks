@@ -13,12 +13,12 @@ const maxUploadBytes = () => Number(process.env.RUNDOWN_MAX_UPLOAD_GB || 12) * 1
 const VIDEO_FILE = /\.(mp4|mov|m4v|mkv|webm|mts|ts)$/i;
 const TITLE_MAX = 120;
 
-export type NewJob = { title: string; sport: JobSport; placements: JobPlacement[]; fileName: string; size: number; replay?: boolean };
+export type NewJob = { title: string; sport: JobSport; placements: JobPlacement[]; fileName: string; size: number; replay?: boolean; colour?: string };
 type Parsed<T> = { ok: true; value: T } | { ok: false; error: string };
 
 export function parseNewJob(body: unknown): Parsed<NewJob> {
   if (typeof body !== "object" || body === null) return { ok: false, error: "Send a JSON body." };
-  const { title, sport, placements, fileName, size, replay } = body as Record<string, unknown>;
+  const { title, sport, placements, fileName, size, replay, colour } = body as Record<string, unknown>;
   if (typeof title !== "string" || !title.trim() || title.trim().length > TITLE_MAX) return { ok: false, error: `Give the match a title of 1 to ${TITLE_MAX} characters.` };
   if (!SPORTS.includes(sport as JobSport)) return { ok: false, error: `sport must be one of ${SPORTS.join(", ")}.` };
   if (!Array.isArray(placements) || placements.length === 0 || !placements.every((p) => JOB_PLACEMENTS.includes(p as JobPlacement))) {
@@ -28,7 +28,24 @@ export function parseNewJob(body: unknown): Parsed<NewJob> {
   if (typeof size !== "number" || !Number.isInteger(size) || size <= 0) return { ok: false, error: "size must be the file's size in bytes." };
   if (size > maxUploadBytes()) return { ok: false, error: `The file is over the ${maxUploadBytes() / 1024 ** 3} GB upload limit.` };
   if (replay !== undefined && typeof replay !== "boolean") return { ok: false, error: "replay must be true or false." };
-  return { ok: true, value: { title: title.trim(), sport: sport as JobSport, placements: [...new Set(placements as JobPlacement[])], fileName, size, ...(replay && { replay }) } };
+  if (colour !== undefined && (typeof colour !== "string" || !HEX.test(colour))) return { ok: false, error: "colour must be a hex colour such as #FFD60A." };
+  return {
+    ok: true,
+    value: { title: title.trim(), sport: sport as JobSport, placements: [...new Set(placements as JobPlacement[])], fileName, size, ...(replay && { replay }), ...(colour && { colour: colour.toUpperCase() }) },
+  };
+}
+
+const HEX = /^#[0-9a-f]{6}$/i;
+/** A logo is laid over every clip, so it stays small. */
+export const LOGO_MAX_BYTES = 2 * 1024 ** 2;
+
+/** A logo upload's type from its first bytes: PNG (which keeps transparency) or JPEG. */
+export function checkLogo(bytes: Uint8Array): Parsed<"png" | "jpg"> {
+  if (bytes.byteLength === 0 || bytes.byteLength > LOGO_MAX_BYTES) return { ok: false, error: "Upload a logo of at most 2 MB." };
+  const starts = (sig: number[]) => sig.every((b, i) => bytes[i] === b);
+  if (starts([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) return { ok: true, value: "png" };
+  if (starts([0xff, 0xd8, 0xff])) return { ok: true, value: "jpg" };
+  return { ok: false, error: "The logo must be a PNG or a JPEG." };
 }
 
 type ChunkCheck = { ok: true } | { ok: false; status: 400 | 409 | 413; received?: number; error?: string };

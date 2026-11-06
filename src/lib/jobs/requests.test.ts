@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { CHUNK_BYTES, checkChunk, parseAddPlacements, parseNewJob, parseRange, parseTrim, type NewJob } from "./requests";
+import { CHUNK_BYTES, checkChunk, checkLogo, parseAddPlacements, parseNewJob, parseRange, parseTrim, type NewJob } from "./requests";
 
 const valid: NewJob = { title: "City v United", sport: "soccer", placements: ["tiktok", "x-video"], fileName: "match.mp4", size: 2_000_000_000 };
 
@@ -61,4 +61,18 @@ test("added platforms must be known and new to the job", () => {
   expect(parseAddPlacements({ placements: ["tiktok"] }, ["tiktok"])).toMatchObject({ ok: false });
   expect(parseAddPlacements({ placements: ["myspace"] }, ["tiktok"])).toMatchObject({ ok: false });
   expect(parseAddPlacements({ placements: [] }, ["tiktok"])).toMatchObject({ ok: false });
+});
+
+test("a brand colour is a #RRGGBB hex, kept upper case", () => {
+  expect(parseNewJob({ ...valid, colour: "#ffd60a" })).toEqual({ ok: true, value: { ...valid, colour: "#FFD60A" } });
+  expect(parseNewJob({ ...valid, colour: "gold" })).toMatchObject({ ok: false });
+});
+
+test("a logo is a PNG or JPEG of at most 2 MB", () => {
+  const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0]);
+  const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0]);
+  expect(checkLogo(png)).toEqual({ ok: true, value: "png" });
+  expect(checkLogo(jpeg)).toEqual({ ok: true, value: "jpg" });
+  expect(checkLogo(new TextEncoder().encode("<svg></svg>"))).toMatchObject({ ok: false });
+  expect(checkLogo(new Uint8Array(2 * 1024 ** 2 + 1).fill(0x89))).toMatchObject({ ok: false });
 });

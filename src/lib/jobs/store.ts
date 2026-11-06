@@ -33,6 +33,7 @@ export const jobFile = {
     if (!isClipId(clipId)) throw new Error(`Not a clip id: ${clipId}`);
     return path.join(jobDir(id), "clips", `${clipId}.mp4`);
   },
+  logo: (id: string, type: "png" | "jpg") => path.join(jobDir(id), `logo.${type}`),
   cover: (id: string, clipId: string) => {
     if (!isClipId(clipId)) throw new Error(`Not a clip id: ${clipId}`);
     return path.join(jobDir(id), "clips", `${clipId}.jpg`);
@@ -71,6 +72,7 @@ export async function createJob(input: NewJob): Promise<Job> {
     sport: input.sport,
     placements: input.placements,
     ...(input.replay && { replay: true }),
+    ...(input.colour && { brand: { colour: input.colour } }),
     createdAt: new Date().toISOString(),
     status: "uploading",
     upload: { fileName: input.fileName, size: input.size, received: 0 },

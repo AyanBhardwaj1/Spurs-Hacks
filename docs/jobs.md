@@ -37,6 +37,8 @@ The play comes before the crowd, so every short cut opens on the build-up and la
 | X | 16:9 and 1:1 | opens 10 s before, 14 to 20 s | top 3 |
 | YouTube | 16:9 | one highlights cut of the top 8 moments in match order | 1 |
 
+Under "Your brand", pick the colour the caption word being said turns, and add a logo (PNG or JPEG, up to 2 MB). The logo sits in the top corner of every clip and cover, under the band each app covers, at 14% of the short side and slightly see-through. `PUT /api/jobs/{id}/logo` with the image as the body does the same; clips rendered afterwards carry it.
+
 Tick "End each short clip with a slow-motion replay" on upload and every short clip ends with the three seconds around its play again at half speed, sound slowed with it and labelled Replay, which adds 6 s to the lengths above. The replay sits inside the cut, so trimming a clip moves its replay with it; the YouTube highlights cut never has one.
 
 Captions keep to each platform's caption and hashtag limits from `src/lib/rundown/platforms.ts`, and burned-in text stays out of the bands each app covers with its own buttons. Moments scoring under 0.30 are left out everywhere. The YouTube highlights cut's description lists a chapter for each moment, so viewers can jump between them; YouTube shows chapters only with three or more, each at least 10 s long, so a shorter cut has none. The rules are in `src/lib/jobs/planner.ts`; the tests next to it pin them.

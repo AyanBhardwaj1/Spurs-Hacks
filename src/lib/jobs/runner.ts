@@ -4,7 +4,7 @@ import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { PLACEMENTS } from "@/lib/rundown/platforms";
 import { defaultFont } from "@/lib/rundown/render";
-import { clipAss, captionEvents, fontFamily, renderArgs } from "./captions";
+import { clipAss, captionEvents, fontFamily, logoPlacement, renderArgs } from "./captions";
 import { anchorsFrom, ANCHOR_SCHEMA, ANCHOR_SYSTEM, isAnchorAnswer } from "./anchors";
 import { coverArgs, coverAss, coverTime } from "./cover";
 import { applyCopy, copyPrompt, COPY_SCHEMA, isCopyAnswer } from "./copy";
@@ -316,12 +316,13 @@ async function renderOne(id: string, clipId: string, source: string, words: Word
     safeBottom: p.safeBottom,
     hook: clip.hook,
     font: font ? fontFamily(font) : "Arial",
-    captions: captionEvents(words, clip.segments, 3, { highlight: CAPTION_HIGHLIGHT }),
+    captions: captionEvents(words, clip.segments, 3, { highlight: job.brand?.colour ?? CAPTION_HIGHLIGHT }),
     ...(clip.replay && { replayAt: { start: clipSeconds({ segments: clip.segments }), end: clipSeconds(clip) } }),
   });
   await writeFile(path.join(dir, "captions.ass"), captions);
   const focus = job.moments.find((m) => m.id === clip.momentId)?.focus;
-  const args = renderArgs({ source, segments: clip.segments, replay: clip.replay, width: p.width, height: p.height, captions: "captions.ass", fontsDir: font ? path.dirname(font) : undefined, output, hasAudio, focus });
+  const logo = job.brand?.logo ? { file: jobFile.logo(id, job.brand.logo), ...logoPlacement(p.width, p.height, p.safeTop) } : undefined;
+  const args = renderArgs({ source, segments: clip.segments, replay: clip.replay, logo, width: p.width, height: p.height, captions: "captions.ass", fontsDir: font ? path.dirname(font) : undefined, output, hasAudio, focus });
   const run = await runFfmpeg(args, { cwd: dir, timeoutMs: 900_000 });
   if (run.code !== 0) {
     await rm(dir, { recursive: true, force: true });
@@ -332,7 +333,7 @@ async function renderOne(id: string, clipId: string, source: string, words: Word
   const coverFile = jobFile.cover(id, clip.id);
   await writeFile(path.join(dir, "cover.ass"), coverAss({ width: p.width, height: p.height, hook: clip.hook, font: font ? fontFamily(font) : "Arial" }));
   const coverRun = await runFfmpeg(
-    coverArgs({ source, at: coverTime(moment, clip.segments), width: p.width, height: p.height, captions: "cover.ass", fontsDir: font ? path.dirname(font) : undefined, output: coverFile, focus }),
+    coverArgs({ source, at: coverTime(moment, clip.segments), width: p.width, height: p.height, captions: "cover.ass", fontsDir: font ? path.dirname(font) : undefined, output: coverFile, focus, logo }),
     { cwd: dir, timeoutMs: 120_000 },
   );
   if (coverRun.code !== 0) console.warn(`[jobs] ${id} cover for ${clip.id} failed: ${lastLine(coverRun.stderr)}`);
