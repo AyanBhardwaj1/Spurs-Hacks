@@ -17,9 +17,18 @@ export async function POST(request: Request, ctx: RouteContext<"/api/jobs/[id]/m
   const placements = job.placements.filter((p) => !isMontage(p));
   if (placements.length === 0) return Response.json({ error: "This job only has montage cuts; add a short platform first." }, { status: 409 });
 
-  const moment = pickedMoment(parsed.value, await jobWords(id), job.source.durationSec, new Set(job.moments.map((m) => m.id)));
-  const { clips } = planClips({ moments: [moment], placements, durationSec: job.source.durationSec, sport: job.sport, title: job.title, replay: job.replay });
-  const next = await updateJob(id, (j) => ({ ...j, status: "queued", moments: [...j.moments, moment], clips: [...j.clips, ...clips] }));
-  enqueueRender(id, clips.map((c) => c.id), { writeCopy: true });
+  const words = await jobWords(id);
+  // The moment's id is chosen under the job's lock, from the moments as they are then, so two picks at
+  // once cannot both take it; a job that started rendering meanwhile refuses the second.
+  let clipIds: string[] = [];
+  const next = await updateJob(id, (j) => {
+    if (j.status !== "done" || !j.source) return j;
+    const moment = pickedMoment(parsed.value, words, j.source.durationSec, new Set(j.moments.map((m) => m.id)));
+    const { clips } = planClips({ moments: [moment], placements, durationSec: j.source.durationSec, sport: j.sport, title: j.title, replay: j.replay });
+    clipIds = clips.map((c) => c.id);
+    return { ...j, status: "queued", moments: [...j.moments, moment], clips: [...j.clips, ...clips] };
+  });
+  if (clipIds.length === 0) return Response.json({ error: "Pick a moment once the job has finished." }, { status: 409 });
+  enqueueRender(id, clipIds, { writeCopy: true });
   return Response.json(next, { status: 201 });
 }

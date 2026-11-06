@@ -59,6 +59,8 @@ if (logo) {
   await writeFile(jobFile.logo(job.id, logo.type), logo.bytes);
   await updateJob(job.id, (j) => ({ ...j, brand: { ...j.brand, logo: logo.type } }));
 }
+// A studio server sharing this data folder leaves the job to this process while it runs.
+await updateJob(job.id, (j) => ({ ...j, owner: { pid: process.pid } }));
 await adoptSource(job.id, size, `Read ${opts.video} from disk`);
 console.log(`Job ${job.id}: ${opts.title}, ${opts.sport}, for ${opts.placements.map((p) => PLACEMENT_LABEL[p]).join(", ")}`);
 
@@ -76,6 +78,7 @@ const report = async () => {
 const ticker = setInterval(() => void report(), 1000);
 await runJob(job.id).catch(() => undefined);
 clearInterval(ticker);
+await updateJob(job.id, (j) => ({ ...j, owner: undefined }));
 await report();
 
 const done = await getJob(job.id);

@@ -86,13 +86,25 @@ async function drain() {
  * Picks up after a restart, once per data folder: a job saved as queued or running that this process is
  * not running is started again from the top, until it has been interrupted MAX_ATTEMPTS times.
  */
+/** Whether another live process, such as the command line, is running this job. */
+function ownedElsewhere(job: Job) {
+  const pid = job.owner?.pid;
+  if (!pid || pid === process.pid) return false;
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function recoverJobs(): Promise<void> {
   const key = dataDir();
   let done = state.recovered.get(key);
   if (!done) {
     done = (async () => {
       for (const job of await listJobs()) {
-        if (isActive(job.id) || (job.status !== "queued" && job.status !== "running")) continue;
+        if (isActive(job.id) || (job.status !== "queued" && job.status !== "running") || ownedElsewhere(job)) continue;
         const attempts = job.attempts ?? 0;
         if (job.status === "running" && attempts >= MAX_ATTEMPTS) {
           await updateJob(job.id, (j) => ({ ...j, status: "failed", error: `The server stopped during this job ${attempts} times; it was not started again.` }));
@@ -255,7 +267,9 @@ async function runRender(id: string, clipIds: string[], writeCopy = false) {
     }
     if (openaiConfigured()) {
       // Clips of a moment nobody has followed yet, such as one only a new platform uses, get followed now.
-      const windows = cropWindows(job, info, (c) => clipIds.includes(c.id) && !job.moments.find((m) => m.id === c.momentId)?.focus);
+      // Windows are per moment, a montage's per segment; a moment already followed keeps its own, wider path.
+      const windows = cropWindows(job, info, (c) => clipIds.includes(c.id));
+      for (const m of job.moments) if (m.focus) windows.delete(m.id);
       await followMoments(id, source, windows);
     }
     const words = job.services.transcript ? await jobWords(id) : [];

@@ -5,6 +5,9 @@ import { getJob, updateJob } from "@/lib/jobs/store";
 // A producer swaps a clip's hook, one of its options or their own words, and the clip and its cover
 // render again with it. The earlier approval was for the old hook, so it is cleared. POST { hook }.
 
+/** Rule copy opens the caption with the hook; the model's own caption is left as it wrote it. */
+const swapLead = (caption: string, from: string, to: string) => (caption.startsWith(`${from} · `) ? `${to}${caption.slice(from.length)}` : caption);
+
 export async function POST(request: Request, ctx: RouteContext<"/api/jobs/[id]/clips/[clipId]/hook">) {
   const { id, clipId } = await ctx.params;
   const job = await getJob(id);
@@ -16,7 +19,7 @@ export async function POST(request: Request, ctx: RouteContext<"/api/jobs/[id]/c
   const next = await updateJob(id, (j) => ({
     ...j,
     status: "queued",
-    clips: j.clips.map((c) => (c.id === clipId ? { ...c, hook: parsed.value, decision: undefined, render: { state: "waiting" } } : c)),
+    clips: j.clips.map((c) => (c.id === clipId ? { ...c, hook: parsed.value, caption: swapLead(c.caption, c.hook, parsed.value), decision: undefined, render: { state: "waiting" } } : c)),
   }));
   enqueueRender(id, [clipId]);
   return Response.json(next.clips.find((c) => c.id === clipId));

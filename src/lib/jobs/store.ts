@@ -51,9 +51,12 @@ const STAGES: { id: StageId; label: string }[] = [
   { id: "render", label: "Render the clips" },
 ];
 
-// One process holds the jobs it runs; the JSON on disk is what a reload or a restart reads back.
-const memory = globalThis as unknown as { rundownJobs?: Map<string, Job> };
-const jobs = (memory.rundownJobs ??= new Map<string, Job>());
+// The JSON on disk is the truth; this process keeps each job it has read with the file's modified time, and
+// reads it again when another process (the command line, a second server) has written it since.
+const memory = globalThis as unknown as { rundownJobs?: Map<string, { job: Job; mtimeMs: number }> };
+const jobs = (memory.rundownJobs ??= new Map<string, { job: Job; mtimeMs: number }>());
+
+const mtimeOf = (id: string) => stat(/*turbopackIgnore: true*/ jobFile.json(id)).then((s) => s.mtimeMs, () => undefined);
 
 export async function saveJob(job: Job) {
   const file = jobFile.json(job.id);
@@ -62,7 +65,7 @@ export async function saveJob(job: Job) {
   const tmp = `${file}.${process.pid}.tmp`;
   await writeFile(tmp, JSON.stringify(job, null, 2));
   await rename(tmp, file);
-  jobs.set(job.id, job);
+  jobs.set(job.id, { job, mtimeMs: (await mtimeOf(job.id)) ?? 0 });
 }
 
 export async function createJob(input: NewJob): Promise<Job> {
@@ -90,12 +93,14 @@ export async function createJob(input: NewJob): Promise<Job> {
 
 export async function getJob(id: string): Promise<Job | undefined> {
   if (!isJobId(id)) return undefined;
+  const mtimeMs = await mtimeOf(id);
+  if (mtimeMs === undefined) return undefined;
   const hit = jobs.get(id);
-  if (hit) return hit;
+  if (hit && hit.mtimeMs === mtimeMs) return hit.job;
   try {
     // Job folders are run-time data under RUNDOWN_DATA_DIR, not code to trace into the build.
     const job = JSON.parse(await readFile(/*turbopackIgnore: true*/ jobFile.json(id), "utf8")) as Job;
-    jobs.set(id, job);
+    jobs.set(id, { job, mtimeMs });
     return job;
   } catch {
     return undefined;

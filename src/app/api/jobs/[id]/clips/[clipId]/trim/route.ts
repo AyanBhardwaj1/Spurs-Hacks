@@ -1,4 +1,4 @@
-import { replayWindow } from "@/lib/jobs/planner";
+import { highlightChapters, replayWindow } from "@/lib/jobs/planner";
 import { parseTrim } from "@/lib/jobs/requests";
 import { enqueueRender, isActive } from "@/lib/jobs/runner";
 import { getJob, updateJob } from "@/lib/jobs/store";
@@ -16,10 +16,17 @@ export async function POST(request: Request, ctx: RouteContext<"/api/jobs/[id]/c
   if (!parsed.ok) return Response.json({ error: parsed.error }, { status: 400 });
   // A replay follows the cut: it shows the play if the cut still holds it, or the nearest seconds that do.
   const peak = job.moments.find((m) => m.id === clip.momentId)?.peak ?? parsed.value[0].start;
+  // A highlights cut that is one segment keeps chapters, which move with its new start.
+  const [seg] = parsed.value;
+  const chapters = clip.chapters ? highlightChapters(job.moments.filter((m) => m.peak >= seg.start && m.peak <= seg.end), parsed.value) : [];
   const next = await updateJob(id, (j) => ({
     ...j,
     status: "queued",
-    clips: j.clips.map((c) => (c.id === clipId ? { ...c, segments: parsed.value, ...(c.replay && { replay: replayWindow(peak, parsed.value[0]) }), decision: undefined, render: { state: "waiting" } } : c)),
+    clips: j.clips.map((c) =>
+      c.id === clipId
+        ? { ...c, segments: parsed.value, ...(c.replay && { replay: replayWindow(peak, seg) }), chapters: chapters.length ? chapters : undefined, decision: undefined, render: { state: "waiting" } }
+        : c,
+    ),
   }));
   enqueueRender(id, [clipId]);
   return Response.json(next.clips.find((c) => c.id === clipId));

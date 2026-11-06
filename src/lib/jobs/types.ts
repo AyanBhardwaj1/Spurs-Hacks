@@ -105,6 +105,8 @@ export type Job = {
   language?: Language;
   /** Whether short clips end with a slow-motion replay of their play. */
   replay?: boolean;
+  /** The process running this job when it is not the server, such as the command line; the server leaves it alone while that process lives. */
+  owner?: { pid: number };
   /** Runs started for this job; a restart mid-run starts another, up to a limit. */
   attempts?: number;
   error?: string;

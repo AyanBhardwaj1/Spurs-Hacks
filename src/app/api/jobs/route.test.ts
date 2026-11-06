@@ -141,3 +141,47 @@ test("a new hook re-renders the clip and clears its approval", async () => {
   expect(saved.status).toBe("queued");
   expect((await send({ hook: "Again" })).status).toBe(409);
 });
+
+test("a swapped hook also opens the rule-written caption, and leaves a model-written one alone", async () => {
+  const hookRoute = await import("./[id]/clips/[clipId]/hook/route");
+  const swap = async (caption: string) => {
+    const { job } = await (await jobs.POST(new Request("http://localhost/api/jobs", { method: "POST", body: JSON.stringify({ title: "F", sport: "soccer", placements: ["tiktok"], fileName: "m.mp4", size: 1 }) }))).json();
+    await updateJob(job.id, (j) => ({
+      ...j,
+      status: "done",
+      clips: [{ id: "tiktok-m-30", momentId: "m-30", placement: "tiktok", segments: [{ start: 22, end: 40 }], title: "T", hook: "Listen to this crowd", caption, hashtags: [], why: "w", render: { state: "ready" } }],
+    }));
+    const res = await hookRoute.POST(new Request("http://localhost", { method: "POST", body: JSON.stringify({ hook: "Wait for it…" }) }), ctx({ id: job.id, clipId: "tiktok-m-30" }) as never);
+    return (await res.json()).caption;
+  };
+  expect(await swap("Listen to this crowd · 0:30 · F")).toBe("Wait for it… · 0:30 · F");
+  expect(await swap("A model's own words")).toBe("A model's own words");
+});
+
+test("a job file another process rewrote is read again, not served from memory", async () => {
+  const { getJob } = await import("@/lib/jobs/store");
+  const { writeFileSync, statSync, utimesSync } = await import("node:fs");
+  const { job } = await (await jobs.POST(new Request("http://localhost/api/jobs", { method: "POST", body: JSON.stringify({ title: "Before", sport: "soccer", placements: ["tiktok"], fileName: "m.mp4", size: 1 }) }))).json();
+  expect((await getJob(job.id))!.title).toBe("Before");
+  const file = path.join(dir, "jobs", job.id, "job.json");
+  writeFileSync(file, JSON.stringify({ ...job, title: "After" }));
+  const later = new Date(statSync(file).mtimeMs + 5000);
+  utimesSync(file, later, later);
+  expect((await getJob(job.id))!.title).toBe("After");
+});
+
+test("trimming a one-segment highlights cut moves its chapters with the new start", async () => {
+  const trim = await import("./[id]/clips/[clipId]/trim/route");
+  const { job } = await (await jobs.POST(new Request("http://localhost/api/jobs", { method: "POST", body: JSON.stringify({ title: "F", sport: "soccer", placements: ["youtube-video"], fileName: "m.mp4", size: 1 }) }))).json();
+  const m = (peak: number) => ({ id: `m-${peak}`, peak, start: peak - 15, end: peak + 10, score: 1, signals: ["crowd" as const], title: `Crowd erupts at ${peak}` });
+  await updateJob(job.id, (j) => ({
+    ...j,
+    status: "done",
+    source: { durationSec: 600, width: 1280, height: 720, fps: 25, hasAudio: true },
+    moments: [m(115), m(130), m(145)],
+    clips: [{ id: "youtube-video-highlights", momentId: "m-115", placement: "youtube-video", segments: [{ start: 100, end: 155 }], title: "T", hook: "H", caption: "C", hashtags: [], why: "w", render: { state: "ready" }, chapters: [{ at: 0, label: "a" }, { at: 15, label: "b" }, { at: 30, label: "c" }] }],
+  }));
+  const res = await trim.POST(new Request("http://localhost", { method: "POST", body: JSON.stringify({ start: 90, end: 155 }) }), ctx({ id: job.id, clipId: "youtube-video-highlights" }) as never);
+  expect(res.status).toBe(200);
+  expect((await res.json()).chapters.map((c: { at: number }) => c.at)).toEqual([0, 25, 40]);
+});

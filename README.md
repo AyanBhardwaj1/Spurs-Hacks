@@ -27,7 +27,7 @@ The same pipeline runs with no server and no browser:
 bun run rundown match.mp4 --sport tennis --platforms tiktok,x-video --replay --logo logo.png
 ```
 
-It prints each stage as it finishes, then copies every clip, its cover and captions, `posts.txt` and `manifest.json` to `rundown-match/` (or `--out`), and names the clip to post first on each platform. The job stays in the studio, where you can review, trim or add platforms. `bun run rundown` with no arguments lists the options.
+It prints each stage as it finishes, then copies every clip, its cover and captions, `posts.txt` and `manifest.json` to `rundown-match/` (or `--out`), and names the clip to post first on each platform. The job stays in the studio, where you can review, trim or add platforms; a studio server sharing the data folder leaves the job to the command line while it runs. `bun run rundown` with no arguments lists the options.
 
 ## Team and this repo
 
