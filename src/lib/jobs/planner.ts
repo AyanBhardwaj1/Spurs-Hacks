@@ -70,6 +70,30 @@ export function cutRange(placement: JobPlacement): { min: number; max: number; c
   return { min: s.lead + s.minTail, max: s.lead + s.maxTail, count: s.count };
 }
 
+/** YouTube shows chapters only when there are at least three, the first at 0:00, each 10 s or longer. */
+const CHAPTER_MIN = 3;
+const CHAPTER_SEC = 10;
+
+/**
+ * Chapters for a highlights cut, one per moment where it starts in the cut. A moment closer than 10 s to
+ * the one before shares its chapter. Empty when YouTube would not show them.
+ */
+export function highlightChapters(moments: JobMoment[], segments: { start: number; end: number }[]): { at: number; label: string }[] {
+  const chapters: { at: number; label: string }[] = [];
+  for (const m of [...moments].sort((a, b) => a.start - b.start)) {
+    let offset = 0;
+    for (const seg of segments) {
+      if (m.start < seg.end && m.peak >= seg.start) {
+        const at = Math.round(chapters.length === 0 ? 0 : offset + Math.max(0, m.start - seg.start));
+        if (chapters.length === 0 || at - chapters.at(-1)!.at >= CHAPTER_SEC) chapters.push({ at, label: m.title });
+        break;
+      }
+      offset += seg.end - seg.start;
+    }
+  }
+  return chapters.length >= CHAPTER_MIN ? chapters : [];
+}
+
 /** Moments under this score are noise for every platform. */
 const MIN_SCORE = 0.3;
 /** The highlights cut takes this many of the top moments, at most. */
@@ -128,6 +152,7 @@ export function planClips({ moments, placements, durationSec, sport, title }: Pl
         else if (seg.end > seg.start) segments.push(seg);
       }
       const sec = Math.round(segments.reduce((n, s) => n + s.end - s.start, 0));
+      const chapters = highlightChapters(top, segments);
       clips.push({
         id: `${placement}-highlights`,
         momentId: top[0].id,
@@ -138,6 +163,7 @@ export function planClips({ moments, placements, durationSec, sport, title }: Pl
         ...copy(placement, `${title}: the ${top.length} biggest moments`, title, sport, top[0].peak),
         why: `One ${sec} s highlights cut of the top ${top.length} moments in match order, for viewers who missed the game.`,
         render: { state: "waiting" },
+        ...(chapters.length > 0 && { chapters }),
       });
       strong.slice(HIGHLIGHTS_MOMENTS).forEach((m, i) =>
         skipped.push({ momentId: m.id, placement, reason: `Ranked ${ordinal(HIGHLIGHTS_MOMENTS + i + 1)}; the highlights cut takes the top ${HIGHLIGHTS_MOMENTS}.` }),

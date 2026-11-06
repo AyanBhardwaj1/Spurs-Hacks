@@ -37,7 +37,7 @@ The play comes before the crowd, so every short cut opens on the build-up and la
 | X | 16:9 and 1:1 | opens 10 s before, 14 to 20 s | top 3 |
 | YouTube | 16:9 | one highlights cut of the top 8 moments in match order | 1 |
 
-Captions keep to each platform's caption and hashtag limits from `src/lib/rundown/platforms.ts`, and burned-in text stays out of the bands each app covers with its own buttons. Moments scoring under 0.30 are left out everywhere. The rules are in `src/lib/jobs/planner.ts`; the tests next to it pin them.
+Captions keep to each platform's caption and hashtag limits from `src/lib/rundown/platforms.ts`, and burned-in text stays out of the bands each app covers with its own buttons. Moments scoring under 0.30 are left out everywhere. The YouTube highlights cut's description lists a chapter for each moment, so viewers can jump between them; YouTube shows chapters only with three or more, each at least 10 s long, so a shorter cut has none. The rules are in `src/lib/jobs/planner.ts`; the tests next to it pin them.
 
 ## After a job finishes
 

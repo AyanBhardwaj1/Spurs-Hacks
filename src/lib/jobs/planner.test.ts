@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { PLACEMENTS } from "@/lib/rundown/platforms";
-import { cutRange, planClips } from "./planner";
+import { cutRange, highlightChapters, planClips } from "./planner";
 import type { JobMoment } from "./types";
 
 const moment = (peak: number, score: number, extra: Partial<JobMoment> = {}): JobMoment => ({
@@ -86,4 +86,16 @@ test("each short-form platform's cut length runs from its shortest tail to its l
   expect(cutRange("tiktok")).toEqual({ min: 14, max: 26, count: 5 });
   expect(cutRange("youtube-short")).toEqual({ min: 22, max: 44, count: 4 });
   expect(cutRange("youtube-video")).toBeUndefined();
+});
+
+test("the highlights cut gets YouTube chapters: from 0:00, in cut time, at least 10 s apart", () => {
+  const m = (id: string, peak: number, start: number, title: string) => ({ id, peak, start, end: start + 25, score: 1, signals: ["crowd" as const], title });
+  const segments = [{ start: 100, end: 125 }, { start: 300, end: 330 }, { start: 600, end: 625 }];
+  const chapters = highlightChapters([m("a", 115, 100, "“what a goal” at 1:55"), m("b", 312, 300, "Crowd erupts at 5:12"), m("b2", 318, 305, "x"), m("c", 615, 600, "Crowd erupts at 10:15")], segments);
+  expect(chapters).toEqual([
+    { at: 0, label: "“what a goal” at 1:55" },
+    { at: 25, label: "Crowd erupts at 5:12" },
+    { at: 55, label: "Crowd erupts at 10:15" },
+  ]);
+  expect(highlightChapters([m("a", 115, 100, "a"), m("b", 312, 300, "b")], segments.slice(0, 2))).toEqual([]);
 });

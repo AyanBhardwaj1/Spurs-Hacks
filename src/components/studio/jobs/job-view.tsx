@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useId, useState } from "react";
 import { PLACEMENTS } from "@/lib/rundown/platforms";
 import { matchClock } from "@/lib/jobs/moments";
+import { postText } from "@/lib/jobs/post";
 import { JOB_PLACEMENTS, PLACEMENT_LABEL, type Job, type JobClip, type JobPlacement, type JobStage } from "@/lib/jobs/types";
 import { uploadFile } from "./upload";
 
@@ -161,7 +162,7 @@ function ClipCard({ jobId, clip, editable, hasCaptions, durationSec, onChange, o
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const src = `/api/jobs/${jobId}/clips/${clip.id}`;
-  const post = [clip.caption, ...clip.hashtags.map((h) => `#${h}`)].join(" ");
+  const post = postText(clip);
 
   async function decide(decision: "approved" | "rejected" | null) {
     setSaving(true);
@@ -193,7 +194,7 @@ function ClipCard({ jobId, clip, editable, hasCaptions, durationSec, onChange, o
       <p className="num mt-0.5 text-caption text-secondary">
         {length(clip)} s · from {matchClock(clip.segments[0].start)}
       </p>
-      <p className="mt-2 text-caption text-label/85 text-pretty">{post}</p>
+      <p className="mt-2 whitespace-pre-line text-caption text-label/85 text-pretty">{post}</p>
       <p className="mt-2 text-caption text-secondary text-pretty">{clip.why}</p>
       <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-2 pt-3">
         <button

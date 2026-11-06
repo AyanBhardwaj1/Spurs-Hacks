@@ -74,6 +74,8 @@ export type JobClip = {
   /** Why this cut suits this platform, in one sentence a producer can argue with. */
   why: string;
   render: { state: "waiting" | "rendering" | "ready" | "failed"; file?: string; error?: string };
+  /** YouTube chapters for a highlights cut: where each moment starts, in seconds into the cut. */
+  chapters?: { at: number; label: string }[];
   decision?: { value: ClipDecision; reason?: string; at: string };
 };
 

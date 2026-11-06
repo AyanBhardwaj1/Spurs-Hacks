@@ -1,5 +1,6 @@
 import { PLACEMENTS } from "@/lib/rundown/platforms";
 import { captionEvents } from "./captions";
+import { postText } from "./post";
 import type { JobClip, Word } from "./types";
 
 // Getting approved clips out of Rundown in one go: an SRT per clip for platforms that take a captions
@@ -101,7 +102,8 @@ export function exportManifest(match: string, clips: JobClip[]) {
         hook: c.hook,
         caption: c.caption,
         hashtags: c.hashtags,
-        post: [c.caption, ...c.hashtags.map((h) => `#${h}`)].join(" "),
+        post: postText(c),
+        ...(c.chapters && { chapters: c.chapters }),
         source: c.segments,
       };
     }),
