@@ -9,6 +9,7 @@ import { clipSeconds } from "@/lib/jobs/planner";
 import { postText } from "@/lib/jobs/post";
 import { postOrder, type Strength } from "@/lib/jobs/rank";
 import { JOB_PLACEMENTS, PLACEMENT_LABEL, type Job, type JobClip, type JobPlacement, type JobStage } from "@/lib/jobs/types";
+import { useReviewKeys } from "./review-keys";
 import { uploadFile } from "./upload";
 
 const POLL_MS = 2000;
@@ -30,6 +31,7 @@ export function JobView() {
   const [missing, setMissing] = useState(false);
   // Bumped when something outside the poll, such as a resumed upload, makes the job live again.
   const [pollKey, setPollKey] = useState(0);
+  useReviewKeys();
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/jobs/${id}`, { cache: "no-store" });
@@ -123,11 +125,18 @@ export function JobView() {
               </span>
               {s.label}
               <span className="sr-only">: {s.state}</span>
+              {took(s) && <span className="num ml-auto text-caption font-normal text-secondary">{took(s)}</span>}
             </p>
             {s.detail && <p className="mt-0.5 text-caption text-secondary">{s.detail}</p>}
           </li>
         ))}
       </ol>
+
+      {byPlacement.length > 0 && (
+        <p className="mt-10 text-caption text-secondary">
+          Review from the keyboard: <Kbd>J</Kbd> and <Kbd>K</Kbd> move between clips, <Kbd>A</Kbd> approves, <Kbd>R</Kbd> rejects, <Kbd>U</Kbd> undoes.
+        </p>
+      )}
 
       {byPlacement.map((g) => (
         <section key={g.placement} className="mt-12" aria-labelledby={`p-${g.placement}`}>
@@ -158,6 +167,15 @@ export function JobView() {
       {job.moments.length > 0 && <MomentsAndSkips job={job} />}
     </>
   );
+}
+
+const Kbd = ({ children }: { children: string }) => <kbd className="num rounded border border-separator bg-fill px-1.5 py-px text-caption font-semibold text-label">{children}</kbd>;
+
+/** How long a finished stage took, as "4 s" or "2 min 5 s"; nothing for a stage that has not finished. */
+function took(s: JobStage) {
+  if (!s.startedAt || !s.endedAt) return undefined;
+  const sec = Math.max(0, Math.round((Date.parse(s.endedAt) - Date.parse(s.startedAt)) / 1000));
+  return sec < 60 ? `${sec} s` : `${Math.floor(sec / 60)} min ${sec % 60} s`;
 }
 
 const ordinal = (n: number) => `${n}${n === 1 ? "st" : n === 2 ? "nd" : n === 3 ? "rd" : "th"}`;
@@ -204,7 +222,13 @@ function ClipCard({ jobId, clip, strength, editable, hasCaptions, durationSec, o
   }
 
   return (
-    <article className="flex flex-col rounded-[14px] bg-grouped p-3" data-decision={clip.decision?.value ?? "none"}>
+    <article
+      data-clip-card
+      tabIndex={-1}
+      aria-label={`${PLACEMENT_LABEL[clip.placement]}: ${clip.hook}`}
+      className="flex scroll-m-24 flex-col rounded-[14px] bg-grouped p-3 outline-none focus:ring-2 focus:ring-tint"
+      data-decision={clip.decision?.value ?? "none"}
+    >
       <div className={`${ASPECT_CLASS[PLACEMENTS[clip.placement].aspect]} max-h-[440px] overflow-hidden rounded-lg bg-black`}>
         {clip.render.state === "ready" ? (
           <video src={src} poster={clip.render.cover ? `${src}/cover` : undefined} controls playsInline preload="metadata" className="size-full object-contain" aria-label={clip.title} />
@@ -253,16 +277,16 @@ function ClipCard({ jobId, clip, strength, editable, hasCaptions, durationSec, o
         {clip.decision ? (
           <>
             <p className={`text-footnote font-semibold ${clip.decision.value === "approved" ? "text-go" : "text-label"}`}>{clip.decision.value === "approved" ? "Approved" : "Rejected"}</p>
-            <button type="button" disabled={saving} onClick={() => decide(null)} className="press rounded-md text-caption font-semibold text-tint hover:underline disabled:opacity-40">
+            <button type="button" data-shortcut="undo" disabled={saving} onClick={() => decide(null)} className="press rounded-md text-caption font-semibold text-tint hover:underline disabled:opacity-40">
               Undo
             </button>
           </>
         ) : (
           <>
-            <button type="button" disabled={saving} onClick={() => decide("approved")} aria-label={`Approve ${clip.title}`} className="press inline-flex h-8 items-center rounded-full bg-button px-3 text-caption font-semibold text-white hover:bg-button-hover disabled:opacity-40">
+            <button type="button" data-shortcut="approve" disabled={saving} onClick={() => decide("approved")} aria-label={`Approve ${clip.title}`} className="press inline-flex h-8 items-center rounded-full bg-button px-3 text-caption font-semibold text-white hover:bg-button-hover disabled:opacity-40">
               Approve
             </button>
-            <button type="button" disabled={saving} onClick={() => decide("rejected")} aria-label={`Reject ${clip.title}`} className="press inline-flex h-8 items-center rounded-full bg-fill px-3 text-caption font-semibold text-label hover:bg-separator disabled:opacity-40">
+            <button type="button" data-shortcut="reject" disabled={saving} onClick={() => decide("rejected")} aria-label={`Reject ${clip.title}`} className="press inline-flex h-8 items-center rounded-full bg-fill px-3 text-caption font-semibold text-label hover:bg-separator disabled:opacity-40">
               Reject
             </button>
           </>

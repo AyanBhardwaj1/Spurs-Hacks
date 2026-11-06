@@ -43,6 +43,8 @@ Captions keep to each platform's caption and hashtag limits from `src/lib/rundow
 
 ## After a job finishes
 
+Review from the keyboard: J and K move between clips in the order the page shows them, A approves and moves on, R rejects and moves on, U undoes. Each finished stage shows how long it took.
+
 Each platform's clips are shown in posting order, and the card says why: a clip's strength is half its moment's score, plus points for evidence the job has about the clip (the crowd and the commentary agreed, the hook quotes the commentary, the cut ends as the crowd settles, the crop follows the play or nothing is cropped, the clip is short enough to watch twice). It is a rule you can check, not a prediction of views. The rule is in `src/lib/jobs/rank.ts`, and the manifest in the zip carries each clip's place in the order.
 
 - **Adjust a cut.** On any single-moment clip, move the start and end a second at a time and render it again. The new edges must stay inside the video, run at least 3 s and keep to the platform's length limit. The clip's approval is cleared, since it was given for the old cut. `POST /api/jobs/{id}/clips/{clipId}/trim` with `{ start, end }`.
