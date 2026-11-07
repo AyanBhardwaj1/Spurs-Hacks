@@ -63,8 +63,14 @@ export async function saveJob(job: Job) {
   // No mkdir: createJob makes the folder, so a save that lands after a delete fails instead of bringing
   // the job back. Write then rename, so a poll never reads half a file.
   const tmp = `${file}.${process.pid}.tmp`;
-  await writeFile(tmp, JSON.stringify(job, null, 2));
-  await rename(tmp, file);
+  try {
+    await writeFile(tmp, JSON.stringify(job, null, 2));
+    await rename(tmp, file);
+  } catch (err) {
+    // A full disk fails the write part-way; the half file would only take more of the space that ran out.
+    await rm(tmp, { force: true });
+    throw err;
+  }
   jobs.set(job.id, { job, mtimeMs: (await mtimeOf(job.id)) ?? 0 });
 }
 

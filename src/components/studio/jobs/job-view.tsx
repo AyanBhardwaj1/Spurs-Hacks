@@ -330,10 +330,11 @@ function Preflight({ clip }: { clip: JobClip }) {
 
 const Kbd = ({ children }: { children: string }) => <kbd className="num rounded border border-separator bg-fill px-1.5 py-px text-caption font-semibold text-label">{children}</kbd>;
 
-/** How long a finished stage took, as "4 s" or "2 min 5 s"; nothing for a stage that has not finished. */
+/** How long a stage took, or has been running at the last poll, as "4 s" or "2 min 5 s". */
 function took(s: JobStage) {
-  if (!s.startedAt || !s.endedAt) return undefined;
-  const sec = Math.max(0, Math.round((Date.parse(s.endedAt) - Date.parse(s.startedAt)) / 1000));
+  if (!s.startedAt || (!s.endedAt && s.state !== "running")) return undefined;
+  const end = s.endedAt ? Date.parse(s.endedAt) : Date.now();
+  const sec = Math.max(0, Math.round((end - Date.parse(s.startedAt)) / 1000));
   return sec < 60 ? `${sec} s` : `${Math.floor(sec / 60)} min ${sec % 60} s`;
 }
 

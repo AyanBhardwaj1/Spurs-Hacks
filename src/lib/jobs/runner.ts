@@ -242,7 +242,7 @@ async function runStages(id: string) {
   });
 
   await stage(id, "render", async (job) => {
-    const ready = await renderClips(id, job.clips.map((c) => c.id), source, words, info.hasAudio);
+    const ready = await renderClips(id, job.clips.map((c) => c.id), source, words, info.hasAudio, { progress: true });
     return { value: undefined, detail: `${ready} of ${job.clips.length} rendered` };
   });
 
@@ -301,11 +301,16 @@ async function followMoments(id: string, source: string, windows: Map<string, { 
 }
 
 /** Renders the given clips one by one, recording each one's result. Returns how many are ready. */
-async function renderClips(id: string, clipIds: string[], source: string, words: Word[], hasAudio: boolean) {
+/** With progress, the render stage's line says which clip is rendering, so a long render does not look stuck. */
+async function renderClips(id: string, clipIds: string[], source: string, words: Word[], hasAudio: boolean, { progress = false } = {}) {
   const font = defaultFont();
   let ready = 0;
-  for (const clipId of clipIds) {
-    await updateJob(id, (j) => ({ ...j, clips: j.clips.map((c) => (c.id === clipId ? { ...c, render: { state: "rendering" } } : c)) }));
+  for (const [i, clipId] of clipIds.entries()) {
+    await updateJob(id, (j) => ({
+      ...j,
+      ...(progress && { stages: setStage(j.stages, "render", { detail: `Rendering ${i + 1} of ${clipIds.length}` }) }),
+      clips: j.clips.map((c) => (c.id === clipId ? { ...c, render: { state: "rendering" } } : c)),
+    }));
     const result = await renderOne(id, clipId, source, words, hasAudio, font).then(
       ({ file, cover, probe }) => ({ state: "ready" as const, file, ...(cover && { cover }), ...(probe && { probe }) }),
       (err: Error) => ({ state: "failed" as const, error: err.message }),
